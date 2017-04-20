@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+{% block title %}添加数据{% endblock %}
+{% block content %}
+    <script>
+     function shopdata() {
+      shop_name = $.trim($("select[name=shop_name]").val());
+      money = $.trim($("input[name=sale_money]").val());
+     data_date=$.trim($("input[name=data_date]").val());
+               $.ajax(
+             {
+                 url:"{% url 'check' %}",
+                 type:"get",
+                 data:{shop_name:shop_name,money:money,data_date:data_date},
+                 datetype:"json",
+                 success:function(data) {
+                        window.location.reload();
+
+
+                    }
+             }
+
+     )
+
+
+
+ }
+function edit_event(event_id)
+			{
+                $("#"+event_id).append('<form action="/update_diff/" class="edit_input_box"><input type="hidden" size="50" name="diff_id" class="itembox" value="'+event_id+'"><input type="text" size="50" name="diff_new"  class="itembox" >&nbsp;<input type="submit" value="确定" class="edit btn btn-success"></form>');
+              $("#"+event_id+"edit").attr("disabled",true);
+                $("#"+event_id+"cansle").attr("disabled",false);
+            };
+function ablebtn(btnid) {
+     $("#"+btnid+"edit").attr("disabled",false);
+    $("#"+btnid+"cansle").attr("disabled",true);
+};
+
+
+    </script>
+<div class="container">
+ <!-- 弹出添加店铺上报数据 -->
+
+<p>
+    <button class="btn btn-info" data-toggle="modal" data-target="#diffmodal-data" type="button">店铺上报数据</button>
+</p>
+{% csrf_token %}
+<form action="{% url 'upsysamout' %}" enctype="multipart/form-data" method="post">
+    <div >
+       </div>
+         <div >
+             <input type="date" name="exceldate">
+             <input type="file" class="input-group"  name="excelfile" >
+             <button class="btn btn-danger">提交系统数据</button>
+         </div>
+</form>
+
+
+<!-- 店铺添加弹窗内容 -->
+<div class="modal  " id="diffmodal-data" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+     <div class="modal-dialog">
+         <div class="modal-content">
+             <div class="modal-header">
+                 <button type="button" class="close" data-dismiss="modal">
+                     <span aria-hidden="true">×</span>
+                     <span class="sr-only">Close</span>
+                 </button>
+                 <h4 class="modal-title text-center">请输入以下信息</h4>
+             </div>
+
+             <div class="modal-body ">
+                   <div class="container">
+                       <form class="form-group col-md-5" method="get" action="{% url 'addshop'%}" id="form_data">
+
+                           <div class="input-group">
+                                <span class="input-group-addon">店铺名称</span>
+                               <select class="form-control" name="shop_name">
+                                   {% for shop in shop_list %}
+                                       <option value="{{ shop.Id }}">{{ shop.sName }}</option>
+                                   {% endfor %}
+                               </select>
+                           </div>
+                           <br>
+                        <div class="input-group">
+                              <span class="input-group-addon">日&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;期</span>
+                              <input type="date" class="form-control" name="data_date" id="data_date"  >
+                          </div>
+                           <br>
+
+                           <div class="input-group">
+                               <span  class="input-group-addon">销售金额</span>
+                              <input type="text" class="form-control" name="sale_money" >
+                           </div>
+
+                      </form>
+                   </div>
+             </div>
+             <div class="modal-footer">
+                 <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                 <button type="submit" class="btn btn-primary" id="save_button" onclick="shopdata()" >提交 </button>
+             </div>
+
+         </div>
+     </div>
+</div>
+<!--添加数据弹窗-->
+<p>&nbsp;</p>
+
+
+<!--页面主体内容-->
+   <table class="table table-hover table-bordered">
+       <tr class="active">
+         <td>店铺</td>
+         <td>日期</td>
+         <td>系统金额</td>
+         <td>上报金额</td>
+         <td>差异金额</td>
+           <td>差异原因</td>
+          <td>操作</td>
+       </tr>
+       {% for d in diff %}
+           <tr class="success">
+              <td>{{ d.id_shop.sysName }}</td>
+              <td>{{ d.date }}</td>
+              <td>{{ d.sys_amount }}</td>
+               <td>{{ d.shop_amount }}</td>
+               <td>{{ d.amount }}</td>
+               <td id="{{ d.id }}">{{ d.diff}}</td>
+              <td >
+                  <button class="delete btn btn-warning" value="{{ d.id }}"  onclick="edit_event({{ d.id }})" id="{{ d.id }}edit" >编辑</button>
+                  <button class="delete btn " value="{{ d.id }}"  onclick="ablebtn({{ d.id }})" id="{{ d.id }}cansle" disabled="true" >取消</button>
+              </td>
+           </tr>
+       {% endfor %}
+   </table>
+   </div>
+{% endblock %}

@@ -1,0 +1,221 @@
+{% extends 'base.html' %}
+{% block title %}店铺一览表{% endblock %}
+{% block content %}
+
+
+    <script>
+    function add_info() {
+        sys_name = $.trim($("input[name=sys_name]").val());
+        s_name = $.trim($("input[name=s_name]").val());
+        area = $.trim($("select[name=area]").val());
+        sale_manager = $.trim($("select[name=salemanager]").val());
+        shoptype = $.trim($("select[name=shoptye]").val());
+        shopstate = $.trim($("select[name=shopState]").val());
+        malltype=$.trim($("input[name=mallType]").val());
+        shopadd=$.trim($("input[name=shopAddress]").val());
+        openningdate=$.trim($("input[name=openningdate]").val());
+        contractBeDate=$.trim($("input[name=contractBeginDate]").val());
+        contractEDate=$.trim($("input[name=contractEndDate]").val());
+        var form_data = {
+            sys_name: sys_name,
+            s_name: s_name,
+            area: area,
+            shoptype: shoptype,
+            sale_manager: sale_manager,
+            shopadd:shopadd,
+            malltype:malltype,
+            shopstate:shopstate,
+            openingdate:openningdate,
+            contractBegindate:contractBeDate,
+            contractEndDate:contractEDate,
+
+        };
+
+        $.ajax(
+                {
+                   url:"{% url 'addshop' %}",
+                   type:"get",
+                   data:form_data,
+                   datatype:'json',
+                    success:function (data) {
+                        alert (data.sava_message);
+
+
+                    }
+                }
+        );
+    }
+
+    </script>
+    <div class="container">
+
+ <!-- 弹出添加店铺窗口 -->
+<button class="btn btn-success" data-toggle="modal" data-target="#mymodal-data" type="button">添加店铺</button>
+<!-- 店铺添加弹窗内容 -->
+<div class="modal  " id="mymodal-data" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+     <div class="modal-dialog">
+         <div class="modal-content">
+             <div class="modal-header">
+                 <button type="button" class="close" data-dismiss="modal">
+                     <span aria-hidden="true">×</span>
+                     <span class="sr-only">Close</span>
+                 </button>
+                 <h4 class="modal-title text-center">请输入以下信息</h4>
+             </div>
+
+             <div class="modal-body ">
+                   <div class="container">
+                       <form class="form-group col-md-5" method="get" action="{% url 'addshop'%}" id="form_data">
+                           <div class="input-group">
+                                <span class="input-group-addon">系统名称</span>
+                                <input type="text" class="form-control" name="sys_name">
+                           </div>
+                           <br>
+                           <div class="input-group">
+                                <span class="input-group-addon">店铺名称</span>
+                                <input type="text" class="form-control" name="s_name">
+                           </div>
+                           <br>
+
+                           <div class="input-group">
+                               <span class="input-group-addon">所属大区</span>
+                               <select class="form-control" name="area">
+                                  <option value="" selected>------</option>
+                                  {% for area in area_list %}
+                                      <option name="{{ area.id }}" value="{{ area.id }}">{{ area.name }}</option>
+                                   {% endfor %}
+                           </select>
+                           </div>
+                           <br>
+
+                         <div class="input-group">
+                               <span class="input-group-addon">销售经理</span>
+                               <select class="form-control" name="salemanager">
+                                   <option value="" selected>------</option>
+                                   {% for man in man_list %}
+                                     <option id="{{ man.id }}" value="{{ man.id }}">{{ man.name }}</option>
+                                   {% endfor %}
+                               </select>
+                           </div>
+                           <br>
+
+                       <div class="input-group">
+                              <span class="input-group-addon">经营状态</span>
+                               <select class="form-control selected" name="shopState">
+                                   <option value="" selected>------</option>
+                                   <option value="S">正常营业</option>
+                                   <option VALUE="Z">装修</option>
+                                   <option value="C">撤店</option>
+                                   <option value="P">暂停整改</option>
+                             </select>
+                          </div>
+                           <br>
+
+                          <div class="input-group">
+                              <span class="input-group-addon">经营方式</span>
+                               <select class="form-control" name="shoptye">
+                                   <option value="" selected>------</option>
+                                   <option value="D">直营</option>
+                                   <option VALUE="A">代理</option>
+                                   <option value="J">加盟</option>
+                                   <option value="C">承包</option>
+                             </select>
+                          </div>
+                           <br>
+
+                       <div class="input-group">
+                              <span class="input-group-addon">店铺地址</span>
+                            <input type="text" class="form-control" name="shopAddress">
+                          </div>
+                           <br>
+
+                        <div class="input-group">
+                              <span class="input-group-addon">卖场类型</span>
+                              <input type="text" class="form-control" name="mallType">
+                          </div>
+                           <br>
+
+                        <div class="input-group">
+                              <span class="input-group-addon">开业时间</span>
+                              <input type="date" class="form-control" name="openningdate" placeholder="请输入店铺开业时间,格式为2016-01-01">
+                          </div>
+                           <br>
+
+                           <div class="input-group">
+                               <span  class="input-group-addon">合同开始时间</span>
+                              <input type="date" class="form-control" name="contractBeginDate" placeholder="请输入店铺合同开始时间,格式为2016-01-01">
+                           </div><br>
+                           <div class="input-group">
+                               <span class="input-group-addon" >合同截至时间</span>
+                               <input type="date" class="form-control" name="contractEndDate" placeholder="请输入店铺合同结束时间,格式为2016-01-01">
+                           </div>
+
+                      </form>
+                   </div>
+             </div>
+             <div class="modal-footer">
+                 <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                 <button type="submit" class="btn btn-primary" id="save_button" onclick="add_info()" >提交 </button>
+             </div>
+
+         </div>
+     </div>
+</div>
+    <p>&nbsp;</p>
+       <table class="table table-hover table-bordered">
+              <tr class="active">
+               <td>店铺名称</td>
+               <td>销售经理</td>
+               <td>职务</td>
+               <td>区域</td>
+                  <td>地址</td>
+                  <td>店铺类型</td>
+                  <td>营业状态</td>
+           </tr>
+
+           {% for s in shop_list %}
+               <tr class="success">
+                  <td id="{{ s.Id }}">{{ s.sysName }}</td>
+                  <td>{{ s.managerId.name }}</td>
+                  <td id="{{ s.managerId_id.name }}"><a href="#" rel="drevil">{{ s.managerId.title }}</a></td>
+                  <td>{{ s.areaId.name }}</td>
+                  <td>{{ s.shopAddress }}</td>
+               <td>{{ s.get_shopType_display }}</td>
+               <td>{{ s.get_state_display }}</td>
+               </tr>
+           {% endfor %}
+
+       </table>
+
+    </div>
+    <!--鼠标划过销售经理名字后显示信息-->
+    <script>
+   $(function(){
+        $("[rel=drevil]").popover({
+            trigger:'manual',
+            placement : 'bottom', //placement of the popover. also can use top, bottom, left or right
+            title : '<div style="text-align:center; color:red; text-decoration:underline; font-size:14px;"> '+ $(this).parent().prev().text()+'</div>', //this is the top title bar of the popover. add some basic css
+            html: 'true', //needed to show html of course
+            content : '<div id="popOverBox"><img src="http://www.hd-report.com/wp-content/uploads/2008/08/mr-evil.jpg" width="251" height="201" /></div>', //this is the content of the html box. add the image here or anything you want really.
+            animation: false
+        }).on("mouseenter", function () {
+                    var _this = this;
+                    $(this).popover("show");
+                    $(this).siblings(".popover").on("mouseleave", function () {
+                        $(_this).popover('hide');
+                    });
+                }).on("mouseleave", function () {
+                   <!--设置鼠标离开后弹窗可保持的时间 单位毫秒-->
+                    var _this = this;
+                    setTimeout(function () {
+                        if (!$(".popover:hover").length) {
+                            $(_this).popover("hide")
+                        }
+                    }, 1000);
+                });
+	});
+    </script>
+    <!--鼠标划过销售经理名字后显示信息-->
+
+
+{% endblock %}

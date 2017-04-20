@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}差异检查{% endblock %}
+{% block content %}
+    <div class="container">
+     <table class=table>
+         <tr>
+             <td>店铺</td>
+             <td>日期</td>
+             <td>系统数</td>
+             <td>店铺上报</td>
+             <td>差异</td>
+         </tr>
+         {% for s in df %}
+         <tr>
+             <td>{{ s.shopname  }}</td>
+             <td>{{ s.date }}</td>
+             <td>{{ s.sys_data }}</td>
+             <td>{{ s.shop_data }}</td>
+             <td>{{ s.cy }}</td>
+
+         </tr>
+         {% endfor %}
+     </table>
+    </div>
+
+{% endblock %}

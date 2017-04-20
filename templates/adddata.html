@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}店铺上报数据{% endblock %}
+{% block content %}
+   <div class="container">
+
+   <div class=" col-lg-6 col-lg-offset-4">
+       <h1 class="c">店铺上报数据</h1>
+   </div>
+    <form action="{% url 'addshop' %}" method="post" class="form-group">
+        {% csrf_token %}
+     <table class="table">
+         <tr>
+             <td>日期：{{ form.date }}</td>
+             <td>店铺：{{ form.id_shop }}</td>
+             <td>金额：{{ form.amount }}</td>
+             <td><button type="submit">提交</button></td>
+         </tr>
+     </table>
+    </form>
+
+   <table class="table">
+       <tr>
+         <td>店铺</td>
+         <td>日期</td>
+         <td>金额</td>
+       </tr>
+       {% for d in shop_data %}
+           <tr>
+              <td>{{ d.id_shop__sys_name }}</td>
+              <td>{{ d.date| date:"Y-m-d " }}</td>
+              <td>{{ d.amount }}</td>
+           </tr>
+       {% endfor %}
+   </table>
+   </div>
+{% endblock %}
