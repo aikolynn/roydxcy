@@ -8,7 +8,7 @@ urlpatterns = [
     # url(r'^blog/', include('blog.urls')),
 
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^shop/',shop,name='shop'),
+    url(r'^/',shop,name='shop'),
     url(r'^addshop/', addshop, name='addshop'),
     url(r'^update_diff/', update_diff, name='update_diff'),
     url(r'^upsysamout/',excelindb,name='upsysamout'),
