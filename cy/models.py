@@ -32,6 +32,7 @@ class Area(models.Model):
         db_table='area'
     def __unicode__(self):
         return  self.name
+
 shopState=(
     ('S', u'正常营业'),
     ('Z',u'装修'),

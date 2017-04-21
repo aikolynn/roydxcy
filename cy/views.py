@@ -40,7 +40,8 @@ def addshop(req):
                               state=shopstate)
 
     return JsonResponse(sava_message)
-#展示数据并填写差异原因
+
+
 
 def addcheckdata(req):
     sava_message = {"sava_message": "提交成功"}
