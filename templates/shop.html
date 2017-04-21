@@ -45,10 +45,134 @@
                 }
         );
     }
-
+function add_manager() {
+  manager_name=$.trim($("input[name=s_name]"));
+}
+function add_area() {
+    area_name=$.trim($("input[name=area_name]"));
+    area_manager=$.trim($("select[name=area_manager]"));
+    $.ajax(
+            {
+                url:"{% url 'addshop' %}",
+                type:"get",
+                data:{"area_name":area_name,"action":"area","area_manager":area_manager}
+                datatype:'json',
+                success:function (data) {
+                    window.location.reload()
+                }
+            }
+    )
+}
     </script>
     <div class="container">
+<button class="btn btn-success" data-toggle="modal" data-target="#mymodal-data" type="button">添加人员</button>
+   <!-- 添加人员 -->
+<div class="modal  " id="mymodal-data" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+     <div class="modal-dialog">
+         <div class="modal-content">
+             <div class="modal-header">
+                 <button type="button" class="close" data-dismiss="modal">
+                     <span aria-hidden="true">×</span>
+                     <span class="sr-only">关闭</span>
+                 </button>
+                 <h4 class="modal-title text-center">请输入以下信息</h4>
+             </div>
+             <div class="modal-body ">
+                   <div class="container">
+                       <form class="form-group col-md-5"  id="manager_data">
+                           <div class="input-group">
+                                <span class="input-group-addon">姓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;名</span>
+                                <input type="text" class="form-control" name="s_name">
+                           </div>
+                           <br>
+                           <div class="input-group">
+                                <span class="input-group-addon">私人手机</span>
+                                <input type="text" class="form-control" name="personal_phone">
+                           </div>
+                           <br>
+                         <div class="input-group">
+                               <span class="input-group-addon">公司手机</span>
+                               <input type="text" class="form-control" name="c_phone">
+                           </div>
+                           <br>
+                           <div class="input-group">
+                               <span class="input-group-addon">电子邮箱</span>
+                               <input type="text" class="form-control" name="s_email">
+                           </div>
+                           <br>
+                           <div class="input-group">
+                               <span class="input-group-addon">&nbsp;&nbsp;&nbsp;&nbsp;QQ&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                               <input type="text" class="form-control" name="s_qq">
+                           </div>
+                           <br>
+                             <div class="input-group">
+                               <span class="input-group-addon">职&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;务</span>
+                               <input type="text" class="form-control" name="s_title">
+                           </div>
+                           <br>
+                             <div class="input-group">
+                               <span class="input-group-addon">通讯地址</span>
+                               <input type="text" class="form-control" name="s_address">
+                           </div>
+                           <br>
+                      </form>
+                   </div>
+             </div>
+             <div class="modal-footer">
+                 <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                 <button type="submit" class="btn btn-primary" id="save_button" onclick="add_manager()"  name="manager">提交 </button>
+             </div>
 
+         </div>
+     </div>
+</div>
+  <!-- 添加人员窗口 -->
+
+
+  <button class="btn btn-success" data-toggle="modal" data-target="#mymodal-data" type="button">添加区域</button>
+   <!-- 添加区域 -->
+<div class="modal  " id="mymodal-data" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+     <div class="modal-dialog">
+         <div class="modal-content">
+             <div class="modal-header">
+                 <button type="button" class="close" data-dismiss="modal">
+                     <span aria-hidden="true">×</span>
+                     <span class="sr-only">关闭</span>
+                 </button>
+                 <h4 class="modal-title text-center">请输入以下信息</h4>
+             </div>
+
+             <div class="modal-body ">
+                   <div class="container">
+                       <form class="form-group col-md-5" method="get"  id="area_data">
+
+                           <div class="input-group">
+                                <span class="input-group-addon">区域名称</span>
+                                <input type="text" class="form-control" name="area_name">
+                           </div>
+                           <br>
+                         <div class="input-group">
+                               <span class="input-group-addon">区域负责人</span>
+                               <select class="form-control" name="area_manager">
+                                   <option value="" selected>------</option>
+                                   {% for man in man_list %}
+                                     <option id="{{ man.id }}" value="{{ man.id }}">{{ man.name }}</option>
+                                   {% endfor %}
+                               </select>
+                           </div>
+                           <br>
+                      </form>
+                   </div>
+             </div>
+             <div class="modal-footer">
+                 <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                 <button type="submit" class="btn btn-primary" id="save_button" onclick="add_area()"  name="area">提交 </button>
+             </div>
+
+         </div>
+     </div>
+</div>
+  <!-- 添加区域窗口 -->
  <!-- 弹出添加店铺窗口 -->
 <button class="btn btn-success" data-toggle="modal" data-target="#mymodal-data" type="button">添加店铺</button>
 <!-- 店铺添加弹窗内容 -->
