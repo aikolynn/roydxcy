@@ -80,11 +80,14 @@ def excelindb(request):
     destination.close()
     excel_data = openpyxl.load_workbook("static/upload/"+excel_date+".xlsx")
     sheetnames = excel_data.get_sheet_names()
-    excel_sheets=excel_data.get_sheet_by_name(sheetnames[2])
+    excel_sheets=excel_data.get_sheet_by_name(sheetnames[0])
     excel_rows=excel_sheets.max_row
     excel_columns=excel_sheets.max_column
     print excel_rows,excel_columns
-    for i in range(1,excel_rows+1):
-        for j in range(1,excel_columns+1):
-            print excel_sheets.cell(row=i,column=j).value
+    for i in range(2,excel_rows+1):
+        j=1
+        # sys_diff = (float(excel_sheets.cell(row=i, column=j + 1).value),excel_date,
+        #                     excel_sheets.cell(row=i, column=j).value)
+        sys_diff=datadiff(sys_amount=float(excel_sheets.cell(row=i, column=j + 1).value),date=excel_date,id_shop=ShopInfo.objects.get(sName=excel_sheets.cell(row=i,column=j).value))
+        sys_diff.save()
     return render(request,'checkdata.html',sava_message)
