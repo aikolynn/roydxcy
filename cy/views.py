@@ -41,7 +41,17 @@ def addshop(req):
 
     return JsonResponse(sava_message)
 
-
+def addinfo(req):
+    sava_message = {"sava_message": "保存成功"}
+    action=req.GET["action"]
+    if action=="manager":
+        Managers.objects.bulk_create(
+            name=req.GET["manager_name"],
+            personal_cellphone=req.GET["manger_phone"],
+            company_cellphone=req.GET["manager_c_phone"],
+            qq=req.GET["manager_qq"],
+        )
+    return JsonResponse(sava_message)
 
 def addcheckdata(req):
     sava_message = {"sava_message": "提交成功"}
