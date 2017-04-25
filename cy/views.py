@@ -43,23 +43,65 @@ def addshop(req):
 
 def addinfo(req):
     sava_message = {"sava_message": "保存成功"}
-    action=req.GET["action"]
-    if action=="manager":
-        Managers.objects.bulk_create(
-            name=req.GET["manager_name"],
-            personal_cellphone=req.GET["manger_phone"],
-            company_cellphone=req.GET["manager_c_phone"],
-            qq=req.GET["manager_qq"],
+    action=req.GET['action']
+   #判断添加信息类型：manager--添加人员信息 area--添加区域信息 shopinfo--添加店铺信息
+   #添加人员信息
+    if action=='manager':
+        Managers.objects.create(
+            name=req.GET['manager_name'],
+            personal_cellphone=req.GET['manager_phone'],
+            company_cellphone=req.GET['manager_c_phone'],
+            qq=req.GET['manager_qq'],
+            title=req.GET['manager_title'],
+            email=req.GET['manger_email'],
+            address=req.GET['manager_address']
         )
+     #添加区域信息
+    elif action=='area':
+        manager_name=Managers.objects.get(id=req.GET['area_manager'])
+        print manager_name
+        Area.objects.create(
+            manager=manager_name,
+            name=req.GET["area_name"]
+        )
+     #添加店铺信息
+    elif action=="shopinfo" :
+        sys_name = req.GET['sys_name']
+        s_name = req.GET['s_name']
+        sale_manager = Managers.objects.get(id=req.GET['sale_manager'])
+        aree = Area.objects.get(id=req.GET['area'])
+        shoptype = req.GET['shoptype']
+        malltype = req.GET['malltype']
+        opendate = req.GET['openingdate']
+        shopadd = req.GET['shopadd']
+        conbengin = req.GET['contractBegindate']
+        conEnd = req.GET['contractEndDate']
+        shopstate = req.GET['shopstate']
+        ShopInfo.objects.create(sysName=sys_name,
+                                sName=s_name,
+                                managerId=sale_manager,
+                                areaId=aree,
+                                shopType=shoptype,
+                                mallType=malltype,
+                                openingDate=opendate,
+                                shopAddress=shopadd,
+                                contractBeginDate=conbengin,
+                                contractEndDate=conEnd,
+                                state=shopstate)
     return JsonResponse(sava_message)
 
 def addcheckdata(req):
     sava_message = {"sava_message": "提交成功"}
     shopname=ShopInfo.objects.get(Id=req.GET["shop_name"])
     data_date=req.GET["data_date"]
-    money = float(req.GET["money"])
-    create_list=datadiff(date=data_date,shop_amount=money,id_shop=shopname)
-    create_list.save()
+    if datadiff.objects.get(date=data_date,id_shop=shopname):
+        money = float(req.GET["money"])
+        datadiff.objects.filter(date=data_date,id_shop=shopname).update(shop_amount=money)
+    else:
+        money = float(req.GET["money"])
+        create_list = datadiff(date=data_date, shop_amount=money, id_shop=shopname)
+        create_list.save()
+
     return JsonResponse(sava_message)
 
 #获取数据

@@ -27,13 +27,13 @@
             shopstate:shopstate,
             openingdate:openningdate,
             contractBegindate:contractBeDate,
-            contractEndDate:contractEDate,
-
+            contractEndDate: contractEDate,
+            action: "shopinfo",
         };
 
         $.ajax(
                 {
-                   url:"{% url 'addshop' %}",
+                   url:"{% url 'addinfo' %}",
                    type:"get",
                    data:form_data,
                    datatype:'json',
@@ -46,28 +46,55 @@
         );
     }
 function add_manager() {
-  manager_name=$.trim($("input[name=s_name]"));
+  manager_name=$.trim($("input[name=s_name]").val());
+  manager_phone=$.trim($("input[name=personal_phone]").val());
+  manager_c_phone=$.trim($("input[name=c_phone]").val());
+  manager_email=$.trim($("input[name=s_email]").val());
+  manager_qq=$.trim($("input[name=s_qq]").val());
+  manager_title=$.trim($("input[name=s_title]").val());
+  manager_address=$.trim($("input[name=s_address]").val());
+  $.ajax(
+          {
+              url:"{% url 'addinfo' %}",
+              type:"get",
+              data:
+              {
+                  "action":"manager",
+                  "manager_name":manager_name,
+                  "manager_phone":manager_phone,
+                  "manager_c_phone":manager_c_phone,
+                  "manger_email":manager_email,
+                  "manager_title":manager_title,
+                  "manager_qq":manager_qq,
+                  "manager_address":manager_address,
+
+              },
+              success:function (data) {
+                  window.location.reload();
+              }
+          }
+  )  ;
 }
 function add_area() {
-    area_name=$.trim($("input[name=area_name]"));
-    area_manager=$.trim($("select[name=area_manager]"));
+    area_name=$.trim($("input[name=area_name]").val());
+    area_manager=$.trim($("select[name=area_manager]").val());
     $.ajax(
             {
-                url:"{% url 'addshop' %}",
+                url:"{% url 'addinfo' %}",
                 type:"get",
-                data:{"area_name":area_name,"action":"area","area_manager":area_manager}
+                data:{"area_name":area_name,"action":"area","area_manager":area_manager},
                 datatype:'json',
                 success:function (data) {
                     window.location.reload()
                 }
             }
-    )
+    );
 }
     </script>
     <div class="container">
-<button class="btn btn-success" data-toggle="modal" data-target="#mymodal-data" type="button">添加人员</button>
+<button class="btn btn-success" data-toggle="modal" data-target="#mymodal-manager" type="button">添加人员</button>
    <!-- 添加人员 -->
-<div class="modal  " id="mymodal-data" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+<div class="modal  " id="mymodal-manager" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
      <div class="modal-dialog">
          <div class="modal-content">
              <div class="modal-header">
@@ -129,9 +156,9 @@ function add_area() {
   <!-- 添加人员窗口 -->
 
 
-  <button class="btn btn-success" data-toggle="modal" data-target="#mymodal-data" type="button">添加区域</button>
+  <button class="btn btn-success" data-toggle="modal" data-target="#mymodal-area" type="button">添加区域</button>
    <!-- 添加区域 -->
-<div class="modal  " id="mymodal-data" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+<div class="modal  " id="mymodal-area" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
      <div class="modal-dialog">
          <div class="modal-content">
              <div class="modal-header">

@@ -89,6 +89,12 @@ class datadiff(models.Model):
         else:
             self.amount = self.sys_amount - self.shop_amount
         return super(datadiff,self).save(*args,**kwargs)
+    def update(self,*args,**kwargs):
+        if not self.pk:
+            self.amount = self.sys_amount - self.shop_amount
+        else:
+            self.amount = self.sys_amount - self.shop_amount
+        return super(datadiff, self).update(*args, **kwargs)
     #
     # def __unicode__(self):
     #
