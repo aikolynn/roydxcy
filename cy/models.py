@@ -83,19 +83,11 @@ class datadiff(models.Model):
         verbose_name=u'差异表'
         verbose_name_plural=verbose_name
         db_table = 'datadiff'
+    #覆写save方法，保存数据时amount=sys_aount-shop_amount
     def save(self,*args,**kwargs):
         if not self.pk:
             self.amount=self.sys_amount-self.shop_amount
         else:
             self.amount = self.sys_amount - self.shop_amount
         return super(datadiff,self).save(*args,**kwargs)
-    def update(self,*args,**kwargs):
-        if not self.pk:
-            self.amount = self.sys_amount - self.shop_amount
-        else:
-            self.amount = self.sys_amount - self.shop_amount
-        return super(datadiff, self).update(*args, **kwargs)
-    #
-    # def __unicode__(self):
-    #
-    #      return self.diff
+

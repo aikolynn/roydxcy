@@ -1,7 +1,7 @@
 #coding=utf-8
 
 from django.shortcuts import render,HttpResponseRedirect,redirect,HttpResponse
-from models import  Area,Managers,ShopInfo
+from models import  *
 from forms import *
 from django.http import JsonResponse
 # Create your views here.
@@ -89,19 +89,23 @@ def addinfo(req):
                                 contractEndDate=conEnd,
                                 state=shopstate)
     return JsonResponse(sava_message)
-
+def update_amount(update):
+    pass
 def addcheckdata(req):
     sava_message = {"sava_message": "提交成功"}
     shopname=ShopInfo.objects.get(Id=req.GET["shop_name"])
     data_date=req.GET["data_date"]
-    if datadiff.objects.get(date=data_date,id_shop=shopname):
-        money = float(req.GET["money"])
-        datadiff.objects.filter(date=data_date,id_shop=shopname).update(shop_amount=money)
+    shop_amount_report = float(req.GET["money"])
+    #根据data_date和shopname查询是否存在记录，如存在则更新，否则新建
+    if datadiff.objects.filter(date=data_date,id_shop=shopname).count():
+        #获取原有记录中的sys_amount
+        sys_amount_exists=datadiff.objects.get(date=data_date, id_shop=shopname).sys_amount
+        #更新记录中的shop_amount和amount
+        datadiff.objects.filter(date=data_date, id_shop=shopname).update(shop_amount=shop_amount_report,amount=sys_amount_exists-shop_amount_report)
     else:
-        money = float(req.GET["money"])
-        create_list = datadiff(date=data_date, shop_amount=money, id_shop=shopname)
-        create_list.save()
 
+        create_list = datadiff(date=data_date, shop_amount=shop_amount_report, id_shop=shopname)
+        create_list.save()
     return JsonResponse(sava_message)
 
 #获取数据
@@ -136,10 +140,18 @@ def excelindb(request):
     excel_rows=excel_sheets.max_row
     excel_columns=excel_sheets.max_column
     print excel_rows,excel_columns
+    #循环读取每行数据然后写入数据库
     for i in range(2,excel_rows+1):
         j=1
-        # sys_diff = (float(excel_sheets.cell(row=i, column=j + 1).value),excel_date,
-        #                     excel_sheets.cell(row=i, column=j).value)
-        sys_diff=datadiff(sys_amount=float(excel_sheets.cell(row=i, column=j + 1).value),date=excel_date,id_shop=ShopInfo.objects.get(sName=excel_sheets.cell(row=i,column=j).value))
-        sys_diff.save()
+        #excel表格从第二行开始读取，每行第一列为店铺名
+        shop_id=ShopInfo.objects.get(sName=(excel_sheets.cell(row=i,column=j).value))
+        #每行第二列为系统金额
+        sys_amount_excel=float(excel_sheets.cell(row=i,column=j+1).value)
+        #根据时间（excel_date）和店铺名称（shop_id）来判断记录是否存在，如果存在更新原有记录，否则新建记录
+        if datadiff.objects.filter(date=excel_date, id_shop=shop_id).count():
+            shop_amount_excel = datadiff.objects.get(date=excel_date, id_shop=shop_id).shop_amount
+            datadiff.objects.filter(date=excel_date, id_shop=shop_id).update(sys_amount=sys_amount_excel, amount=sys_amount_excel-shop_amount_excel)
+        else:
+            sys_diff=datadiff(sys_amount=sys_amount_excel,date=excel_date,id_shop=shop_id)
+            sys_diff.save()
     return render(request,'checkdata.html',sava_message)
