@@ -48,6 +48,10 @@ function ablebtn(btnid) {
     <div >
        </div>
          <div >
+             请选择上传数据的类型:<select name="upinfo_type">
+                 <option value="diff">差异上传</option>
+                 <option value="staff">人员信息上传</option>
+             </select>
              <input type="date" name="exceldate">
              <input type="file" class="input-group"  name="excelfile" >
              <button class="btn btn-danger">提交系统数据</button>
@@ -69,7 +73,7 @@ function ablebtn(btnid) {
 
              <div class="modal-body ">
                    <div class="container">
-                       <form class="form-group col-md-5" method="get" action="{% url 'addshop'%}" id="form_data">
+                       <form class="form-group col-md-5" method="get"  id="form_data">
 
                            <div class="input-group">
                                 <span class="input-group-addon">店铺名称</span>
@@ -109,12 +113,13 @@ function ablebtn(btnid) {
 <!--页面主体内容-->
    <table class="table table-hover table-bordered">
        <tr class="active">
-         <td>店铺</td>
-         <td>日期</td>
-         <td>系统金额</td>
-         <td>上报金额</td>
-         <td>差异金额</td>
+           <td>店&nbsp;&nbsp;铺</td>
+           <td>日&nbsp;&nbsp;期</td>
+           <td>系统金额</td>
+           <td>上报金额</td>
+           <td>差异金额</td>
            <td>差异原因</td>
+           <td>备&nbsp;&nbsp;注</td>
           <td>操作</td>
        </tr>
        {% for d in diff %}
@@ -125,6 +130,7 @@ function ablebtn(btnid) {
                <td>{{ d.shop_amount }}</td>
                <td>{{ d.amount }}</td>
                <td id="{{ d.id }}">{{ d.diff}}</td>
+               <td id="{{ d.id }}">{{ d.remark}}</td>
               <td >
                   <button class="delete btn btn-warning" value="{{ d.id }}"  onclick="edit_event({{ d.id }})" id="{{ d.id }}edit" >编辑</button>
                   <button class="delete btn " value="{{ d.id }}"  onclick="ablebtn({{ d.id }})" id="{{ d.id }}cansle" disabled="true" >取消</button>
