@@ -12,34 +12,7 @@ def shop(request):
      area_list=Area.objects.all()
      return render(request,'shop.html',locals())
 #添加店铺信息
-def addshop(req):
-    sava_message={"sava_message":"保存成功"}
-    if req.method=='GET':
-        sys_name=req.GET['sys_name']
-        s_name=req.GET['s_name']
-        sale_manager=Managers.objects.get(id=req.GET['sale_manager'])
-        aree=Area.objects.get(id=req.GET['area'])
-        shoptype = req.GET['shoptype']
-        malltype=req.GET['malltype']
-        opendate=req.GET['openingdate']
-        shopadd=req.GET['shopadd']
-        conbengin=req.GET['contractBegindate']
-        conEnd=req.GET['contractEndDate']
-        shopstate = req.GET['shopstate']
 
-        ShopInfo.objects.create(sysName=sys_name,
-                              sName=s_name,
-                              managerId=sale_manager,
-                              areaId=aree,
-                              shopType=shoptype,
-                              mallType=malltype,
-                              openingDate=opendate,
-                              shopAddress=shopadd,
-                              contractBeginDate=conbengin,
-                              contractEndDate=conEnd,
-                              state=shopstate)
-
-    return JsonResponse(sava_message)
 
 def addinfo(req):
     sava_message = {"sava_message": "保存成功"}
@@ -108,14 +81,12 @@ def addcheckdata(req):
         create_list.save()
     return JsonResponse(sava_message)
 
-#获取数据
-
-
+#获取所有有差异的数据
 def checkdata(request):
     shop_list = ShopInfo.objects.all()
     diff=datadiff.objects.exclude(amount=0).order_by("id_shop","-date")
     return render(request,'checkdata.html',locals())
-
+#修改差异原因
 def update_diff(req):
     sava_message = {"sava_message": "提交成功"}
     diff_new=req.GET["diff_new"]
