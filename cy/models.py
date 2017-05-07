@@ -8,7 +8,7 @@ class Managers(models.Model):
     id = models.IntegerField(unique=False, blank=False, null=False, verbose_name=u'用户ID', primary_key=True,auto_created=True)
     name = models.CharField(null=False, verbose_name=u'姓名', max_length=40)
     personal_cellphone = models.CharField(max_length=11, verbose_name=u'私人手机')
-    company_cellphone = models.CharField(max_length=11, verbose_name=u'公司手机')
+    company_cellphone = models.CharField(max_length=11, verbose_name=u'公司手机',null=True)
     qq = models.CharField(max_length=20, verbose_name=u'QQ', null=True, blank=True)
     email = models.EmailField(null=True, verbose_name=u'邮箱')
     title = models.CharField(verbose_name=u'职务', max_length=40, null=False)

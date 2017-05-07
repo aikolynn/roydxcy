@@ -96,21 +96,26 @@ def update_diff(req):
 
 #导入excel读写库 openpyxl(只可读写2007版及之后的office文档)
 import  openpyxl
+import  os
 def excelindb(request):
     sava_message = "上传成功"
     excel_file = request.FILES['excelfile']
     excel_date = request.POST["exceldate"]
     excel_data_type=request.POST['upinfo_type']
-    print(excel_data_type)
-    with open('/static/upload/' + excel_date + '.xlsx', 'wb+') as destination:
+    #获取项目根目录
+    filepath=os.path.abspath(os.path.dirname('__file__'))
+    print(filepath)
+    with open(filepath +'/static/upload/'+ excel_date + '.xlsx', 'wb+') as destination:
         for chunk in excel_file.chunks():
             destination.write(chunk)
     destination.close()
-    excel_data = openpyxl.load_workbook("/static/upload/"+excel_date+".xlsx")
+    excel_data = openpyxl.load_workbook(filepath+'/static/upload/'+ excel_date+".xlsx")
     sheetnames = excel_data.get_sheet_names()
     excel_sheets=excel_data.get_sheet_by_name(sheetnames[0])
     excel_rows=excel_sheets.max_row
-    excel_columns=excel_sheets.max_column
+    #获取当前人员表总记录数数
+    manger_count=Managers.objects.all().count()
+
     if excel_data_type=="diff":
         #循环读取每行数据然后写入数据库
         for i in range(2,excel_rows+1):
@@ -130,11 +135,11 @@ def excelindb(request):
         for i in range(2,excel_rows+1):
             staff_name=excel_sheets.cell(row=i,column=1).value
             staff_personal_phone=excel_sheets.cell(row=i,column=2).value
-            staff_c_phone=excel_sheets.cell(row=i,columns=3).value
+            staff_c_phone=excel_sheets.cell(row=i,column=3).value
             staff_email=excel_sheets.cell(row=i,column=4).value
             staff_qq=excel_sheets.cell(row=i,column=5).value
-            staff_title=excel_sheets.cell(row=i,columns=6).value
-            staff_address=excel_sheets.cell(row=i,columns=7).value
+            staff_title=excel_sheets.cell(row=i,column=6).value
+            staff_address=excel_sheets.cell(row=i,column=7).value
             if Managers.objects.filter(name=staff_name,personal_cellphone=staff_personal_phone).count() or Managers.objects.filter(name=staff_name,company_cellphone=staff_c_phone).count():
                 Managers.objects.filter(name=staff_name, personal_cellphone=staff_personal_phone).update(
                     name=staff_name,
@@ -147,13 +152,15 @@ def excelindb(request):
 
                 )
             else:
+                manger_count+=1
                 Managers.objects.create(name=staff_name,
                                         personal_cellphone=staff_personal_phone,
                                         company_cellphone=staff_c_phone,
                                         qq=staff_qq,
                                         email=staff_email,
                                         title=staff_title,
-                                        address=staff_address
+                                        address=staff_address,
+                                        id=manger_count
                                         )
     return render(request,'checkdata.html',sava_message)
 
