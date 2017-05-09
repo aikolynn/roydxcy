@@ -62,8 +62,7 @@ def addinfo(req):
                                 contractEndDate=conEnd,
                                 state=shopstate)
     return JsonResponse(sava_message)
-def update_amount(update):
-    pass
+
 def addcheckdata(req):
     sava_message = {"sava_message": "提交成功"}
     shopname=ShopInfo.objects.get(Id=req.GET["shop_name"])
@@ -84,14 +83,15 @@ def addcheckdata(req):
 #获取所有有差异的数据
 def checkdata(request):
     shop_list = ShopInfo.objects.all()
-    diff=datadiff.objects.exclude(amount=0).order_by("id_shop","-date")
+    diff=datadiff.objects.all().order_by("id_shop","amount")
     return render(request,'checkdata.html',locals())
 #修改差异原因
 def update_diff(req):
     sava_message = {"sava_message": "提交成功"}
     diff_new=req.GET["diff_new"]
-    diff_id=req.GET["diff_id"]
-    datadiff.objects.filter(id=diff_id).update(diff=diff_new)
+    remark_new = req.GET["remark"]
+    diff_id=req.GET["diffid"]
+    datadiff.objects.filter(id=diff_id).update(diff=diff_new,remark=remark_new)
     return  JsonResponse(sava_message)
 
 #导入excel读写库 openpyxl(只可读写2007版及之后的office文档)
@@ -115,8 +115,7 @@ def excelindb(request):
     excel_rows=excel_sheets.max_row
     #获取当前人员表总记录数数
     manger_count=Managers.objects.all().count()
-
-    if excel_data_type=="diff":
+    if excel_data_type=="sysamout":
         #循环读取每行数据然后写入数据库
         for i in range(2,excel_rows+1):
             j=1
@@ -131,6 +130,20 @@ def excelindb(request):
             else:
                 sys_diff=datadiff(sys_amount=sys_amount_excel,date=excel_date,id_shop=shop_id)
                 sys_diff.save()
+    elif excel_data_type=="shopamout" :
+        for i in range(2,excel_rows+1):
+            j=1
+            #excel表格从第二行开始读取，每行第一列为店铺名
+            shop_id=ShopInfo.objects.get(sName=(excel_sheets.cell(row=i,column=j).value))
+            #每行第二列为店铺金额
+            shopamount_excel=float(excel_sheets.cell(row=i,column=j+1).value)
+            #根据时间（excel_date）和店铺名称（shop_id）来判断记录是否存在，如果存在更新原有记录，否则新建记录
+            if datadiff.objects.filter(date=excel_date, id_shop=shop_id).count():
+                sys_amount_base = datadiff.objects.get(date=excel_date, id_shop=shop_id).sys_amount
+                datadiff.objects.filter(date=excel_date, id_shop=shop_id).update(shop_amount=shopamount_excel, amount=sys_amount_base-shopamount_excel)
+            else:
+                shop_diff=datadiff(shop_amount=shopamount_excel,date=excel_date,id_shop=shop_id)
+                shop_diff.save()
     elif excel_data_type=="staff":
         for i in range(2,excel_rows+1):
             staff_name=excel_sheets.cell(row=i,column=1).value
@@ -149,7 +162,6 @@ def excelindb(request):
                     email=staff_email,
                     title=staff_title,
                     address=staff_address
-
                 )
             else:
                 manger_count+=1
@@ -163,17 +175,3 @@ def excelindb(request):
                                         id=manger_count
                                         )
     return render(request,'checkdata.html',sava_message)
-
-
-#批量导入人员信息
-def staff_excel_import(req):
-    staff_excel_file=req.FILES['staff_file']
-    staff_excel_file_name=req.POST['staff_file_name']
-    with open('static/upload'+staff_excel_file_name+'.xlsx','wb+') as destination:
-        for file_chunk in staff_excel_file.chunks():
-            destination.write(file_chunk)
-    destination.close()
-    staff_excel_data=openpyxl.load_workbook('static/upload'+staff_excel_file_name+'.xlsx')
-    excel_sheets_names=staff_excel_data.get_sheet_names()
-    excel_sheets=staff_excel_data.get_sheet_by_name(excel_sheets_names(0))
-    excel
