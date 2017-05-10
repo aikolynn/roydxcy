@@ -32,7 +32,6 @@ def addinfo(req):
      #添加区域信息
     elif action=='area':
         manager_name=Managers.objects.get(id=req.GET['area_manager'])
-        print manager_name
         Area.objects.create(
             manager=manager_name,
             name=req.GET["area_name"]
@@ -83,7 +82,7 @@ def addcheckdata(req):
 #获取所有有差异的数据
 def checkdata(request):
     shop_list = ShopInfo.objects.all()
-    diff=datadiff.objects.all().order_by("id_shop","amount")
+    diff=datadiff.objects.all().order_by("id_shop","-date")
     return render(request,'checkdata.html',locals())
 #修改差异原因
 def update_diff(req):
@@ -105,73 +104,84 @@ def excelindb(request):
     #获取项目根目录
     filepath=os.path.abspath(os.path.dirname('__file__'))
     print(filepath)
-    with open(filepath +'/static/upload/'+ excel_date + '.xlsx', 'wb+') as destination:
+    with open(filepath +'/static/upload/'+excel_data_type+ excel_date + '.xlsx', 'wb+') as destination:
         for chunk in excel_file.chunks():
             destination.write(chunk)
     destination.close()
-    excel_data = openpyxl.load_workbook(filepath+'/static/upload/'+ excel_date+".xlsx")
+    excel_data = openpyxl.load_workbook(filepath+'/static/upload/'+ excel_data_type+excel_date+".xlsx")
     sheetnames = excel_data.get_sheet_names()
     excel_sheets=excel_data.get_sheet_by_name(sheetnames[0])
     excel_rows=excel_sheets.max_row
     #获取当前人员表总记录数数
-    manger_count=Managers.objects.all().count()
-    if excel_data_type=="sysamout":
-        #循环读取每行数据然后写入数据库
-        for i in range(2,excel_rows+1):
-            j=1
-            #excel表格从第二行开始读取，每行第一列为店铺名
-            shop_id=ShopInfo.objects.get(sName=(excel_sheets.cell(row=i,column=j).value))
-            #每行第二列为系统金额
-            sys_amount_excel=float(excel_sheets.cell(row=i,column=j+1).value)
-            #根据时间（excel_date）和店铺名称（shop_id）来判断记录是否存在，如果存在更新原有记录，否则新建记录
-            if datadiff.objects.filter(date=excel_date, id_shop=shop_id).count():
-                shop_amount_excel = datadiff.objects.get(date=excel_date, id_shop=shop_id).shop_amount
-                datadiff.objects.filter(date=excel_date, id_shop=shop_id).update(sys_amount=sys_amount_excel, amount=sys_amount_excel-shop_amount_excel)
-            else:
-                sys_diff=datadiff(sys_amount=sys_amount_excel,date=excel_date,id_shop=shop_id)
-                sys_diff.save()
-    elif excel_data_type=="shopamout" :
-        for i in range(2,excel_rows+1):
-            j=1
-            #excel表格从第二行开始读取，每行第一列为店铺名
-            shop_id=ShopInfo.objects.get(sName=(excel_sheets.cell(row=i,column=j).value))
-            #每行第二列为店铺金额
-            shopamount_excel=float(excel_sheets.cell(row=i,column=j+1).value)
-            #根据时间（excel_date）和店铺名称（shop_id）来判断记录是否存在，如果存在更新原有记录，否则新建记录
-            if datadiff.objects.filter(date=excel_date, id_shop=shop_id).count():
-                sys_amount_base = datadiff.objects.get(date=excel_date, id_shop=shop_id).sys_amount
-                datadiff.objects.filter(date=excel_date, id_shop=shop_id).update(shop_amount=shopamount_excel, amount=sys_amount_base-shopamount_excel)
-            else:
-                shop_diff=datadiff(shop_amount=shopamount_excel,date=excel_date,id_shop=shop_id)
-                shop_diff.save()
-    elif excel_data_type=="staff":
-        for i in range(2,excel_rows+1):
-            staff_name=excel_sheets.cell(row=i,column=1).value
-            staff_personal_phone=excel_sheets.cell(row=i,column=2).value
-            staff_c_phone=excel_sheets.cell(row=i,column=3).value
-            staff_email=excel_sheets.cell(row=i,column=4).value
-            staff_qq=excel_sheets.cell(row=i,column=5).value
-            staff_title=excel_sheets.cell(row=i,column=6).value
-            staff_address=excel_sheets.cell(row=i,column=7).value
-            if Managers.objects.filter(name=staff_name,personal_cellphone=staff_personal_phone).count() or Managers.objects.filter(name=staff_name,company_cellphone=staff_c_phone).count():
-                Managers.objects.filter(name=staff_name, personal_cellphone=staff_personal_phone).update(
-                    name=staff_name,
-                    personal_cellphone=staff_personal_phone,
-                    company_cellphone=staff_c_phone,
-                    qq=staff_qq,
-                    email=staff_email,
-                    title=staff_title,
-                    address=staff_address
-                )
-            else:
-                manger_count+=1
-                Managers.objects.create(name=staff_name,
-                                        personal_cellphone=staff_personal_phone,
-                                        company_cellphone=staff_c_phone,
-                                        qq=staff_qq,
-                                        email=staff_email,
-                                        title=staff_title,
-                                        address=staff_address,
-                                        id=manger_count
-                                        )
+    for row_excel in range(2, excel_rows + 1):
+        if excel_data_type=="sysamout":
+            #循环读取每行数据然后写入数据库
+                j=1
+                #excel表格从第二行开始读取，每行第一列为店铺名
+                shop_id=ShopInfo.objects.get(sName=(excel_sheets.cell(row=row_excel,column=j).value))
+                #每行第二列为系统金额
+                sys_amount_excel=float(excel_sheets.cell(row=row_excel,column=j+1).value)
+                #根据时间（excel_date）和店铺名称（shop_id）来判断记录是否存在，如果存在更新原有记录，否则新建记录
+                if datadiff.objects.filter(date=excel_date, id_shop=shop_id).count():
+                    shop_amount_excel = datadiff.objects.get(date=excel_date, id_shop=shop_id).shop_amount
+                    datadiff.objects.filter(date=excel_date, id_shop=shop_id).update(sys_amount=sys_amount_excel, amount=sys_amount_excel-shop_amount_excel)
+                else:
+                    sys_diff=datadiff(sys_amount=sys_amount_excel,date=excel_date,id_shop=shop_id)
+                    sys_diff.save()
+        elif excel_data_type=="shopamout" :
+                j=1
+                #excel表格从第二行开始读取，每行第一列为店铺名
+                shop_id=ShopInfo.objects.get(sName=(excel_sheets.cell(row=row_excel,column=j).value))
+                #每行第二列为店铺金额
+                shopamount_excel=float(excel_sheets.cell(row=row_excel,column=j+1).value)
+                #根据时间（excel_date）和店铺名称（shop_id）来判断记录是否存在，如果存在更新原有记录，否则新建记录
+                if datadiff.objects.filter(date=excel_date, id_shop=shop_id).count():
+                    sys_amount_base = datadiff.objects.get(date=excel_date, id_shop=shop_id).sys_amount
+                    datadiff.objects.filter(date=excel_date, id_shop=shop_id).update(shop_amount=shopamount_excel, amount=sys_amount_base-shopamount_excel)
+                else:
+                    shop_diff=datadiff(shop_amount=shopamount_excel,date=excel_date,id_shop=shop_id)
+                    shop_diff.save()
+        elif excel_data_type=="staff":
+                staff_name=excel_sheets.cell(row=row_excel,column=1).value
+                staff_personal_phone=excel_sheets.cell(row=row_excel,column=2).value
+                staff_c_phone=excel_sheets.cell(row=row_excel,column=3).value
+                staff_email=excel_sheets.cell(row=row_excel,column=4).value
+                staff_qq=excel_sheets.cell(row=row_excel,column=5).value
+                staff_title=excel_sheets.cell(row=row_excel,column=6).value
+                staff_address=excel_sheets.cell(row=row_excel,column=7).value
+                if Managers.objects.filter(name=staff_name,personal_cellphone=staff_personal_phone).count() or Managers.objects.filter(name=staff_name,company_cellphone=staff_c_phone).count():
+                    Managers.objects.filter(name=staff_name, personal_cellphone=staff_personal_phone).update(
+                        name=staff_name,
+                        personal_cellphone=staff_personal_phone,
+                        company_cellphone=staff_c_phone,
+                        qq=staff_qq,
+                        email=staff_email,
+                        title=staff_title,
+                        address=staff_address
+                    )
+                else:
+
+                    Managers.objects.create(name=staff_name,
+                                            personal_cellphone=staff_personal_phone,
+                                            company_cellphone=staff_c_phone,
+                                            qq=staff_qq,
+                                            email=staff_email,
+                                            title=staff_title,
+                                            address=staff_address
+                                            )
+
+        #批量导入区域档案
+        elif excel_data_type=='areainfo':
+                 #表格第二列为区域负责人姓名
+                 manager_id=Managers.objects.get(name=(excel_sheets.cell(row=row_excel,column=2).value))
+                 #创建区域信息
+                 area_name=excel_sheets.cell(row=row_excel,column=1).value
+                 # if Area.objects.filter(name=area_name).count():
+                 #     Area.objects.filter(name=area_name).update(manager=manager_id,name=area_name)
+                 # else:
+                 #    Area.objects.update_or_create(name=area_name, manager=manager_id)
+                 Area.objects.update_or_create(name=area_name,manager=manager_id)
+        elif excel_data_type=='shopinfo':
+                shop_name_excel=excel_sheets.cell(row=row_excel,column=1).value
+                #未完成2017-5-10
     return render(request,'checkdata.html',sava_message)

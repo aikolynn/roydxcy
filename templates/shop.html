@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% block title %}店铺一览表{% endblock %}
+{% block title %}档案管理{% endblock %}
 {% block content %}
 
 
@@ -91,10 +91,79 @@ function add_area() {
     );
 }
     </script>
-    <div class="container">
-<button class="btn btn-success" data-toggle="modal" data-target="#mymodal-manager" type="button">添加人员</button>
-   <!-- 添加人员 -->
-<div class="modal  " id="mymodal-manager" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+
+ <style>
+.div1{
+float: left;
+height: 34px;
+background: #a6e1ec;
+width: 82px;
+position:relative;
+border-radius: 5px;
+margin-right: 10px;
+}
+.div2{
+text-align:center;
+padding-top:5px;
+font-size:15px;
+font-weight:800
+}
+.inputstyle{
+    width: 82px;
+    height: 34px;
+    cursor: pointer;
+    font-size: 30px;
+    outline: medium none;
+    position: absolute;
+    filter:alpha(opacity=50);
+    -moz-opacity:0;
+    opacity:0;
+    left:0px;
+    top: 0px;
+}
+ </style>
+ <div class="container" >
+   <!--批量导入档案开始-->
+     <div class="col-xs-3">
+         <p class="text-center h2">批量导入档案</p>
+         {% csrf_token %}
+            <form action="{% url 'upinfo' %}" enctype="multipart/form-data" method="post" class="form-group " role="form">
+             <div class="form-group" >
+                 <div class="input-group">
+                     <span  class="input-group-addon">档案类型</span>
+                     <select name="upinfo_type" class="form-control">
+                         <option value="shopinfo">店铺信息</option>
+                         <option value="areainfo">区域信息</option>
+                         <option value="staff">人员信息</option>
+                     </select>
+                 </div><br>
+                 <div class="input-group">
+                    <span  class="input-group-addon btn-success">档案日期</span>
+                    <input type="date" name="exceldate" class="form-control ">
+                 </div><br>
+                 <div class="div1">
+                    <div class="div2 ">浏览文件</div>
+                    <input type="file" class="inputstyle" name="excelfile" >
+                </div>
+                <div class="input-group">
+                    <button type="submit" class="btn btn-info">上传文件</button>
+                </div>
+             </div>
+        </form>
+     </div>
+  <!--批量导入档案结束-->
+
+  <!--档案录入开始-->
+ <div class="col-xs-4 col-xs-offset-1 ">
+  <p class="text-center h2">
+      档案录入
+  </p>
+
+          <!-- 添加人员 -->
+   <button class="btn btn-success" data-toggle="modal" data-target="#mymodal-manager" type="button">添加人员</button>
+
+
+ <div class="modal  " id="mymodal-manager" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
      <div class="modal-dialog">
          <div class="modal-content">
              <div class="modal-header">
@@ -155,6 +224,7 @@ function add_area() {
 </div>
   <!-- 添加人员窗口 -->
 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 
   <button class="btn btn-success" data-toggle="modal" data-target="#mymodal-area" type="button">添加区域</button>
    <!-- 添加区域 -->
@@ -200,6 +270,7 @@ function add_area() {
      </div>
 </div>
   <!-- 添加区域窗口 -->
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
  <!-- 弹出添加店铺窗口 -->
 <button class="btn btn-success" data-toggle="modal" data-target="#mymodal-data" type="button">添加店铺</button>
 <!-- 店铺添加弹窗内容 -->
@@ -310,33 +381,145 @@ function add_area() {
              </div>
 
          </div>
-     </div>
-</div>
-    <p>&nbsp;</p>
-       <table class="table table-hover table-bordered">
-              <tr class="active">
-               <td>店铺名称</td>
-               <td>销售经理</td>
-               <td>职务</td>
-               <td>区域</td>
-                  <td>地址</td>
-                  <td>店铺类型</td>
-                  <td>营业状态</td>
-           </tr>
+      </div>
+    </div>
+ </div>
 
-           {% for s in shop_list %}
-               <tr class="success">
-                  <td id="{{ s.Id }}">{{ s.sysName }}</td>
-                  <td>{{ s.managerId.name }}</td>
-                  <td id="{{ s.managerId_id.name }}"><a href="#" rel="drevil">{{ s.managerId.title }}</a></td>
-                  <td>{{ s.areaId.name }}</td>
-                  <td>{{ s.shopAddress }}</td>
-               <td>{{ s.get_shopType_display }}</td>
-               <td>{{ s.get_state_display }}</td>
-               </tr>
-           {% endfor %}
+  <!--档案录入结束-->
+ <div class="col-xs-4">
+     <p class="text-center h2">
+         档案查询
+     </p>
+     <button class="btn btn-info"  data-toggle="modal" data-target="#staff-info" ><span class="glyphicon glyphicon-user"></span>人员档案</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      <!--显示人员档案弹窗 -->
+        <div class="modal" id="staff-info" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+            <div class="modal-dialog" style="width: auto">
+                <!--人员档案弹窗主体 -->
+                <div class="modal-content">
+                    <!--人员档案弹窗头部 -->
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">
+                             <span aria-hidden="true">×</span>
+                             <span class="sr-only">Close</span>
+                         </button>
+                        <h2 class="text-center">人员信息档案</h2>
+                    </div>
+                    <!--人员档案弹窗头部 -->
 
-       </table>
+                    <!--人员档案弹窗正文 -->
+                    <div class="modal-body">
+                        <table class="table  table-striped table-condensed table-responsive ">
+                            <tr class="text-center h3">
+                                <td > <span class="glyphicon glyphicon-user"></span> 姓名</td>
+                                <td>职务</td>
+                                <td ><span class="glyphicon glyphicon-phone"></span> 手机</td>
+                                <td>公司手机</td>
+                                <td>QQ</td>
+                                <td>电子邮箱</td>
+                                <td>联系地址</td>
+                            </tr>
+                             {% for m in man_list %}
+                            <tr class="text-center">
+                                    <td>{{ m.name }}</td>
+                                    <td>{{ m.title }}</td>
+                                    <td>{{ m.personal_cellphone }}</td>
+                                    {% if m.company_cellphone %}
+                                        <td>{{ m.company_cellphone }}</td>
+                                     {% else %}
+                                        <td class="danger">未配备</td>
+                                    {% endif %}
+                                    {% if m.qq %}
+                                        <td>{{ m.qq }}</td>
+                                    {% else %}
+                                        <td class="glyphicon">未提供</td>
+                                    {% endif %}
+                                    <td>{{ m.email }}</td>
+                                    <td>{{ m.address }}</td>
+
+                            </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                    <!--人员档案弹窗正文 -->
+
+                    <!--人员档案弹窗底部 -->
+                    <div class="modal-footer">
+
+                    </div>
+                    <!--人员档案弹窗底部 -->
+                </div>
+            </div>
+            <!--人员档案弹窗主体 -->
+        </div>
+
+      <!--显示人员档案弹窗 -->
+     <button class="btn btn-info" data-toggle="modal" data-target="#area-info">区域档案</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+     <!--显示区域档案弹窗 -->
+        <div class="modal" id="area-info" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <!--区域档案弹窗主体 -->
+                <div class="modal-content">
+                    <!--人员档案弹窗头部 -->
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">
+                             <span aria-hidden="true">×</span>
+                             <span class="sr-only">Close</span>
+                         </button>
+                        <h2 class="text-center">区域信息档案</h2>
+                    </div>
+                    <!--区域档案弹窗头部 -->
+
+                    <!--区域档案弹窗正文 -->
+                    <div class="modal-body">
+
+                    </div>
+                    <!--区域档案弹窗正文 -->
+
+                    <!--区域档案弹窗底部 -->
+                    <div class="modal-footer">
+
+                    </div>
+                    <!--区域档案弹窗底部 -->
+                </div>
+            </div>
+            <!--区域档案弹窗主体 -->
+        </div>
+      <!--显示区域档案弹窗 -->
+
+     <button class="btn btn-info" data-toggle="modal" data-target="#shop-info">店铺档案</button>
+     <!--显示店铺档案弹窗 -->
+        <div class="modal" id="shop-info" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <!--店铺档案弹窗主体 -->
+                <div class="modal-content">
+                    <!--店铺档案弹窗头部 -->
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">
+                             <span aria-hidden="true">×</span>
+                             <span class="sr-only">Close</span>
+                         </button>
+                        <h2 class="text-center">店铺信息档案</h2>
+                    </div>
+                    <!--店铺档案弹窗头部 -->
+
+                    <!--店铺档案弹窗正文 -->
+                    <div class="modal-body">
+
+                    </div>
+                    <!--店铺档案弹窗正文 -->
+
+                    <!--店铺档案弹窗底部 -->
+                    <div class="modal-footer">
+
+                    </div>
+                    <!--店铺档案弹窗底部 -->
+                </div>
+            </div>
+            <!--店铺档案弹窗主体 -->
+        </div>
+      <!--显示店铺档案弹窗 -->
+
+ </div>
 
     </div>
     <!--鼠标划过销售经理名字后显示信息-->

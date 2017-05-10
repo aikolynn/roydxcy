@@ -11,53 +11,148 @@
                  url:"{% url 'check' %}",
                  type:"get",
                  data:{shop_name:shop_name,money:money,data_date:data_date},
-                 datetype:"json",
+                 datatype:"json",
                  success:function(data) {
                         window.location.reload();
 
 
                     }
-             }
-
+        }
      )
-
-
-
  }
-function edit_event(event_id)
-			{
-                $("#"+event_id).append('<form action="/update_diff/" class="edit_input_box"><input type="hidden" size="50" name="diff_id" class="itembox" value="'+event_id+'"><input type="text" size="50" name="diff_new"  class="itembox" >&nbsp;<input type="submit" value="确定" class="edit btn btn-success"></form>');
-              $("#"+event_id+"edit").attr("disabled",true);
-                $("#"+event_id+"cansle").attr("disabled",false);
-            };
+function edit_event(eventid) {
+    diff=$("#diff"+eventid).text()
+    remark=$("#remark"+eventid).text()
+    $.ajax(
+        {
+            url:"{% url 'update_diff' %}",
+            type:"get",
+            data:{
+                diff_new:diff,
+                remark:remark,
+                diffid:eventid
+            },
+            datatype:"json",
+            suceess:function (data) {
+                window.location.reload();
+            }
+        }
+    )
+}
 function ablebtn(btnid) {
      $("#"+btnid+"edit").attr("disabled",false);
     $("#"+btnid+"cansle").attr("disabled",true);
 };
 
-
+$(document).ready(function(){
+    var tdNods = $(".edit");
+    tdNods.click(tdClick);
+});
+function tdClick(){
+    //将td的文本内容保存
+    var td = $(this);
+    var tdText = td.text();
+    //将td的内容清空
+    td.empty();
+    //新建一个输入框
+    var input = $("<input type='text' class=' form-control ' size='3'>");
+    //将保存的文本内容赋值给输入框
+    input.attr("value",tdText);
+    //将输入框添加到td中
+    td.append(input);
+    //给输入框注册事件，当失去焦点时就可以将文本保存起来
+    input.blur(function(){
+        //将输入框的文本保存
+        var input = $(this);
+        var inputText = input.val();
+        //将td的内容，即输入框去掉,然后给td赋值
+        var td = input.parent("td");
+        td.html(inputText);
+        //让td重新拥有点击事件
+        td.click(tdClick);
+    });
+    input.keyup(function(event){
+        //1.获取当前用户按下的键值
+              //解决不同浏览器获得事件对象的差异,
+             // IE用自动提供window.event，而其他浏览器必须显示的提供，即在方法参数中加上event
+           var myEvent = event || window.event;
+           var keyCode = myEvent.keyCode;
+           //2.判断是否是ESC键按下
+           if(keyCode == 27){
+               //将input输入框的值还原成修改之前的值
+               input.val(tdText);
+           }
+    });
+    //将输入框中的文本高亮选中
+    //将jquery对象转化为DOM对象
+    var inputDom = input.get(0);
+    inputDom.select();
+    //将td的点击事件移除
+    td.unbind("click");
+}
     </script>
-<div class="container">
+
+
+
+ <style>
+.div1{
+float: left;
+height: 34px;
+background: #a6e1ec;
+width: 82px;
+position:relative;
+border-radius: 5px;
+margin-right: 10px;
+}
+.div2{
+text-align:center;
+padding-top:5px;
+font-size:15px;
+font-weight:800
+}
+.inputstyle{
+    width: 82px;
+    height: 34px;
+    cursor: pointer;
+    font-size: 30px;
+    outline: medium none;
+    position: absolute;
+    filter:alpha(opacity=50);
+    -moz-opacity:0;
+    opacity:0;
+    left:0px;
+    top: 0px;
+}
+ </style>
+<div class="container" >
  <!-- 弹出添加店铺上报数据 -->
 
-<p>
-    <button class="btn btn-info" data-toggle="modal" data-target="#diffmodal-data" type="button">店铺上报数据</button>
+<p class="col-xs-2">
+    <button class="btn btn-info " data-toggle="modal" data-target="#diffmodal-data" type="button">店铺上报数据</button>
 </p>
 {% csrf_token %}
-<form action="{% url 'upsysamout' %}" enctype="multipart/form-data" method="post">
-    <div >
-       </div>
-         <div >
-             请选择上传数据的类型:<select name="upinfo_type">
-                 <option value="diff">差异上传</option>
-                 <option value="staff">人员信息上传</option>
-             </select>
-             <input type="date" name="exceldate">
-             <input type="file" class="input-group"  name="excelfile" >
-             <button class="btn btn-danger">提交系统数据</button>
+<form action="{% url 'upinfo' %}" enctype="multipart/form-data" method="post" class="form-group col-xs-3" role="form">
+         <div class="form-group" >
+             <div class="input-group">
+                 <span  class="input-group-addon">数据类型</span>
+                 <select name="upinfo_type" class="form-control">
+                     <option value="sysamout">系统数据</option>
+                     <option value="shopamout">店铺数据</option>
+                 </select>
+             </div><br>
+             <div class="input-group">
+                <span  class="input-group-addon btn-success">数据日期</span>
+                <input type="date" name="exceldate" class="form-control ">
+             </div><br>
+             <div class="div1">
+                <div class="div2 ">浏览文件</div>
+                <input type="file" class="inputstyle" name="excelfile" >
+            </div>
+            <div class="input-group">
+                <button type="submit" class="btn btn-info">上传文件</button>
+            </div>
          </div>
 </form>
-
 
 <!-- 店铺添加弹窗内容 -->
 <div class="modal  " id="diffmodal-data" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
@@ -108,10 +203,8 @@ function ablebtn(btnid) {
 </div>
 <!--添加数据弹窗-->
 <p>&nbsp;</p>
-
-
 <!--页面主体内容-->
-   <table class="table table-hover table-bordered">
+   <table class="table table-hover table-bordered" id="editTable">
        <tr class="active">
            <td>店&nbsp;&nbsp;铺</td>
            <td>日&nbsp;&nbsp;期</td>
@@ -126,14 +219,15 @@ function ablebtn(btnid) {
            <tr class="success">
               <td>{{ d.id_shop.sysName }}</td>
               <td>{{ d.date }}</td>
-              <td>{{ d.sys_amount }}</td>
-               <td>{{ d.shop_amount }}</td>
-               <td>{{ d.amount }}</td>
-               <td id="{{ d.id }}">{{ d.diff}}</td>
-               <td id="{{ d.id }}">{{ d.remark}}</td>
-              <td >
-                  <button class="delete btn btn-warning" value="{{ d.id }}"  onclick="edit_event({{ d.id }})" id="{{ d.id }}edit" >编辑</button>
-                  <button class="delete btn " value="{{ d.id }}"  onclick="ablebtn({{ d.id }})" id="{{ d.id }}cansle" disabled="true" >取消</button>
+              <td >{{ d.sys_amount }}</td>
+               <td >{{ d.shop_amount }}</td>
+               <td >{{ d.amount }}</td>
+               <td id="diff{{ d.id }}" class="edit">{{ d.diff}}</td>
+               <td id="remark{{ d.id }}" class="edit">{{ d.remark}}</td>
+              <td>
+                  <input type="button" class="btn btn-info" value="保存"  onclick="edit_event({{ d.id }})">
+{#                  <button class="delete btn btn-warning" value="{{ d.id }}"  onclick="edit_event({{ d.id }})" id="{{ d.id }}edit" >编辑</button>#}
+{#                  <button class="delete btn " value="{{ d.id }}"  onclick="ablebtn({{ d.id }})" id="{{ d.id }}cansle" disabled="true" >取消</button>#}
               </td>
            </tr>
        {% endfor %}

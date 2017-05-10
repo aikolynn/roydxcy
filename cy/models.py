@@ -1,11 +1,10 @@
-#coding=utf-8
+# -*- coding: utf-8 -*-
 from django.db import models
 
-# import sys
-# reload(sys)
-# sys.setdefaultencoding('utf-8')
+
+
 class Managers(models.Model):
-    id = models.IntegerField(unique=False, blank=False, null=False, verbose_name=u'用户ID', primary_key=True,auto_created=True)
+    id = models.AutoField(unique=False, blank=False, null=False, verbose_name=u'用户ID', primary_key=True,auto_created=True)
     name = models.CharField(null=False, verbose_name=u'姓名', max_length=40)
     personal_cellphone = models.CharField(max_length=11, verbose_name=u'私人手机')
     company_cellphone = models.CharField(max_length=11, verbose_name=u'公司手机',null=True)
@@ -23,7 +22,7 @@ class Managers(models.Model):
         return self.name
 
 class Area(models.Model):
-    id=models.IntegerField(unique=False,primary_key=True,verbose_name=u'区域ID',db_column='id',auto_created=True)
+    id=models.AutoField(unique=False,primary_key=True,verbose_name=u'区域ID',db_column='id',auto_created=True)
     name=models.CharField(max_length=40,verbose_name=u'区域名称',db_column='name',null=False)
     manager=models.ForeignKey(Managers,verbose_name=u'区域负责人ID',db_column='manager')
     class Meta:
@@ -47,7 +46,7 @@ shoptype=(
    ('C',u'承包'),
 )
 class ShopInfo(models.Model):
-    Id=models.IntegerField(unique=False,auto_created=True,verbose_name=u'店铺ID',primary_key=True,db_column='Id')
+    Id=models.AutoField(unique=False,auto_created=True,verbose_name=u'店铺ID',primary_key=True,db_column='Id')
     sName = models.CharField(max_length=255, blank=True, null=True,verbose_name=u'店铺名称',db_column='sName')
     sysName = models.CharField(max_length=255, blank=True, null=True,verbose_name=u'系统名称',db_column='sysName')
     areaId = models.ForeignKey(Area,verbose_name=u'区域ID',db_column='areaId')
@@ -69,7 +68,7 @@ class ShopInfo(models.Model):
 
 
 class datadiff(models.Model):
-    id = models.IntegerField( unique=False, auto_created=True, verbose_name=u'账目ID',primary_key=True)
+    id = models.AutoField( unique=False, auto_created=True, verbose_name=u'账目ID',primary_key=True)
     id_shop = models.ForeignKey(ShopInfo, db_column='id_shop',verbose_name=u'店铺ID')
     date = models.DateField(blank=True, null=True,verbose_name=u'日期')
     shop_amount = models.FloatField(blank=True, null=True, verbose_name=u'上报金额',default=0)
