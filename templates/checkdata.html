@@ -218,12 +218,20 @@ font-weight:800
        {% for d in diff %}
            <tr class="success">
               <td>{{ d.id_shop.sysName }}</td>
-              <td>{{ d.date }}</td>
+              <td>{{ d.date|date:"Y-m-d "}}</td>
               <td >{{ d.sys_amount }}</td>
                <td >{{ d.shop_amount }}</td>
                <td >{{ d.amount }}</td>
-               <td id="diff{{ d.id }}" class="edit">{{ d.diff}}</td>
-               <td id="remark{{ d.id }}" class="edit">{{ d.remark}}</td>
+               {% if d.diff %}
+                    <td id="diff{{ d.id }}" class="edit" style="color: red;font-family:楷体;">{{ d.diff}}</td>
+               {% else %}
+                    <td id="diff{{ d.id }}" class="edit"> </td>
+               {% endif %}
+               {% if d.remark %}
+                   <td id="remark{{ d.id }}" class="edit">{{ d.remark}}</td>
+                {% else %}
+                   <td id="remark{{ d.id }}" class="edit"></td>
+               {% endif %}
               <td>
                   <input type="button" class="btn btn-info" value="保存"  onclick="edit_event({{ d.id }})">
 {#                  <button class="delete btn btn-warning" value="{{ d.id }}"  onclick="edit_event({{ d.id }})" id="{{ d.id }}edit" >编辑</button>#}

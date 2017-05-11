@@ -53,12 +53,12 @@ class ShopInfo(models.Model):
     managerId=models.ForeignKey(Managers,verbose_name=u'销售经理',db_column='managerId')
     #店铺状态取值shopState
     state=models.CharField(max_length=2,verbose_name=u'运营状态',choices=shopState,db_column='state')
-    mallType=models.CharField(max_length=3,verbose_name=u'卖场类型',db_column='mallTyep')
+    mallType=models.CharField(max_length=3,verbose_name=u'卖场类型',db_column='mallTyep',null=True)
     shopType=models.CharField(max_length=2,verbose_name=u'经营方式',choices=shoptype,db_column='shopType')
     shopAddress=models.CharField(max_length=255,verbose_name=u'店铺地址',db_column='shopAddress')
-    openingDate=models.DateField(verbose_name=u'开业时间',db_column='openingDate',auto_created=False,auto_now=False,auto_now_add=False)
-    contractBeginDate=models.DateField(verbose_name=u'合同开始时间',db_column='contractBeginDate')
-    contractEndDate=models.DateField(verbose_name=u'合同结束时间',db_column='contractEndDate')
+    openingDate=models.DateField(default=None,verbose_name=u'开业时间',db_column='openingDate',auto_created=False,auto_now=False,auto_now_add=False)
+    contractBeginDate=models.DateField(verbose_name=u'合同开始时间',db_column='contractBeginDate',null=True,default=None)
+    contractEndDate=models.DateField(verbose_name=u'合同结束时间',db_column='contractEndDate',null=True,default=None)
     class Meta:
         verbose_name=u'店铺基础信息'
         verbose_name_plural=verbose_name
@@ -74,7 +74,7 @@ class datadiff(models.Model):
     shop_amount = models.FloatField(blank=True, null=True, verbose_name=u'上报金额',default=0)
     sys_amount = models.FloatField(blank=True, null=True, verbose_name=u'系统金额',default=0)
     amount = models.FloatField(blank=True, null=True,verbose_name=u'差异金额',default=0)
-    diff=models.TextField(blank=True,null=True,verbose_name=u'差异原因',default="无")
+    diff=models.TextField(blank=True,null=True,verbose_name=u'差异原因')
     remark=models.TextField(blank=True,null=True,verbose_name=u'备注')
 
     class Meta:

@@ -82,7 +82,7 @@ def addcheckdata(req):
 #获取所有有差异的数据
 def checkdata(request):
     shop_list = ShopInfo.objects.all()
-    diff=datadiff.objects.all().order_by("id_shop","-date")
+    diff=datadiff.objects.exclude(amount=0).order_by("id_shop","-date")
     return render(request,'checkdata.html',locals())
 #修改差异原因
 def update_diff(req):
@@ -97,13 +97,12 @@ def update_diff(req):
 import  openpyxl
 import  os
 def excelindb(request):
-    sava_message = "上传成功"
+    sava_message = {"sava_message": "上传成功"}
     excel_file = request.FILES['excelfile']
     excel_date = request.POST["exceldate"]
     excel_data_type=request.POST['upinfo_type']
     #获取项目根目录
     filepath=os.path.abspath(os.path.dirname('__file__'))
-    print(filepath)
     with open(filepath +'/static/upload/'+excel_data_type+ excel_date + '.xlsx', 'wb+') as destination:
         for chunk in excel_file.chunks():
             destination.write(chunk)
@@ -118,9 +117,11 @@ def excelindb(request):
             #循环读取每行数据然后写入数据库
                 j=1
                 #excel表格从第二行开始读取，每行第一列为店铺名
-                shop_id=ShopInfo.objects.get(sName=(excel_sheets.cell(row=row_excel,column=j).value))
+                shop_id=ShopInfo.objects.get(sysName=(excel_sheets.cell(row=row_excel,column=j).value))
+                print  shop_id
                 #每行第二列为系统金额
                 sys_amount_excel=float(excel_sheets.cell(row=row_excel,column=j+1).value)
+                print sys_amount_excel
                 #根据时间（excel_date）和店铺名称（shop_id）来判断记录是否存在，如果存在更新原有记录，否则新建记录
                 if datadiff.objects.filter(date=excel_date, id_shop=shop_id).count():
                     shop_amount_excel = datadiff.objects.get(date=excel_date, id_shop=shop_id).shop_amount
@@ -181,7 +182,32 @@ def excelindb(request):
                  # else:
                  #    Area.objects.update_or_create(name=area_name, manager=manager_id)
                  Area.objects.update_or_create(name=area_name,manager=manager_id)
+        #批量导入门店档案
         elif excel_data_type=='shopinfo':
-                shop_name_excel=excel_sheets.cell(row=row_excel,column=1).value
-                #未完成2017-5-10
+                shop_sysname_excel=excel_sheets.cell(row=row_excel,column=1).value
+                shop_reportname_excel=excel_sheets.cell(row=row_excel,column=2).value
+                print  shop_reportname_excel
+                shop_manager_excel=Managers.objects.get(name=excel_sheets.cell(row=row_excel,column=3).value)
+                shop_area_excel=Area.objects.get(name=excel_sheets.cell(row=row_excel,column=4).value)
+                shop_type_excel=excel_sheets.cell(row=row_excel,column=5).value
+                shop_state_excel=excel_sheets.cell(row=row_excel,column=6).value
+                shop_address_excel=excel_sheets.cell(row=row_excel,column=7).value
+                shop_mall_type_excel=excel_sheets.cell(row=row_excel,column=8).value
+                shop_opendate_excel=excel_sheets.cell(row=row_excel,column=9).value
+                print shop_opendate_excel
+                shop_contractBeginDate_excel=excel_sheets.cell(row=row_excel,column=10).value
+                shop_contractEndDate_excel=excel_sheets.cell(row=row_excel,column=11).value
+                ShopInfo.objects.update_or_create(
+                    sysName=shop_sysname_excel,
+                    sName=shop_reportname_excel,
+                    managerId=shop_manager_excel,
+                    areaId=shop_area_excel,
+                    state=shop_state_excel,
+                    mallType=shop_mall_type_excel,
+                    shopType=shop_type_excel,
+                    shopAddress=shop_address_excel,
+                    contractBeginDate=shop_contractBeginDate_excel,
+                    contractEndDate=shop_contractEndDate_excel,
+                    openingDate=shop_opendate_excel
+                )
     return render(request,'checkdata.html',sava_message)
