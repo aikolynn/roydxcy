@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% block title %}添加数据{% endblock %}
+{% block title %}差异核对{% endblock %}
 {% block content %}
     <script>
      function shopdata() {
@@ -23,6 +23,7 @@
 function edit_event(eventid) {
     diff=$("#diff"+eventid).text()
     remark=$("#remark"+eventid).text()
+    true_amount=$.trim($("select[name=true_amount"+eventid+"]").val())
     $.ajax(
         {
             url:"{% url 'update_diff' %}",
@@ -30,12 +31,18 @@ function edit_event(eventid) {
             data:{
                 diff_new:diff,
                 remark:remark,
+                true_amount:true_amount,
                 diffid:eventid
             },
             datatype:"json",
-            suceess:function (data) {
-                window.location.reload();
+            success:(
+                function (data) {
+                    if(data.success()){
+                        window.location.reload(true);
+                    }
+
             }
+            ),
         }
     )
 }
@@ -131,7 +138,7 @@ font-weight:800
     <button class="btn btn-info " data-toggle="modal" data-target="#diffmodal-data" type="button">店铺上报数据</button>
 </p>
 {% csrf_token %}
-<form action="{% url 'upinfo' %}" enctype="multipart/form-data" method="post" class="form-group col-xs-3" role="form">
+<form action="{% url 'upinfo' %}" enctype="multipart/form-data" method="post" class=" col-xs-4" role="form">
          <div class="form-group" >
              <div class="input-group">
                  <span  class="input-group-addon">数据类型</span>
@@ -150,6 +157,11 @@ font-weight:800
             </div>
             <div class="input-group">
                 <button type="submit" class="btn btn-info">上传文件</button>
+            </div>
+            <div class="input-group">
+                <a href="{% url 'diff_export_excel' %}">
+                    <button class="glyphicon glyphicon-download-alt btn btn-info">下载差异表</button>
+                </a>
             </div>
          </div>
 </form>
@@ -204,7 +216,14 @@ font-weight:800
 <!--添加数据弹窗-->
 <p>&nbsp;</p>
 <!--页面主体内容-->
-   <table class="table table-hover table-bordered" id="editTable">
+
+   <table class="table table-hover table-bordered text-center" id="editTable">
+       <tr>
+           <td colspan="8" >
+               <span class="h3"><b>ERP系统数据差异核对表</b></span>
+               <span class=" btn btn-danger">标红表示该数据为正确数据</span>
+           </td>
+       </tr>
        <tr class="active">
            <td>店&nbsp;&nbsp;铺</td>
            <td>日&nbsp;&nbsp;期</td>
@@ -218,27 +237,43 @@ font-weight:800
        {% for d in diff %}
            <tr class="success">
               <td>{{ d.id_shop.sysName }}</td>
+
               <td>{{ d.date|date:"Y-m-d "}}</td>
-              <td >{{ d.sys_amount }}</td>
-               <td >{{ d.shop_amount }}</td>
+
+              {% if  d.true_amount == 1 %}
+                <td style="color:red;font-style:italic;" ><b>{{ d.sys_amount }}</b></td>
+              {% else %}
+                 <td >{{ d.sys_amount }}</td>
+              {% endif %}
+
+               {% if  d.true_amount == 0 %}
+                   <td style="color:red;font-style:italic;" ><b>{{ d.shop_amount }}</b></td>
+               {% else   %}
+                   <td >{{ d.shop_amount }}</td>
+               {% endif %}
+
                <td >{{ d.amount }}</td>
+
                {% if d.diff %}
-                    <td id="diff{{ d.id }}" class="edit" style="color: red;font-family:楷体;">{{ d.diff}}</td>
+                    <td id="diff{{ d.id }}" class="edit h4" style="color: blue;font-family:楷体;">{{ d.diff}}</td>
                {% else %}
-                    <td id="diff{{ d.id }}" class="edit"> </td>
+                    <td id="diff{{ d.id }}" class="edit"></td>
                {% endif %}
-               {% if d.remark %}
-                   <td id="remark{{ d.id }}" class="edit">{{ d.remark}}</td>
-                {% else %}
-                   <td id="remark{{ d.id }}" class="edit"></td>
-               {% endif %}
-              <td>
+
+                <td id="remark{{ d.id }}" class="edit">{{ d.remark}}</td>
+
+                <td>
                   <input type="button" class="btn btn-info" value="保存"  onclick="edit_event({{ d.id }})">
-{#                  <button class="delete btn btn-warning" value="{{ d.id }}"  onclick="edit_event({{ d.id }})" id="{{ d.id }}edit" >编辑</button>#}
-{#                  <button class="delete btn " value="{{ d.id }}"  onclick="ablebtn({{ d.id }})" id="{{ d.id }}cansle" disabled="true" >取消</button>#}
+                  <div class="input-group input-sm">
+                      <select name="true_amount{{ d.id }}" class="form-control">
+                          <option value="show" selected>请选择正确值</option>
+                          <option value="sys">系统金额</option>
+                          <option value="shop">上报金额</option>
+                        </select>
+                  </div>
               </td>
            </tr>
        {% endfor %}
    </table>
-   </div>
+</div>
 {% endblock %}

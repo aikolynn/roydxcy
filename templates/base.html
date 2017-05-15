@@ -14,7 +14,7 @@
 <nav class="navbar navbar-default navbar-top navbar-fixed-top" role="navigation">
     <!--导航骨架：汉堡按钮及导航条LOGO-->
     <div class="navbar-header">
-        <span class="navbar-brand">门店数据核对系统</span>
+        <span class="navbar-brand glyphicon glyphicon-book">门店数据核对系统</span>
 
         <!-- 响应式导航面包按钮 -->
         <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#example-navbar">
@@ -30,7 +30,7 @@
     <!-- 导航主体 -->
     <div class="collapse navbar-collapse" id="example-navbar">
         <ul class="nav navbar-nav">
-           <li><a href="{% url 'diff' %}">添加数据</a> </li>
+           <li><a class="glyphicon glyphicon-list-alt"  href="{% url 'diff' %}">差异核对</a> </li>
            <li ><a href="{% url 'shop'%}">档案管理</a> </li>
 {#           <li ><a href="/diff/">数据差异</a> </li>#}
         </ul>

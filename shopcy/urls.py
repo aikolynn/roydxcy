@@ -14,5 +14,6 @@ urlpatterns = [
     url(r'^upinfo/',excelindb,name='upinfo'),
     url(r"^upload/(?P<path>.*)$", "django.views.static.serve", {"document_root": settings.MEDIA_ROOT,}),
     url(r'^check/', addcheckdata, name='check'),
-    url(r'^diff/', checkdata, name='diff')
+    url(r'^diff/', checkdata, name='diff'),
+    url(r'^diff_excel_export',diff_export_excel,name="diff_export_excel")
 ]

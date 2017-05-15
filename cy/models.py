@@ -59,6 +59,7 @@ class ShopInfo(models.Model):
     openingDate=models.DateField(default=None,verbose_name=u'开业时间',db_column='openingDate',auto_created=False,auto_now=False,auto_now_add=False)
     contractBeginDate=models.DateField(verbose_name=u'合同开始时间',db_column='contractBeginDate',null=True,default=None)
     contractEndDate=models.DateField(verbose_name=u'合同结束时间',db_column='contractEndDate',null=True,default=None)
+    shop_brand=models.CharField(null=True,verbose_name=u'品牌',db_column='shopbrand',default=None,max_length=20)
     class Meta:
         verbose_name=u'店铺基础信息'
         verbose_name_plural=verbose_name
@@ -76,6 +77,13 @@ class datadiff(models.Model):
     amount = models.FloatField(blank=True, null=True,verbose_name=u'差异金额',default=0)
     diff=models.TextField(blank=True,null=True,verbose_name=u'差异原因')
     remark=models.TextField(blank=True,null=True,verbose_name=u'备注')
+    '''
+    指定shop_amount和sys_amount那个值为正确,
+    true_amount=1表示sys_amount为正确值，
+    true_amount=0表示shop_amount为正确值,
+    true_amount为其他值表示暂时不确定正确值
+    '''
+    true_amount=models.IntegerField(default=2,db_column='true_amount',verbose_name=u'正确值')
 
     class Meta:
         ordering=['-date']

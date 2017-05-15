@@ -4,6 +4,9 @@ from django.shortcuts import render,HttpResponseRedirect,redirect,HttpResponse
 from models import  *
 from forms import *
 from django.http import JsonResponse
+import  openpyxl
+from openpyxl import styles
+import  os
 # Create your views here.
 #展示店铺信息并增加修改店铺信息
 def shop(request):
@@ -82,20 +85,56 @@ def addcheckdata(req):
 #获取所有有差异的数据
 def checkdata(request):
     shop_list = ShopInfo.objects.all()
-    diff=datadiff.objects.exclude(amount=0).order_by("id_shop","-date")
+    diff=datadiff.objects.exclude(amount=0).filter(id_shop__shopType__in=["D","C"]).order_by("id_shop","-date")
     return render(request,'checkdata.html',locals())
+def diff_export_excel(request):
+    diff = datadiff.objects.exclude(amount=0).filter(id_shop__shopType__in=["D", "C"]).order_by("id_shop", "-date")
+    print  diff.count()
+    # 创建一个excel表格对象
+    F_styleB=styles.Font(color=styles.colors.BLACK,bold=True)
+    F_styleR=styles.Font(color=styles.colors.RED,bold=True,italic=True)
+    title_style=styles.Fill()
+    diff_excel_book = openpyxl.Workbook()
+    book_sheet = diff_excel_book.create_sheet(u"销售差异")
+    book_sheet.append([u"店铺", u"日期", u"系统金额", u"上报金额", u"差异金额", u"差异原因", u"备注"])
+    for i in range(1,8):
+        book_sheet.cell(row=1,column=i).font=F_styleB
+    row=2
+    for diff_y in diff:
+            book_sheet.cell(row=row, column=1).value = diff_y.id_shop.sysName
+            book_sheet.cell(row=row, column=2).value = diff_y.date
+            book_sheet.cell(row=row, column=3).value = diff_y.sys_amount
+            book_sheet.cell(row=row, column=4).value = diff_y.shop_amount
+            if diff_y.true_amount == 0:
+                book_sheet.cell(row=row, column=4).font=F_styleR
+            elif diff_y.true_amount==1:
+                book_sheet.cell(row=row, column=3).font=F_styleR
+            book_sheet.cell(row=row, column=5).value = diff_y.amount
+            book_sheet.cell(row=row, column=6).value = diff_y.diff
+            row+=1
+    response = HttpResponse(content_type='application/vnd.ms-excel')
+    response['Content-Disposition'] = 'attachment; filename=销售差异.xlsx'
+    diff_excel_book.save(response)
+    return  response
+
 #修改差异原因
 def update_diff(req):
     sava_message = {"sava_message": "提交成功"}
     diff_new=req.GET["diff_new"]
     remark_new = req.GET["remark"]
+    true_amount=req.GET["true_amount"]
     diff_id=req.GET["diffid"]
-    datadiff.objects.filter(id=diff_id).update(diff=diff_new,remark=remark_new)
+
+    if true_amount=="sys":
+            datadiff.objects.filter(id=diff_id).update(diff=diff_new,remark=remark_new,true_amount=1)
+    elif true_amount=="shop":
+            datadiff.objects.filter(id=diff_id).update(diff=diff_new, remark=remark_new,true_amount=0)
+    elif true_amount=="show":
+        datadiff.objects.filter(id=diff_id).update(diff=diff_new, remark=remark_new,true_amount=3)
     return  JsonResponse(sava_message)
 
 #导入excel读写库 openpyxl(只可读写2007版及之后的office文档)
-import  openpyxl
-import  os
+
 def excelindb(request):
     sava_message = {"sava_message": "上传成功"}
     excel_file = request.FILES['excelfile']
@@ -186,7 +225,6 @@ def excelindb(request):
         elif excel_data_type=='shopinfo':
                 shop_sysname_excel=excel_sheets.cell(row=row_excel,column=1).value
                 shop_reportname_excel=excel_sheets.cell(row=row_excel,column=2).value
-                print  shop_reportname_excel
                 shop_manager_excel=Managers.objects.get(name=excel_sheets.cell(row=row_excel,column=3).value)
                 shop_area_excel=Area.objects.get(name=excel_sheets.cell(row=row_excel,column=4).value)
                 shop_type_excel=excel_sheets.cell(row=row_excel,column=5).value
@@ -194,7 +232,7 @@ def excelindb(request):
                 shop_address_excel=excel_sheets.cell(row=row_excel,column=7).value
                 shop_mall_type_excel=excel_sheets.cell(row=row_excel,column=8).value
                 shop_opendate_excel=excel_sheets.cell(row=row_excel,column=9).value
-                print shop_opendate_excel
+                shop_brand_excel=excel_sheets.cell(row=row_excel,column=12).value
                 shop_contractBeginDate_excel=excel_sheets.cell(row=row_excel,column=10).value
                 shop_contractEndDate_excel=excel_sheets.cell(row=row_excel,column=11).value
                 ShopInfo.objects.update_or_create(
@@ -208,6 +246,7 @@ def excelindb(request):
                     shopAddress=shop_address_excel,
                     contractBeginDate=shop_contractBeginDate_excel,
                     contractEndDate=shop_contractEndDate_excel,
-                    openingDate=shop_opendate_excel
+                    openingDate=shop_opendate_excel,
+                    shop_brand=shop_brand_excel
                 )
     return render(request,'checkdata.html',sava_message)
