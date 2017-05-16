@@ -30,8 +30,17 @@
     <!-- 导航主体 -->
     <div class="collapse navbar-collapse" id="example-navbar">
         <ul class="nav navbar-nav">
-           <li><a class="glyphicon glyphicon-list-alt"  href="{% url 'diff' %}">差异核对</a> </li>
-           <li ><a href="{% url 'shop'%}">档案管理</a> </li>
+
+           <li>
+               <a href="{% url 'diff' %}">
+                    <button class="glyphicon glyphicon-list-alt btn btn-success">&nbsp;差异核对</button>
+               </a>
+           </li>
+           <li >
+               <a href="{% url 'shop'%}">
+                   <button class="glyphicon glyphicon-book btn btn-success">&nbsp;档案管理</button>
+               </a>
+           </li>
 {#           <li ><a href="/diff/">数据差异</a> </li>#}
         </ul>
     </div>

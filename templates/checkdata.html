@@ -156,16 +156,16 @@ font-weight:800
                 <input type="file" class="inputstyle" name="excelfile" >
             </div>
             <div class="input-group">
-                <button type="submit" class="btn btn-info">上传文件</button>
+                <button type="submit" class="btn btn-info glyphicon glyphicon-upload">上传文件</button>
             </div>
-            <div class="input-group">
+
+         </div>
+</form>
+<div class="input-group">
                 <a href="{% url 'diff_export_excel' %}">
                     <button class="glyphicon glyphicon-download-alt btn btn-info">下载差异表</button>
                 </a>
             </div>
-         </div>
-</form>
-
 <!-- 店铺添加弹窗内容 -->
 <div class="modal  " id="diffmodal-data" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
      <div class="modal-dialog">
@@ -217,14 +217,14 @@ font-weight:800
 <p>&nbsp;</p>
 <!--页面主体内容-->
 
-   <table class="table table-hover table-bordered text-center" id="editTable">
+   <table class="table table-hover text-center" id="editTable">
        <tr>
-           <td colspan="8" >
+           <td colspan="8" class="lead">
                <span class="h3"><b>ERP系统数据差异核对表</b></span>
                <span class=" btn btn-danger">标红表示该数据为正确数据</span>
            </td>
        </tr>
-       <tr class="active">
+       <tr class=" success text-info">
            <td>店&nbsp;&nbsp;铺</td>
            <td>日&nbsp;&nbsp;期</td>
            <td>系统金额</td>
@@ -235,8 +235,8 @@ font-weight:800
           <td>操作</td>
        </tr>
        {% for d in diff %}
-           <tr class="success">
-              <td>{{ d.id_shop.sysName }}</td>
+           <tr class="info">
+              <td class="text-danger " style="vertical-align: middle !important;font-size:20px;">{{ d.id_shop.sysName }}</td>
 
               <td>{{ d.date|date:"Y-m-d "}}</td>
 
@@ -263,8 +263,8 @@ font-weight:800
                 <td id="remark{{ d.id }}" class="edit">{{ d.remark}}</td>
 
                 <td>
-                  <input type="button" class="btn btn-info" value="保存"  onclick="edit_event({{ d.id }})">
-                  <div class="input-group input-sm">
+                  <button class="btn btn-info glyphicon glyphicon-saved" value=""  onclick="edit_event({{ d.id }})">保存</button>
+                  <div class="input-group ">
                       <select name="true_amount{{ d.id }}" class="form-control">
                           <option value="show" selected>请选择正确值</option>
                           <option value="sys">系统金额</option>

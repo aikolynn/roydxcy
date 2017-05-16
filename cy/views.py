@@ -82,13 +82,16 @@ def addcheckdata(req):
         create_list.save()
     return JsonResponse(sava_message)
 
+one_page_data=10
 #获取所有有差异的数据
 def checkdata(request):
-    shop_list = ShopInfo.objects.all()
+    shop_list = ShopInfo.objects.values('Id','sName')
+    #查询所有有差异的记录总数
     diff=datadiff.objects.exclude(amount=0).filter(id_shop__shopType__in=["D","C"]).order_by("id_shop","-date")
     return render(request,'checkdata.html',locals())
+
 def diff_export_excel(request):
-    diff = datadiff.objects.exclude(amount=0).filter(id_shop__shopType__in=["D", "C"]).order_by("id_shop", "-date")
+    diff = datadiff.objects.exclude(amount=0).filter(id_shop__shopType__in=["D", "C"]).order_by("id_shop", "date")
     print  diff.count()
     # 创建一个excel表格对象
     F_styleB=styles.Font(color=styles.colors.BLACK,bold=True)
@@ -150,37 +153,43 @@ def excelindb(request):
     sheetnames = excel_data.get_sheet_names()
     excel_sheets=excel_data.get_sheet_by_name(sheetnames[0])
     excel_rows=excel_sheets.max_row
+    excel_columns=excel_sheets.max_column
     #获取当前人员表总记录数数
     for row_excel in range(2, excel_rows + 1):
         if excel_data_type=="sysamout":
             #循环读取每行数据然后写入数据库
-                j=1
+            for column_excel in range(2,excel_columns+1):
                 #excel表格从第二行开始读取，每行第一列为店铺名
-                shop_id=ShopInfo.objects.get(sysName=(excel_sheets.cell(row=row_excel,column=j).value))
-                print  shop_id
+                shop_id=ShopInfo.objects.get(sysName=(excel_sheets.cell(row=row_excel,column=1).value))
+                date_excel = excel_sheets.cell(row=1, column=column_excel).value
                 #每行第二列为系统金额
-                sys_amount_excel=float(excel_sheets.cell(row=row_excel,column=j+1).value)
-                print sys_amount_excel
+                print  row_excel,column_excel
+                sys_amount_excel=float(excel_sheets.cell(row=row_excel,column=column_excel).value)
                 #根据时间（excel_date）和店铺名称（shop_id）来判断记录是否存在，如果存在更新原有记录，否则新建记录
-                if datadiff.objects.filter(date=excel_date, id_shop=shop_id).count():
-                    shop_amount_excel = datadiff.objects.get(date=excel_date, id_shop=shop_id).shop_amount
-                    datadiff.objects.filter(date=excel_date, id_shop=shop_id).update(sys_amount=sys_amount_excel, amount=sys_amount_excel-shop_amount_excel)
+                if datadiff.objects.filter(date=date_excel, id_shop=shop_id).count():
+                    shop_amount_base = datadiff.objects.get(date=date_excel, id_shop=shop_id).shop_amount
+                    datadiff.objects.filter(date=date_excel, id_shop=shop_id).update(sys_amount=sys_amount_excel, amount=sys_amount_excel-shop_amount_base)
                 else:
-                    sys_diff=datadiff(sys_amount=sys_amount_excel,date=excel_date,id_shop=shop_id)
+                    sys_diff=datadiff(sys_amount=sys_amount_excel,date=date_excel,id_shop=shop_id)
                     sys_diff.save()
+
         elif excel_data_type=="shopamout" :
-                j=1
+                for column_excel in range(2,excel_columns+1):
                 #excel表格从第二行开始读取，每行第一列为店铺名
-                shop_id=ShopInfo.objects.get(sName=(excel_sheets.cell(row=row_excel,column=j).value))
-                #每行第二列为店铺金额
-                shopamount_excel=float(excel_sheets.cell(row=row_excel,column=j+1).value)
-                #根据时间（excel_date）和店铺名称（shop_id）来判断记录是否存在，如果存在更新原有记录，否则新建记录
-                if datadiff.objects.filter(date=excel_date, id_shop=shop_id).count():
-                    sys_amount_base = datadiff.objects.get(date=excel_date, id_shop=shop_id).sys_amount
-                    datadiff.objects.filter(date=excel_date, id_shop=shop_id).update(shop_amount=shopamount_excel, amount=sys_amount_base-shopamount_excel)
-                else:
-                    shop_diff=datadiff(shop_amount=shopamount_excel,date=excel_date,id_shop=shop_id)
-                    shop_diff.save()
+                    shop_id=ShopInfo.objects.get(sName=(excel_sheets.cell(row=row_excel,column=1).value))
+                    #每行第二列为店铺金额
+                    shopamount_excel=float(excel_sheets.cell(row=row_excel,column=column_excel).value)
+                    print  shopamount_excel
+                    date_excel=excel_sheets.cell(row=1,column=column_excel).value
+                    print date_excel
+                    #根据时间（excel_date）和店铺名称（shop_id）来判断记录是否存在，如果存在更新原有记录，否则新建记录
+                    if datadiff.objects.filter(date=date_excel, id_shop=shop_id).count():
+                        sys_amount_base = datadiff.objects.get(date=date_excel, id_shop=shop_id).sys_amount
+                        datadiff.objects.filter(date=date_excel, id_shop=shop_id).update(shop_amount=shopamount_excel, amount=sys_amount_base-shopamount_excel)
+                    else:
+                        shop_diff=datadiff(shop_amount=shopamount_excel,date=date_excel,id_shop=shop_id)
+                        shop_diff.save()
+
         elif excel_data_type=="staff":
                 staff_name=excel_sheets.cell(row=row_excel,column=1).value
                 staff_personal_phone=excel_sheets.cell(row=row_excel,column=2).value
