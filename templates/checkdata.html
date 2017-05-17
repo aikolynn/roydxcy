@@ -62,7 +62,7 @@ function tdClick(){
     //将td的内容清空
     td.empty();
     //新建一个输入框
-    var input = $("<input type='text' class=' form-control ' size='3'>");
+    var input = $("<input type='text' class=' form-control mi' size='3'>");
     //将保存的文本内容赋值给输入框
     input.attr("value",tdText);
     //将输入框添加到td中
@@ -97,6 +97,11 @@ function tdClick(){
     //将td的点击事件移除
     td.unbind("click");
 }
+
+
+         
+     
+
     </script>
 
 
@@ -130,6 +135,21 @@ font-weight:800
     left:0px;
     top: 0px;
 }
+.wh{
+    bgcolor:white ;
+}
+.comment_inner{
+    width: 300px;
+    word-break: break-all;
+    text-overflow: ellipsis;
+    display: -webkit-box; /** 对象作为伸缩盒子模型显示 **/
+    -webkit-box-orient: vertical; /** 设置或检索伸缩盒对象的子元素的排列方式 **/
+    -webkit-line-clamp: 1; /** 显示的行数 **/
+    overflow: hidden;  /** 隐藏超出的内容 **/
+    }
+ .mi{
+     vertical-align: middle !important;
+ }
  </style>
 <div class="container" >
  <!-- 弹出添加店铺上报数据 -->
@@ -165,7 +185,8 @@ font-weight:800
                 <a href="{% url 'diff_export_excel' %}">
                     <button class="glyphicon glyphicon-download-alt btn btn-info">下载差异表</button>
                 </a>
-            </div>
+ </div>
+
 <!-- 店铺添加弹窗内容 -->
 <div class="modal  " id="diffmodal-data" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
      <div class="modal-dialog">
@@ -215,17 +236,55 @@ font-weight:800
 </div>
 <!--添加数据弹窗-->
 <p>&nbsp;</p>
-<!--页面主体内容-->
 
-   <table class="table table-hover text-center" id="editTable">
-       <tr>
-           <td colspan="8" class="lead">
+<!--页面主体内容-->
+<script>
+    $(document).ready(function(){
+        $("#editTable tr :even").addClass("warning");//奇数行
+        $("#editTable tr :odd").addClass("info");//偶数行
+    }
+    );
+</script>
+  <table class="table table-condensed   text-center " >
+      <tr>
+           <td colspan="9" class="lead">
                <span class="h3"><b>ERP系统数据差异核对表</b></span>
-               <span class=" btn btn-danger">标红表示该数据为正确数据</span>
+               <span class=" btn btn-danger">绿色与蓝色方框圈中的数字为正确数据</span>
            </td>
        </tr>
-       <tr class=" success text-info">
+        <tr >
+          <td colspan="9">
+          <form action="{% url 'diff' %}" class="form-inline" role="form">
+              <div class=" form-group input-group">
+                 <span  class="input-group-addon">店铺名称</span>
+                     <select name="select_name" class="form-control " id="sel">
+                         <option value="" class="selected">请选择要筛选的店铺名称</option>
+                         {% for item in shop_list %}
+                             <option value="{{ item.Id }}">{{ item.sName }}</option>
+                         {% endfor %}
+                     </select>
+             </div>
+            <div class=" form-group input-group">
+                 <span  class="input-group-addon">销售经理</span>
+                     <select name="man_name" class="form-control " id="sel">
+                         <option value="" class="selected">请选择要筛选的销售经理</option>
+                         {% for item in man_list %}
+                             <option value="{{ item.id }}">{{ item.name }}</option>
+                         {% endfor %}
+                     </select>
+             </div>
+             <div class="form-group ">
+                  <button type="submit" class="btn btn-primary">查看</button>
+             </div>
+
+          </form>
+          </td>
+      </tr>
+  </table>
+   <table class="table table-hover text-center table-striped" id="editTable">
+       <tr class=" success text-info" style="font-size:17px;">
            <td>店&nbsp;&nbsp;铺</td>
+           <td>销售经理</td>
            <td>日&nbsp;&nbsp;期</td>
            <td>系统金额</td>
            <td>上报金额</td>
@@ -235,32 +294,33 @@ font-weight:800
           <td>操作</td>
        </tr>
        {% for d in diff %}
-           <tr class="info">
+           <tr>
               <td class="text-danger " style="vertical-align: middle !important;font-size:20px;">{{ d.id_shop.sysName }}</td>
+              <td class="mi">{{ d.id_shop.managerId.name }}</td>
 
-              <td>{{ d.date|date:"Y-m-d "}}</td>
+              <td class="mi">{{ d.date|date:"Y-m-d "}}</td>
 
               {% if  d.true_amount == 1 %}
-                <td style="color:red;font-style:italic;" ><b>{{ d.sys_amount }}</b></td>
+                <td  class="mi" ><button class="btn btn-success">{{ d.sys_amount }}</button></td>
               {% else %}
-                 <td >{{ d.sys_amount }}</td>
+                 <td class="mi" >{{ d.sys_amount }}</td>
               {% endif %}
 
                {% if  d.true_amount == 0 %}
-                   <td style="color:red;font-style:italic;" ><b>{{ d.shop_amount }}</b></td>
+                   <td  class="mi"><button class="btn btn-info">{{ d.shop_amount }}</button></td>
                {% else   %}
-                   <td >{{ d.shop_amount }}</td>
+                   <td  class="mi">{{ d.shop_amount }}</td>
                {% endif %}
 
-               <td >{{ d.amount }}</td>
+               <td class="mi" >{{ d.amount }}</td>
 
                {% if d.diff %}
-                    <td id="diff{{ d.id }}" class="edit h4" style="color: blue;font-family:楷体;">{{ d.diff}}</td>
+                    <td id="diff{{ d.id }}" class="edit h4 mi" style="color: blue;font-family:楷体; width: 20%; ">{{ d.diff}}</td>
                {% else %}
-                    <td id="diff{{ d.id }}" class="edit"></td>
+                    <td id="diff{{ d.id }}" class="edit"  ></td>
                {% endif %}
 
-                <td id="remark{{ d.id }}" class="edit">{{ d.remark}}</td>
+                <td id="remark{{ d.id }}" class="edit mi">{{ d.remark}}</td>
 
                 <td>
                   <button class="btn btn-info glyphicon glyphicon-saved" value=""  onclick="edit_event({{ d.id }})">保存</button>

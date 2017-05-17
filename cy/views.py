@@ -81,13 +81,26 @@ def addcheckdata(req):
         create_list = datadiff(date=data_date, shop_amount=shop_amount_report, id_shop=shopname)
         create_list.save()
     return JsonResponse(sava_message)
-
-one_page_data=10
+def checkall(req):
+    shop_list = ShopInfo.objects.values('Id', 'sName', 'shopType', "managerId__name", "managerId").filter(
+        shopType__in=["D", "C"])
+    man_list = Managers.objects.values('id', 'name').filter(shopinfo__shopType__in=["D", "C"]).distinct()
+    diff = datadiff.objects.exclude(amount=0).filter(id_shop__shopType__in=["D", "C"]).order_by("id_shop", "-date")
+    return render(req,'checkdata.html',locals())
 #获取所有有差异的数据
 def checkdata(request):
-    shop_list = ShopInfo.objects.values('Id','sName')
+    shop_list = ShopInfo.objects.values('Id','sName','shopType',"managerId__name","managerId").filter(shopType__in=["D","C"])
+    man_list=Managers.objects.values('id','name').filter(shopinfo__shopType__in=["D","C"]).distinct()
+    sel_shop_name=request.GET['select_name']
+    sel_man_name=request.GET['man_name']
     #查询所有有差异的记录总数
-    diff=datadiff.objects.exclude(amount=0).filter(id_shop__shopType__in=["D","C"]).order_by("id_shop","-date")
+    if sel_shop_name=='' and sel_man_name=='' :
+        diff=datadiff.objects.exclude(amount=0).filter(id_shop__shopType__in=["D","C"]).order_by("id_shop","-date")
+    elif sel_shop_name and sel_man_name=='':
+        diff = datadiff.objects.exclude(amount=0).filter(id_shop__shopType__in=["D", "C"],id_shop=sel_shop_name).order_by("id_shop", "-date")
+    elif sel_man_name and sel_shop_name=='':
+        diff = datadiff.objects.exclude(amount=0).filter(id_shop__shopType__in=["D", "C"],
+                                                         id_shop__managerId=sel_man_name).order_by("id_shop", "-date")
     return render(request,'checkdata.html',locals())
 
 def diff_export_excel(request):
