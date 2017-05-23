@@ -1,6 +1,7 @@
 from django.conf.urls import include, url
 from django.contrib import admin
 from cy.views import *
+from product.views import *
 from shopcy import settings
 urlpatterns = [
     # Examples:
@@ -15,6 +16,8 @@ urlpatterns = [
     url(r"^upload/(?P<path>.*)$", "django.views.static.serve", {"document_root": settings.MEDIA_ROOT,}),
     url(r'^check/', addcheckdata, name='check'),
     url(r'^diff/', checkdata, name='diff'),
-    url(r'^checkall',checkall,name='checkall'),
-    url(r'^diff_excel_export',diff_export_excel,name="diff_export_excel")
+    url(r'^checkall/',checkall,name='checkall'),
+    url(r'^diff_excel_export',diff_export_excel,name="diff_export_excel"),
+
+    url(r'^productview/',product_view,name='productview')
 ]

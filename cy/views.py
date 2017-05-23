@@ -7,6 +7,7 @@ from django.http import JsonResponse
 import  openpyxl
 from openpyxl import styles
 import  os
+from datetime import *
 # Create your views here.
 #展示店铺信息并增加修改店铺信息
 def shop(request):
@@ -89,17 +90,30 @@ def checkall(req):
     return render(req,'checkdata.html',locals())
 #获取所有有差异的数据
 def checkdata(request):
-    shop_list = ShopInfo.objects.values('Id','sName','shopType',"managerId__name","managerId").filter(shopType__in=["D","C"])
+    shop_list = ShopInfo.objects.values('Id','sName',"managerId__name","managerId").filter(shopType__in=["D","C"])
     man_list=Managers.objects.values('id','name').filter(shopinfo__shopType__in=["D","C"]).distinct()
     sel_shop_name=request.GET['select_name']
     sel_man_name=request.GET['man_name']
+    sel_date=request.GET['sel_date']
+
     #查询所有有差异的记录总数
-    if sel_shop_name=='' and sel_man_name=='' :
+    if sel_shop_name=='' and sel_man_name=='' and sel_date=='' :
         diff=datadiff.objects.exclude(amount=0).filter(id_shop__shopType__in=["D","C"]).order_by("id_shop","-date")
-    elif sel_shop_name and sel_man_name=='':
+    elif sel_shop_name and sel_man_name=='' and sel_date=='':
         diff = datadiff.objects.exclude(amount=0).filter(id_shop__shopType__in=["D", "C"],id_shop=sel_shop_name).order_by("id_shop", "-date")
-    elif sel_man_name and sel_shop_name=='':
+    elif sel_man_name and sel_shop_name=='' and sel_date=='':
         diff = datadiff.objects.exclude(amount=0).filter(id_shop__shopType__in=["D", "C"],
+                                                         id_shop__managerId=sel_man_name).order_by("id_shop", "-date")
+    elif sel_date and sel_shop_name=='' and sel_man_name=='':
+        diff = datadiff.objects.exclude(amount=0).filter(id_shop__shopType__in=["D", "C"],
+                                                         date=sel_date).order_by("id_shop", "-date")
+    elif sel_date and sel_shop_name and sel_man_name=='':
+        diff = datadiff.objects.exclude(amount=0).filter(id_shop__shopType__in=["D","C"],
+                                                         date=sel_date,
+                                                         id_shop=sel_shop_name).order_by("id_shop", "-date")
+    elif sel_man_name and sel_date and sel_shop_name=='':
+        diff = datadiff.objects.exclude(amount=0).filter(id_shop__shopType__in=['D','C'],
+                                                         date=sel_date,
                                                          id_shop__managerId=sel_man_name).order_by("id_shop", "-date")
     return render(request,'checkdata.html',locals())
 
@@ -168,8 +182,8 @@ def excelindb(request):
     excel_rows=excel_sheets.max_row
     excel_columns=excel_sheets.max_column
     #获取当前人员表总记录数数
-    for row_excel in range(2, excel_rows + 1):
-        if excel_data_type=="sysamout":
+    if excel_data_type=="sysamout":
+        for row_excel in range(2, excel_rows + 1):
             #循环读取每行数据然后写入数据库
             for column_excel in range(2,excel_columns+1):
                 #excel表格从第二行开始读取，每行第一列为店铺名
@@ -185,16 +199,16 @@ def excelindb(request):
                 else:
                     sys_diff=datadiff(sys_amount=sys_amount_excel,date=date_excel,id_shop=shop_id)
                     sys_diff.save()
-
-        elif excel_data_type=="shopamout" :
+                date_excel_str=date_excel.strftime("%Y-%m-%d")
+        return HttpResponseRedirect('/diff/?select_name=&man_name=&sel_date=%s' % date_excel_str)
+    elif excel_data_type=="shopamout":
+        for row_excel in range(2, excel_rows + 1):
                 for column_excel in range(2,excel_columns+1):
                 #excel表格从第二行开始读取，每行第一列为店铺名
                     shop_id=ShopInfo.objects.get(sName=(excel_sheets.cell(row=row_excel,column=1).value))
                     #每行第二列为店铺金额
                     shopamount_excel=float(excel_sheets.cell(row=row_excel,column=column_excel).value)
-                    print  shopamount_excel
                     date_excel=excel_sheets.cell(row=1,column=column_excel).value
-                    print date_excel
                     #根据时间（excel_date）和店铺名称（shop_id）来判断记录是否存在，如果存在更新原有记录，否则新建记录
                     if datadiff.objects.filter(date=date_excel, id_shop=shop_id).count():
                         sys_amount_base = datadiff.objects.get(date=date_excel, id_shop=shop_id).sys_amount
@@ -202,8 +216,11 @@ def excelindb(request):
                     else:
                         shop_diff=datadiff(shop_amount=shopamount_excel,date=date_excel,id_shop=shop_id)
                         shop_diff.save()
-
-        elif excel_data_type=="staff":
+                date_excel_str = date_excel.strftime("%Y-%m-%d")
+        return HttpResponseRedirect('/diff/?select_name=&man_name=&sel_date=%s' % date_excel_str)
+        #批量导入人员信息
+    elif excel_data_type=="staff":
+        for row_excel in range(2, excel_rows + 1):
                 staff_name=excel_sheets.cell(row=row_excel,column=1).value
                 staff_personal_phone=excel_sheets.cell(row=row_excel,column=2).value
                 staff_c_phone=excel_sheets.cell(row=row_excel,column=3).value
@@ -222,7 +239,6 @@ def excelindb(request):
                         address=staff_address
                     )
                 else:
-
                     Managers.objects.create(name=staff_name,
                                             personal_cellphone=staff_personal_phone,
                                             company_cellphone=staff_c_phone,
@@ -231,20 +247,20 @@ def excelindb(request):
                                             title=staff_title,
                                             address=staff_address
                                             )
+                return render(request, 'shop.html', locals())
 
         #批量导入区域档案
-        elif excel_data_type=='areainfo':
+    elif excel_data_type=='areainfo':
+        for row_excel in range(2, excel_rows + 1):
                  #表格第二列为区域负责人姓名
                  manager_id=Managers.objects.get(name=(excel_sheets.cell(row=row_excel,column=2).value))
                  #创建区域信息
                  area_name=excel_sheets.cell(row=row_excel,column=1).value
-                 # if Area.objects.filter(name=area_name).count():
-                 #     Area.objects.filter(name=area_name).update(manager=manager_id,name=area_name)
-                 # else:
-                 #    Area.objects.update_or_create(name=area_name, manager=manager_id)
                  Area.objects.update_or_create(name=area_name,manager=manager_id)
+                 return render(request, 'shop.html', locals())
         #批量导入门店档案
-        elif excel_data_type=='shopinfo':
+    elif excel_data_type=='shopinfo':
+        for row_excel in range(2, excel_rows + 1):
                 shop_sysname_excel=excel_sheets.cell(row=row_excel,column=1).value
                 shop_reportname_excel=excel_sheets.cell(row=row_excel,column=2).value
                 shop_manager_excel=Managers.objects.get(name=excel_sheets.cell(row=row_excel,column=3).value)
@@ -271,4 +287,5 @@ def excelindb(request):
                     openingDate=shop_opendate_excel,
                     shop_brand=shop_brand_excel
                 )
-    return render(request,'checkdata.html',sava_message)
+                return render(request,'shop.html',locals())
+

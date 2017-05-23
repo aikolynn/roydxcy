@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block title %}产品列表{% endblock %}
+
+{% block content %}
+
+    {% for pl in image_list %}
+       <ul >
+{#        <li>{{ pl.product_name }}</li>#}
+{#        <li>{{ pl.product_instroduce }}</li>#}
+        <li><img src="{% static 'upload' %}/{{ pl.product_set.image_path }} "></li>
+        </ul>
+    {% endfor %}
+
+{% endblock %}
