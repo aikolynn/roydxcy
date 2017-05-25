@@ -150,6 +150,29 @@ font-weight:800
  .mi{
      vertical-align: middle !important;
  }
+ .fr{
+     color:darkred;
+     border: inherit ;
+     font-weight:bold;
+     font-style: inherit;
+
+     border-top: solid black;
+
+ }
+.btn-size{
+    width: 90px;
+
+}
+ .btn-b-pg{
+     background:palegreen;
+     color:red;
+     border: dotted red;
+ }
+ .btn-b-pr{
+     background: pink;
+     color:green;
+     border: dotted green;
+ }
  </style>
 <div class="container" >
  <!-- 弹出添加店铺上报数据 -->
@@ -242,6 +265,11 @@ font-weight:800
     $(document).ready(function(){
         $("#editTable tr :even").addClass("warning");//奇数行
         $("#editTable tr :odd").addClass("info");//偶数行
+        $("#editTable tr :first").removeClass("warning");
+        $("#editTable tr :first").addClass("fr");
+
+
+
     }
     );
 </script>
@@ -286,9 +314,9 @@ font-weight:800
       </tr>
   </table>
    <table class="table table-hover text-center table-striped" id="editTable">
-       <tr class=" success text-info" style="font-size:15px;">
-           <td>店&nbsp;&nbsp;铺</td>
-           <td>销售经理</td>
+       <tr>
+           <td >店  铺</td>
+           <td >销售经理</td>
            <td>日&nbsp;&nbsp;期</td>
            <td>系统金额</td>
            <td>上报金额</td>
@@ -299,7 +327,7 @@ font-weight:800
        </tr>
        {% for d in diff %}
            <tr>
-              <td class="text-danger " style="vertical-align: middle !important;font-size:20px;">{{ d.id_shop.sysName }}</td>
+              <td class="text-danger " style="vertical-align: middle !important;font-size:15px;">{{ d.id_shop.sysName }}</td>
               <td class="mi">{{ d.id_shop.managerId.name }}</td>
 
               <td class="mi">{{ d.date|date:"Y-m-d "}}</td>
@@ -315,9 +343,11 @@ font-weight:800
                {% else   %}
                    <td  class="mi">{{ d.shop_amount }}</td>
                {% endif %}
-
-               <td class="mi" >{{ d.amount }}</td>
-
+               {% if d.amount > 0 %}
+                    <td class="mi  "><button class="btn  btn-size btn-b-pg glyphicon glyphicon-arrow-up">{{ d.amount }}</button></td>
+               {% elif d.amount < 0 %}
+                   <td class="mi  "><button class="btn  btn-size  btn-b-pr glyphicon glyphicon-arrow-down">{{ d.amount }}</button></td>
+               {% endif %}
                {% if d.diff %}
                     <td id="diff{{ d.id }}" class="edit h4 mi" style="color:darkblue;font-family:楷体; width: 20%; "><b>{{ d.diff}}</b></td>
                {% else %}
@@ -327,7 +357,7 @@ font-weight:800
                 <td id="remark{{ d.id }}" class="edit mi">{{ d.remark}}</td>
 
                 <td>
-                  <button class="btn btn-info glyphicon glyphicon-saved" value=""  onclick="edit_event({{ d.id }})">保存</button>
+                  <button class="btn btn-default glyphicon glyphicon-ok" value=""  onclick="edit_event({{ d.id }})">保存</button>
                   <div class="input-group ">
                       <select name="true_amount{{ d.id }}" class="form-control">
                           <option value="show" selected>请选择正确值</option>

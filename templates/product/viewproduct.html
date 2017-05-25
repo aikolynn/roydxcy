@@ -4,12 +4,13 @@
 
 {% block content %}
 
-    {% for pl in image_list %}
-       <ul >
-{#        <li>{{ pl.product_name }}</li>#}
-{#        <li>{{ pl.product_instroduce }}</li>#}
-        <li><img src="{% static 'upload' %}/{{ pl.product_set.image_path }} "></li>
-        </ul>
+
+    {% for im in image_list %}
+       <ul>
+
+         <li><img src="{% static 'upload/' %}{{ im.image_path }}"></li>
+       <li>{{ im.product_id.product_name }}</li>
+       </ul>
     {% endfor %}
 
 {% endblock %}

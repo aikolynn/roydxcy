@@ -4,7 +4,7 @@ from  models import *
 # Create your views here.
 #产品列表
 def product_view(request):
-    product_list=product.objects.all()
-    image_list=product.product_image_id.all()
+    image_list=product_image.objects.all()
+
     return  render(request,'product/viewproduct.html',locals())
 
