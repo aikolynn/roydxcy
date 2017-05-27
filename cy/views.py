@@ -95,26 +95,43 @@ def checkdata(request):
     sel_shop_name=request.GET['select_name']
     sel_man_name=request.GET['man_name']
     sel_date=request.GET['sel_date']
-
+    sel_none=request.GET['sel_none']
     #查询所有有差异的记录总数
-    if sel_shop_name=='' and sel_man_name=='' and sel_date=='' :
-        diff=datadiff.objects.exclude(amount=0).filter(id_shop__shopType__in=["D","C"]).order_by("id_shop","-date")
-    elif sel_shop_name and sel_man_name=='' and sel_date=='':
-        diff = datadiff.objects.exclude(amount=0).filter(id_shop__shopType__in=["D", "C"],id_shop=sel_shop_name).order_by("id_shop", "-date")
-    elif sel_man_name and sel_shop_name=='' and sel_date=='':
+    if sel_shop_name=='' and sel_man_name=='' and sel_date=='' and sel_none=='' :
+        diff=datadiff.objects.exclude(amount=0).exclude(id_shop__sName__in=['元隆利嘉生活馆','满洲里友谊商厦']).filter(id_shop__shopType__in=["D","C"],).order_by("id_shop","-date")
+
+    elif sel_shop_name and sel_man_name=='' and sel_date=='' and sel_none=='':
+        diff = datadiff.objects.exclude(amount=0).filter(id_shop__shopType__in=["D", "C"],
+                                                         id_shop=sel_shop_name).order_by("id_shop", "-date")
+    elif sel_man_name and sel_shop_name=='' and sel_date=='' and sel_none=='':
         diff = datadiff.objects.exclude(amount=0).filter(id_shop__shopType__in=["D", "C"],
                                                          id_shop__managerId=sel_man_name).order_by("id_shop", "-date")
-    elif sel_date and sel_shop_name=='' and sel_man_name=='':
+    elif sel_date and sel_shop_name=='' and sel_man_name=='' and sel_none=='':
         diff = datadiff.objects.exclude(amount=0).filter(id_shop__shopType__in=["D", "C"],
                                                          date=sel_date).order_by("id_shop", "-date")
-    elif sel_date and sel_shop_name and sel_man_name=='':
+    elif sel_date and sel_shop_name and sel_man_name=='' and sel_none=='':
         diff = datadiff.objects.exclude(amount=0).filter(id_shop__shopType__in=["D","C"],
                                                          date=sel_date,
                                                          id_shop=sel_shop_name).order_by("id_shop", "-date")
-    elif sel_man_name and sel_date and sel_shop_name=='':
+    elif sel_man_name and sel_date and sel_shop_name=='' and sel_none=='':
         diff = datadiff.objects.exclude(amount=0).filter(id_shop__shopType__in=['D','C'],
                                                          date=sel_date,
                                                          id_shop__managerId=sel_man_name).order_by("id_shop", "-date")
+    elif sel_none=='1' and sel_shop_name=='' and sel_man_name==''and sel_date=='' :
+        diff = datadiff.objects.exclude(amount=0).filter(id_shop__shopType__in=['D', 'C'],
+                                                         remark=u'未核查').order_by("id_shop", "-date")
+    elif sel_none=='1' and sel_date and sel_man_name=='' and sel_shop_name=='':
+        diff = datadiff.objects.exclude(amount=0).filter(id_shop__shopType__in=['D', 'C'],
+                                                         remark=u'未核查',
+                                                         date=sel_date).order_by("id_shop", "-date")
+    elif sel_none == '1' and sel_date=='' and sel_man_name and sel_shop_name == '':
+        diff = datadiff.objects.exclude(amount=0).filter(id_shop__shopType__in=['D', 'C'],
+                                                         remark=u'未核查',
+                                                         id_shop__managerId=sel_man_name).order_by("id_shop", "-date")
+    elif sel_none == '1' and sel_date == '' and sel_man_name=='' and sel_shop_name :
+        diff = datadiff.objects.exclude(amount=0).filter(id_shop__shopType__in=['D', 'C'],
+                                                         remark=u'未核查',
+                                                         id_shop=sel_shop_name).order_by("id_shop", "-date")
     return render(request,'checkdata.html',locals())
 
 def diff_export_excel(request):
@@ -200,7 +217,7 @@ def excelindb(request):
                     sys_diff=datadiff(sys_amount=sys_amount_excel,date=date_excel,id_shop=shop_id)
                     sys_diff.save()
                 date_excel_str=date_excel.strftime("%Y-%m-%d")
-        return HttpResponseRedirect('/diff/?select_name=&man_name=&sel_date=%s' % date_excel_str)
+        return HttpResponseRedirect('/diff/?sel_none=&select_name=&man_name=&sel_date=%s' % date_excel_str)
     elif excel_data_type=="shopamout":
         for row_excel in range(2, excel_rows + 1):
                 for column_excel in range(2,excel_columns+1):
@@ -217,7 +234,7 @@ def excelindb(request):
                         shop_diff=datadiff(shop_amount=shopamount_excel,date=date_excel,id_shop=shop_id)
                         shop_diff.save()
                 date_excel_str = date_excel.strftime("%Y-%m-%d")
-        return HttpResponseRedirect('/diff/?select_name=&man_name=&sel_date=%s' % date_excel_str)
+        return HttpResponseRedirect('/diff/?sel_none=&select_name=&man_name=&sel_date=%s' % date_excel_str)
         #批量导入人员信息
     elif excel_data_type=="staff":
         for row_excel in range(2, excel_rows + 1):

@@ -39,7 +39,8 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'cy',
-    'product'
+    'product',
+    'debug_toolbar',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -51,6 +52,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware'
 )
 
 ROOT_URLCONF = 'shopcy.urls'
@@ -114,3 +116,4 @@ STATICFILES_DIRS=(os.path.join(BASE_DIR,'static'),)
 
 MEDIA_URL='/static/upload/'
 MEDIA_ROOT=os.path.join(BASE_DIR,'static/upload')
+INTERNAL_IPS = ('127.0.0.1',)

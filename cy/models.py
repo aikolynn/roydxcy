@@ -76,7 +76,7 @@ class datadiff(models.Model):
     sys_amount = models.FloatField(blank=True, null=True, verbose_name=u'系统金额',default=0)
     amount = models.FloatField(blank=True, null=True,verbose_name=u'差异金额',default=0)
     diff=models.TextField(blank=True,null=True,verbose_name=u'差异原因')
-    remark=models.TextField(blank=True,null=True,verbose_name=u'备注')
+    remark=models.TextField(blank=True,null=True,verbose_name=u'备注',default=u'未核查')
     '''
     指定shop_amount和sys_amount那个值为正确,
     true_amount=1表示sys_amount为正确值，
@@ -96,5 +96,9 @@ class datadiff(models.Model):
             self.amount=self.sys_amount-self.shop_amount
         else:
             self.amount = self.sys_amount - self.shop_amount
+        if self.amount==0:
+            self.remark=u''
+        else:
+            self.remark=u'未核查'
         return super(datadiff,self).save(*args,**kwargs)
 
