@@ -84,13 +84,14 @@ def addcheckdata(req):
     return JsonResponse(sava_message)
 def checkall(req):
     shop_list = ShopInfo.objects.values('Id', 'sName', 'shopType', "managerId__name", "managerId").filter(
-        shopType__in=["D", "C"])
+        shopType__in=["D", "C"]).order_by("-sName")
     man_list = Managers.objects.values('id', 'name').filter(shopinfo__shopType__in=["D", "C"]).distinct()
     diff = datadiff.objects.exclude(amount=0).filter(id_shop__shopType__in=["D", "C"]).order_by("id_shop", "-date")
     return render(req,'checkdata.html',locals())
 #获取所有有差异的数据
 def checkdata(request):
-    shop_list = ShopInfo.objects.values('Id','sName',"managerId__name","managerId").filter(shopType__in=["D","C"])
+    shop_list = ShopInfo.objects.values('Id', 'sName', 'shopType', "managerId__name", "managerId").filter(
+        shopType__in=["D", "C"]).order_by("-sName")
     man_list=Managers.objects.values('id','name').filter(shopinfo__shopType__in=["D","C"]).distinct()
     sel_shop_name=request.GET['select_name']
     sel_man_name=request.GET['man_name']
@@ -140,24 +141,27 @@ def diff_export_excel(request):
     # 创建一个excel表格对象
     F_styleB=styles.Font(color=styles.colors.BLACK,bold=True)
     F_styleR=styles.Font(color=styles.colors.RED,bold=True,italic=True)
-    title_style=styles.Fill()
+
     diff_excel_book = openpyxl.Workbook()
+    diff_excel_book.remove_sheet(diff_excel_book.get_sheet_by_name(u'Sheet'))
     book_sheet = diff_excel_book.create_sheet(u"销售差异")
-    book_sheet.append([u"店铺", u"日期", u"系统金额", u"上报金额", u"差异金额", u"差异原因", u"备注"])
+    book_sheet.append([u"店铺",u'销售经理', u"日期", u"系统金额", u"上报金额", u"差异金额", u"差异原因", u"备注"])
     for i in range(1,8):
         book_sheet.cell(row=1,column=i).font=F_styleB
     row=2
     for diff_y in diff:
             book_sheet.cell(row=row, column=1).value = diff_y.id_shop.sysName
-            book_sheet.cell(row=row, column=2).value = diff_y.date
-            book_sheet.cell(row=row, column=3).value = diff_y.sys_amount
-            book_sheet.cell(row=row, column=4).value = diff_y.shop_amount
+            book_sheet.cell(row=row, column=2).value = diff_y.id_shop.managerId.name
+            book_sheet.cell(row=row, column=3).value = diff_y.date
+            book_sheet.cell(row=row, column=4).value = diff_y.sys_amount
+            book_sheet.cell(row=row, column=5).value = diff_y.shop_amount
             if diff_y.true_amount == 0:
-                book_sheet.cell(row=row, column=4).font=F_styleR
+                book_sheet.cell(row=row, column=5).font=F_styleR
             elif diff_y.true_amount==1:
-                book_sheet.cell(row=row, column=3).font=F_styleR
-            book_sheet.cell(row=row, column=5).value = diff_y.amount
-            book_sheet.cell(row=row, column=6).value = diff_y.diff
+                book_sheet.cell(row=row, column=4).font=F_styleR
+            book_sheet.cell(row=row, column=6).value = diff_y.amount
+            book_sheet.cell(row=row, column=7).value = diff_y.diff
+            book_sheet.cell(row=row, column=8).value = diff_y.remark
             row+=1
     response = HttpResponse(content_type='application/vnd.ms-excel')
     response['Content-Disposition'] = 'attachment; filename=销售差异.xlsx'
