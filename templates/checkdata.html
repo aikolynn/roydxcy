@@ -97,13 +97,34 @@ function tdClick(){
     //将td的点击事件移除
     td.unbind("click");
 }
+$(document).ready(function () {
+    datas=$('.form_datetime_start,.form_datetime_end');
+    datas.datetimepicker(
+        {
+
+            weekStart: 1,
+            todayBtn: 'linked',
+            autoclose: true,
+            todayHighlight: true,
+            startView: 'month',
+            minView: 'month',
+            language: 'zh-CN',
+            format: 'yyyy-mm-dd',
+            weekStart: 1,
+            onSelect: function(selectedDate){
+       var option = this.id == "start" ? "minDate" : "maxDate";
+       dates.not(this).datepicker("option", option, selectedDate);
+    }
+        }
+    );
 
 
-         
+})
+
+
      
 
     </script>
-
 
 
  <style>
@@ -191,8 +212,18 @@ font-weight:800
                  </select>
              </div><br>
              <div class="input-group">
-                <span  class="input-group-addon btn-success">数据日期</span>
-                <input type="date" name="exceldate" class="form-control ">
+
+                  <script>
+                        $('.form_datetime_excel').datetimepicker({
+                                                        format: 'yyyy-mm-dd',
+                                                        startDate: "2017-01-01 ",
+                                                         });
+                 </script>
+                <span  class=" btn-success">
+                     <input size="10" type="text" placeholder="数据日期" readonly name="exceldate" class="form_datetime_excel form-control">
+                </span>
+
+
              </div><br>
              <div class="div1">
                 <div class="div2 ">浏览文件</div>
@@ -283,39 +314,46 @@ font-weight:800
         <tr >
           <td colspan="9" style="width: auto;">
           <form action="{% url 'diff' %}" class="form-inline" role="form">
-              <div class=" form-group input-group" >
-                 <span  class="input-group-addon">店铺名称</span>
-                     <select name="select_name" class="form-control " id="sel">
-                         <option value="" class="selected">请选择要筛选的店铺名称</option>
+             <div class=" form-group input-group" >
+                 <button class="btn  glyphicon glyphicon-hourglass">筛选</button>
+             </div>
+             <div class=" form-group input-group" >
+                     <select name="select_name" class="form-control" id="sel"  style="width:110px" >
+                         <option value="" class="selected">店铺名称</option>
                          {% for item in shop_list %}
                              <option value="{{ item.Id}}">{{ item.sName }}</option>
                          {% endfor %}
                      </select>
              </div>
-            <div class=" form-group input-group" >
-                 <span  class="input-group-addon">销售经理</span>
-                     <select name="man_name" class="form-control " id="sel">
-                         <option value="" class="selected">请选择要筛选的销售经理</option>
+
+              <div class=" form-group input-group" >
+                     <select name="man_name" class="form-control " id="sel" style="width: 110px">
+                         <option value="" class="selected">销售经理</option>
                          {% for item in man_list %}
                              <option value="{{ item.id }}">{{ item.name }}</option>
                          {% endfor %}
                      </select>
              </div>
+
              <div class="form-group " >
-                  <input type="date" class="form-control" name="sel_date" id="sel_date" >
+                 <input size="10" type="text" placeholder="开始日期" readonly name="sel_date_start" class="form_datetime_start form-control">
+             </div>
+             <div class="form-group">
+                 <input size="10" type="text" placeholder="结束日期" readonly name="sel_date_end" class="form_datetime_end form-control">
              </div>
              <div class="form-group " >
-                  <select class="form-control" name="sel_none">
-                      <option class="selected" value="">请选择核查状态</option>
+                  <select class="form-control" name="sel_none" style="width: 110px">
+                      <option class="selected" value="">核查状态</option>
                       <option value="1">未核查</option>
 
                   </select>
              </div>
+
              <div class="form-group " >
                   <button type="submit" class=" glyphicon glyphicon-search btn btn-primary"></button>
              </div>
-
           </form>
+
           </td>
       </tr>
   </table>
