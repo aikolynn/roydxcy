@@ -95,7 +95,8 @@ def checkdata(request):
     man_list=Managers.objects.values('id','name').filter(shopinfo__shopType__in=["D","C"]).distinct()
     sel_shop_name=request.GET['select_name']
     sel_man_name=request.GET['man_name']
-    sel_date=request.GET['sel_date']
+    sel_date=request.GET['sel_date_start']
+    sel_date_end=request.GET['sel_date_end']
     sel_none=request.GET['sel_none']
     #查询所有有差异的记录总数
     if sel_shop_name=='' and sel_man_name=='' and sel_date=='' and sel_none=='' :

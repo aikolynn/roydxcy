@@ -94,11 +94,11 @@ class datadiff(models.Model):
     def save(self,*args,**kwargs):
         if not self.pk:
             self.amount=self.sys_amount-self.shop_amount
+            if self.amount != 0:
+                self.remark = u'未核查'
         else:
             self.amount = self.sys_amount - self.shop_amount
-        if self.amount==0:
-            self.remark=u''
-        else:
-            self.remark=u'未核查'
+            if self.amount != 0:
+               self.remark = u'未核查'
         return super(datadiff,self).save(*args,**kwargs)
 
