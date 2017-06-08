@@ -98,7 +98,7 @@ function tdClick(){
     td.unbind("click");
 }
 $(document).ready(function () {
-    datas=$('.form_datetime_start,.form_datetime_end');
+    datas=$('.form_datetime_start,.form_datetime_end,.form_datetime_excel,.datetime_shop_up,.date_start');
     datas.datetimepicker(
         {
 
@@ -198,29 +198,20 @@ font-weight:800
 <p class="col-xs-2">
     <button class="btn btn-info " data-toggle="modal" data-target="#diffmodal-data" type="button">店铺上报数据</button>
 </p>
+
 {% csrf_token %}
 <form action="{% url 'upinfo' %}" enctype="multipart/form-data" method="post" class=" col-xs-4" role="form">
          <div class="form-group" >
              <div class="input-group">
                  <span  class="input-group-addon">数据类型</span>
-                 <select name="upinfo_type" class="form-control">
+                 <select name="upinfo_type" class="form-control" style="width:120px;">
                      <option value="sysamout">系统数据</option>
                      <option value="shopamout">店铺数据</option>
                  </select>
              </div><br>
              <div class="input-group">
-
-                  <script>
-                        $('.form_datetime_excel').datetimepicker({
-                                                        format: 'yyyy-mm-dd',
-                                                        startDate: "2017-01-01 ",
-                                                         });
-                 </script>
-                <span  class=" btn-success">
-                     <input size="10" type="text" placeholder="数据日期" readonly name="exceldate" class="form_datetime_excel form-control">
-                </span>
-
-
+                <span class="input-group-addon" >数据日期</span>
+                <input size="10" type="text" placeholder="" readonly name="exceldate" class="form_datetime_excel form-control" style="width: 120px">
              </div><br>
              <div class="div1">
                 <div class="div2 ">浏览文件</div>
@@ -232,11 +223,20 @@ font-weight:800
 
          </div>
 </form>
-<div class="input-group">
-                <a href="{% url 'diff_export_excel' %}">
-                    <button class="glyphicon glyphicon-download-alt btn btn-info">下载差异表</button>
-                </a>
- </div>
+<form class=" col-xs-4" role="form" action="{% url 'diff_export_excel' %}">
+  <div class="input-group">
+      <span class="input-group-addon">查询时间</span>
+      <input type="text" name="date_start" placeholder="起始时间" class="date_start form-control" readonly style="width: 100px">
+      <input type="text" name="date_end" placeholder="截止日期" class="date_start form-control" readonly style="width: 100px">
+  </div>
+<br>
+
+
+  <button class="glyphicon glyphicon-download-alt btn btn-info" type="submit" style="width: 280px">下载差异表</button>
+
+
+</form>
+
 
 <!-- 店铺添加弹窗内容 -->
 <div class="modal  " id="diffmodal-data" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
@@ -265,7 +265,7 @@ font-weight:800
                            <br>
                         <div class="input-group">
                               <span class="input-group-addon">日&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;期</span>
-                              <input type="date" class="form-control" name="data_date" id="data_date"  >
+                              <input size="10" type="text"  readonly name="data_date" class="datetime_shop_up form-control">
                           </div>
                            <br>
 
@@ -295,9 +295,6 @@ font-weight:800
         $("#editTable tr :odd").addClass("info");//偶数行
         $("#editTable tr :first").removeClass("warning");
         $("#editTable tr :first").addClass("fr");
-
-
-
     }
     );
 </script>

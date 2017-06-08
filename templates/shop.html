@@ -90,6 +90,21 @@ function add_area() {
             }
     );
 }
+$(document).ready(function () {
+    $(".exceldate,.openningdate,.contractBeginDate,.contractEndDate").datetimepicker(
+        {
+            weekStart: 1,
+            todayBtn: 'linked',
+            autoclose: true,
+            todayHighlight: true,
+            startView: 'month',
+            minView: 'month',
+            language: 'zh-CN',
+            format: 'yyyy-mm-dd',
+            weekStart: 1,
+        }
+    )
+})
     </script>
 
  <style>
@@ -139,7 +154,8 @@ font-weight:800
                  </div><br>
                  <div class="input-group">
                     <span  class="input-group-addon btn-success">档案日期</span>
-                    <input type="date" name="exceldate" class="form-control ">
+
+                     <input type="text" name="exceldate" readonly class="exceldate form-control" >
                  </div><br>
                  <div class="div1">
                     <div class="div2 ">浏览文件</div>
@@ -359,17 +375,18 @@ font-weight:800
 
                         <div class="input-group">
                               <span class="input-group-addon">开业时间</span>
-                              <input type="date" class="form-control" name="openningdate" placeholder="请输入店铺开业时间,格式为2016-01-01">
+                            <input type="text" class="form-control openningdate" name="openningdate" readonly placeholder="请输入店铺开业时间,格式为2016-01-01">
+
                           </div>
                            <br>
 
                            <div class="input-group">
                                <span  class="input-group-addon">合同开始时间</span>
-                              <input type="date" class="form-control" name="contractBeginDate" placeholder="请输入店铺合同开始时间,格式为2016-01-01">
+                              <input type="text" class="form-control contractBeginDate"  readonly name="contractBeginDate" placeholder="请输入店铺合同开始时间,格式为2016-01-01">
                            </div><br>
                            <div class="input-group">
                                <span class="input-group-addon" >合同截至时间</span>
-                               <input type="date" class="form-control" name="contractEndDate" placeholder="请输入店铺合同结束时间,格式为2016-01-01">
+                               <input type="text" class="form-control contractEndDate" readonly name="contractEndDate" placeholder="请输入店铺合同结束时间,格式为2016-01-01">
                            </div>
 
                       </form>
