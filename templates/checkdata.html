@@ -98,10 +98,27 @@ function tdClick(){
     td.unbind("click");
 }
 $(document).ready(function () {
-    datas=$('.form_datetime_start,.form_datetime_end,.form_datetime_excel,.datetime_shop_up,.date_start');
+    datas=$(
+        '.form_datetime_excel,.datetime_shop_up'
+
+    );
     datas.datetimepicker(
         {
-
+            weekStart: 1,
+            todayBtn: 'linked',
+            autoclose: true,
+            todayHighlight: true,
+            startView: 'month',
+            minView: 'month',
+            language: 'zh-CN',
+            format: 'yyyy-mm-dd'
+        }
+    );
+});
+//
+$(document).ready(function () {
+    $(".sel_date_start").datetimepicker(
+        {
             weekStart: 1,
             todayBtn: 'linked',
             autoclose: true,
@@ -110,18 +127,62 @@ $(document).ready(function () {
             minView: 'month',
             language: 'zh-CN',
             format: 'yyyy-mm-dd',
-            weekStart: 1,
 
         }
-    );
+    ).on('changeDate',function () {
+      $(".sel_date_end").datetimepicker("setStartDate",$(".sel_date_start").val())
+  });
+  $("#datetimeEnd").datetimepicker(
+      {
+            weekStart: 1,
+            todayBtn: 'linked',
+            autoclose: true,
+            todayHighlight: true,
+            startView: 'month',
+            minView: 'month',
+            language: 'zh-CN',
+            format: 'yyyy-mm-dd',
+      }
+  ).on('changeDate',function () {
+      $("#datetimeStart").datetimepicker("setEndDate",$("#datetimeEnd").val())//开始日期的结束时间不能大于结束日期
+  });
 
+});
 
-})
+$(document).ready(function () {
+    $(".date_start_sel").datetimepicker(
+        {
+            weekStart: 1,
+            todayBtn: 'linked',
+            autoclose: true,
+            todayHighlight: true,
+            startView: 'month',
+            minView: 'month',
+            language: 'zh-CN',
+            format: 'yyyy-mm-dd',
 
+        }
+    ).on('changeDate',function () {
+      $(".date_end_sel").datetimepicker("setStartDate",$(".date_start_sel").val())
+  });
+  $(".date_end_sel").datetimepicker(
+      {
+            weekStart: 1,
+            todayBtn: 'linked',
+            autoclose: true,
+            todayHighlight: true,
+            startView: 'month',
+            minView: 'month',
+            language: 'zh-CN',
+            format: 'yyyy-mm-dd',
+      }
+  ).on('changeDate',function () {
+      $(".date_start_sel").datetimepicker("setEndDate",$(".date_end_sel").val())//开始日期的结束时间不能大于结束日期
+  });
 
-     
+});
 
-    </script>
+</script>
 
 
  <style>
@@ -211,7 +272,8 @@ font-weight:800
              </div><br>
              <div class="input-group">
                 <span class="input-group-addon" >数据日期</span>
-                <input size="10" type="text" placeholder="" readonly name="exceldate" class="form_datetime_excel form-control" style="width: 120px">
+
+                 <input size="10" type="text" placeholder="" readonly name="exceldate" class="form_datetime_excel form-control" style="width: 120px">
              </div><br>
              <div class="div1">
                 <div class="div2 ">浏览文件</div>
@@ -226,8 +288,8 @@ font-weight:800
 <form class=" col-xs-4" role="form" action="{% url 'diff_export_excel' %}">
   <div class="input-group">
       <span class="input-group-addon">查询时间</span>
-      <input type="text" name="date_start" placeholder="起始时间" class="date_start form-control" readonly style="width: 100px">
-      <input type="text" name="date_end" placeholder="截止日期" class="date_start form-control" readonly style="width: 100px">
+      <input type="text" name="date_start" placeholder="起始时间" class="date_start_sel form-control" readonly style="width: 100px">
+      <input type="text" name="date_end" placeholder="截止日期" class="date_end_sel form-control" readonly style="width: 100px">
   </div>
 <br>
 
@@ -330,10 +392,10 @@ font-weight:800
              </div>
 
              <div class="form-group " >
-                 <input size="10" type="text" placeholder="开始日期" readonly name="sel_date_start" class="form_datetime_start form-control">
+                 <input size="10" type="text" id="datetimeStart" placeholder="开始日期" readonly name="sel_date_start" class="sel_date_start form-control">
              </div>
              <div class="form-group">
-                 <input size="10" type="text" placeholder="结束日期" readonly name="sel_date_end" class="form_datetime_end form-control">
+                 <input size="10" type="text" id="datetimeEnd" placeholder="结束日期" readonly name="sel_date_end" class="sel_date_end form-control">
              </div>
              <div class="form-group " >
                   <select class="form-control" name="sel_none" style="width: 110px">
