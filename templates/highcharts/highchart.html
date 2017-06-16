@@ -1,0 +1,51 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="{% static 'js/highcharts/highcharts.js' %}"></script>
+    <script src="{%  static 'js/highcharts/highcharts-3d.js' %}"></script>
+
+</head>
+<body>
+ <div id="container" style="min-width:400px;height:400px;"></div>
+  <script>
+        var chart= new Highcharts.Chart('container', {
+            chart: {
+                type: 'column',
+                 //指定图表的类型，默认是折线图（line）
+            },
+            title: {
+                text: '区域销售分析'                //指定图表标题
+            },
+            xAxis: {
+                categories:['五月']//指定x轴分组
+            },
+            yAxis: {
+                title: {
+                    text: '销售金额（元）'                //指定y轴的标题
+                }
+            },
+
+            series:
+                [{
+                name:"大区",
+                data:[{% for i in area_a %}['{{ i.0 }}',{{ i.1 }}],{% endfor %}],
+                dataLabels:{enabled: true,
+                rotation: 0,
+                color: '#FF0000',
+                align: 'right',
+                format: '{point.y:.2f}', // one decimal
+                y: 10, // 10 pixels down from the top
+                style: {
+                    fontSize: '25px',
+                    fontFamily: 'Verdana, sans-serif'
+                }}
+            }],
+
+
+
+        });
+    </script>
+
+</body>
+</html>
