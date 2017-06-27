@@ -1,26 +1,52 @@
 {% extends 'base.html' %}
-{% block title %}差异检查{% endblock %}
+{% load staticfiles %}
+{% block title %}人员easyui{% endblock %}
 {% block content %}
-    <div class="container">
-     <table class=table>
-         <tr>
-             <td>店铺</td>
-             <td>日期</td>
-             <td>系统数</td>
-             <td>店铺上报</td>
-             <td>差异</td>
-         </tr>
-         {% for s in df %}
-         <tr>
-             <td>{{ s.shopname  }}</td>
-             <td>{{ s.date }}</td>
-             <td>{{ s.sys_data }}</td>
-             <td>{{ s.shop_data }}</td>
-             <td>{{ s.cy }}</td>
 
-         </tr>
-         {% endfor %}
-     </table>
+    <script src="{% static 'easyui/jquery.easyui.min.js' %}" charset="UTF-8" ></script>
+  <script src="{% static 'easyui/locale/easyui-lang-zh_CN.js' %}" charset="UTF-8"></script>
+  <link rel="stylesheet" href="{% static 'easyui/themes/default/easyui.css' %}">
+  <link rel="stylesheet" href="{% static 'easyui/themes/icon.css' %}">
+
+    <div class="easyui-layout" style="height: 800px;">
+        <div region="west" title="菜单" style="width: 150px; height: 800px;" >
+            <ul class="easyui-tree">
+                    <li >
+                        <span>系统菜单</span>
+                        <ul >
+                            <li >
+                                <span >档案管理</span>
+                                <ul>
+                                    <li><span><a href="{% url 'staff' %}">人员档案</a></span></li>
+                                    <li><span><a href="{% url 'shopinfo' %}">店铺档案</a></span></li>
+                                    <li><span>区域档案</span></li>
+                                </ul>
+                            </li>
+                            <li>
+                                <span>差异核对</span>
+                                <ul>
+                                    <li>数据管理</li>
+                                    <li>差异核查</li>
+                                </ul>
+                            </li>
+                            <li>
+                                <span>数据分析</span>
+                                <ul>
+                                    <li>数据分析</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+            </ul>
+        </div>
+        <div id="content" region="center" style="padding:5px; height: 800px;" >
+            {% block center %}{% endblock %}
+        </div>
+
+
+
     </div>
+  </div>
+
 
 {% endblock %}

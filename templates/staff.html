@@ -1,0 +1,144 @@
+{% extends 'diff.html' %}
+{% block center %}
+    <table id="dg" title="区域管理人员" class="easyui-datagrid" style="height:auto;"
+            url="{% url 'easy' %}"
+            toolbar="#toolbar" pagination="true"
+            rownumbers="true" fitColumns="true" singleSelect="true">
+        <thead>
+            <tr>
+                <th field="name">姓名</th>
+                <th field="title">职位</th>
+                <th field="personal_cellphone">手机</th>
+                <th field="company_cellphone">公司手机</th>
+                <th field="address">通讯地址</th>
+                <th field="email">邮箱</th>
+                <th field="qq">QQ</th>
+            </tr>
+        </thead>
+    </table>
+        <div id="toolbar">
+            <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="newUser()">新增用户</a>
+            <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="editUser()">编辑用户</a>
+            <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="destroyUser()">删除用户</a>
+        </div>
+        <div id="dlg" class="easyui-dialog" style="width:500px" closed="true" buttons="#dlg-buttons">
+                    <form id="fm" method="post" novalidate style="margin:0;padding:20px 50px">
+                        <div style="margin-bottom:20px;font-size:14px;border-bottom:1px solid #ccc">add User_name</div>
+                        <div class="input-group">
+                            <span class="input-group-addon">姓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;名</span>
+                            <input name="name" class=" form-control" required="true" label="Name:" style="width:100%">
+                        </div><br>
+                        <div class="input-group">
+                            <span class="input-group-addon">职&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;位</span>
+                            <input name="title" class="form-control" required="true" label="sex:" style="width:100%">
+                        </div><br>
+                         <div class="input-group">
+                            <span class="input-group-addon">手&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;机</span>
+                            <input name="personal_cellphone" class="form-control" required="true" label="sex:" style="width:100%">
+                        </div><br>
+                        <div class="input-group">
+                            <span class="input-group-addon">公司手机</span>
+                            <input name="company_cellphone" class="form-control" required="true" label="sex:" style="width:100%">
+                        </div><br>
+                        <div class="input-group">
+                            <span class="input-group-addon">通讯地址</span>
+                            <input name="address" class="form-control" required="true" label="sex:" style="width:100%">
+                        </div><br>
+                        <div class="input-group">
+                            <span class="input-group-addon">&nbsp;&nbsp;&nbsp;&nbsp;QQ&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                            <input name="qq" class="form-control" required="true" label="sex:" style="width:100%">
+                        </div><br>
+                        <div class="input-group">
+                            <span class="input-group-addon">邮&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;箱</span>
+                            <input name="email" class="form-control" required="true" label="sex:" style="width:100%">
+                        </div>
+                    </form>
+            </div>
+
+             <div id="dlg-buttons">
+             <a href="javascript:void(0)" class="easyui-linkbutton c6" iconCls="icon-ok" onclick="saveUser()" style="width:90px">保存</a>
+             <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-cancel" onclick="javascript:$('#dlg').dialog('close')" style="width:90px">取消</a>
+          </div>
+
+
+<script type="text/javascript">
+              //设置ajax全局Header  请求头$.cookie('csrftoken')
+        $(function (){
+            $.ajaxSetup({
+                beforeSend: function(xhr,settings){
+                    xhr.setRequestHeader('X-CSRFtoken', $.cookie('csrftoken'))}
+            });
+        });
+
+
+        var url;
+        // 显示 编辑框
+        function newUser(){
+            $('#dlg').dialog('open').dialog('center').dialog('创建','新增');
+            $('#fm').form('clear');
+            url = '{% url 'addinfo' %}';
+        }
+
+        //编辑 USER
+        function editUser(){
+            var row = $('#dg').datagrid('getSelected');
+            if (row){
+                $('#dlg').dialog('open').dialog('center').dialog('setTitle','编辑用户');
+                $('#fm').form('load',row);
+                //  ajax 编辑USER 并且 通过ajax 保存到后端 SQL
+                url = '/edit/'+row.id;
+            }
+        }
+
+        // 创建——USER 并 SAVE  保存
+        function saveUser(){
+           $('#fm').form('submit',{
+                url: url,
+                onSubmit: function(){
+                    return $(this).form('validate');
+                },
+                success: function(result){
+                    if (result=="save"){
+                       $('#dlg').dialog('close');
+                        $('#dg').datagrid('reload');
+                    }else
+                    if (result.errorMsg){
+                        $.messager.show({
+                            title: 'Error',
+                            msg: result.errorMsg
+                        });
+                    } else {
+                        $('#dlg').dialog('close');        // close the dialog
+                        $('#dg').datagrid('reload');    // reload the user data
+                    }
+                }
+            });
+        }
+
+        // 根据ID 删除   user
+        function destroyUser(){
+            var row = $('#dg').datagrid('getSelected');
+            if (row){
+                $.messager.confirm('Confirm','Are you sure you want to destroy this user?',function(r){
+          if (r){
+    $.ajax({
+        url: '/remove/',
+        type: 'POST',
+        data: {id:row.id},
+        headers: {'X-CSRFtoken': $.cookie('csrftoken')},
+        success: function(data) {
+             if (data=="REMOVE"){
+            $('#dg').datagrid('reload');    // reload the user data
+           }
+        },
+        error: function(data) {
+            alert("error")
+  }
+       });
+             }
+                     });
+                        }
+                              }
+    </script>
+
+{% endblock %}

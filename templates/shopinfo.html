@@ -1,0 +1,24 @@
+{% extends 'diff.html' %}
+
+{% block center %}
+    <table id="dg" title="区域管理人员" class="easyui-datagrid" style="height:auto;"
+            url="{% url 'readshopinfo' %}"
+            toolbar="#toolbar" pagination="true"
+            rownumbers="true" fitColumns="true" singleSelect="true">
+        <thead>
+            <tr>
+                <th field="sname">店铺名称</th>
+                <th field="sysname">系统名称</th>
+                <th field="manager">销售经理</th>
+                <th field="area">所属区域</th>
+                <th field="shopAddress">通讯地址</th>
+                <th field="malltype">卖场类型</th>
+                <th field="brand">品牌</th>
+                <th field="shoptype">店铺类型</th>
+            </tr>
+        </thead>
+    </table>
+
+
+
+{% endblock %}
