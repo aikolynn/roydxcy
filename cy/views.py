@@ -4,9 +4,11 @@ from django.shortcuts import render,HttpResponseRedirect,redirect,HttpResponse
 from models import  *
 from forms import *
 from django.http import JsonResponse
+from  django.core import serializers
 import  openpyxl
 from openpyxl import styles
 import  os
+import json
 from datetime import *
 # Create your views here.
 #展示店铺信息并增加修改店铺信息
@@ -86,7 +88,10 @@ def checkall(req):
     shop_list = ShopInfo.objects.values('Id', 'sName', 'shopType', "managerId__name", "managerId").filter(
         shopType__in=["D", "C"]).order_by("-sName")
     man_list = Managers.objects.values('id', 'name').filter(shopinfo__shopType__in=["D", "C"]).distinct()
-    diff = datadiff.objects.exclude(amount=0).filter(id_shop__shopType__in=["D", "C"]).order_by("id_shop", "-date")
+    diff = datadiff.objects.exclude(amount=0)\
+                           .exclude(id_shop__sName__in=['元隆利嘉生活馆','满洲里友谊商厦'])\
+                           .filter(id_shop__shopType__in=["D", "C"])\
+                           .order_by("id_shop", "-date")
     return render(req,'checkdata.html',locals())
 #获取所有有差异的数据
 def checkdata(request):
@@ -130,16 +135,24 @@ def checkdata(request):
                                                          id_shop=sel_shop_name).order_by("id_shop", "-date")
     #按销售经理和时间查询
     elif sel_man_name and sel_date and sel_date_end and sel_shop_name=='' and sel_none=='':
-        diff = datadiff.objects.exclude(amount=0).filter(id_shop__shopType__in=['D','C'],
-                                                         date__range=(sel_date, sel_date_end),
-                                                         id_shop__managerId=sel_man_name).order_by("id_shop", "-date")
-     #查询所有未核查的结果
+        diff = datadiff.objects.exclude(amount=0) \
+            .exclude(id_shop__sName__in=['元隆利嘉生活馆', '满洲里友谊商厦']) \
+            .filter(id_shop__shopType__in=['D','C'],
+                    date__range=(sel_date, sel_date_end),
+                    id_shop__managerId=sel_man_name)\
+            .order_by("id_shop", "-date")
+    #查询所有未核查的结果
     elif sel_none=='1' and sel_shop_name=='' and sel_man_name==''and sel_date=='' and sel_date_end=='' :
-        diff = datadiff.objects.exclude(amount=0).filter(id_shop__shopType__in=['D', 'C'],
-                                                         remark=u'未核查').order_by("id_shop", "-date")
-     # 查询某段时间内的未核查结果
+        diff = datadiff.objects.exclude(amount=0) \
+            .exclude(id_shop__sName__in=['元隆利嘉生活馆', '满洲里友谊商厦']) \
+            .filter(id_shop__shopType__in=['D', 'C'],
+                    remark=u'未核查')\
+            .order_by("id_shop", "-date")
+    # 查询某段时间内的未核查结果
     elif sel_none=='1' and sel_date and sel_date_end and sel_man_name=='' and sel_shop_name=='':
-        diff = datadiff.objects.exclude(amount=0).filter(id_shop__shopType__in=['D', 'C'],
+        diff = datadiff.objects.exclude(amount=0) \
+            .exclude(id_shop__sName__in=['元隆利嘉生活馆', '满洲里友谊商厦']) \
+            .filter(id_shop__shopType__in=['D', 'C'],
                                                          remark=u'未核查',
                                                          date__range=(sel_date, sel_date_end)).order_by("id_shop", "-date")
     #查询销售经理未核查的结果
@@ -147,29 +160,31 @@ def checkdata(request):
         diff = datadiff.objects.exclude(amount=0).filter(id_shop__shopType__in=['D', 'C'],
                                                          remark=u'未核查',
                                                          id_shop__managerId=sel_man_name).order_by("id_shop", "-date")
-     #查询单店未核查的结果
+    #查询单店未核查的结果
     elif sel_none == '1' and sel_date == '' and sel_man_name=='' and sel_shop_name and sel_date_end=='' :
         diff = datadiff.objects.exclude(amount=0).filter(id_shop__shopType__in=['D', 'C'],
                                                          remark=u'未核查',
                                                          id_shop=sel_shop_name).order_by("id_shop", "-date")
-     #查询单店给定时间段内的结果
+    #查询单店给定时间段内的结果
     elif sel_date_end and sel_date and sel_shop_name and sel_man_name=='' and sel_none=='':
         diff=datadiff.objects.exclude(amount=0).filter(id_shop__shopType__in=['D','C'],
                                                        id_shop=sel_shop_name,
                                                        date__range=(sel_date,sel_date_end)).order_by('id_shop',"date")
     return render(request,'checkdata.html',locals())
-
+#差异Excel导出
 def diff_export_excel(request):
     sel_date_start=request.GET['date_start']
     sel_date_end=request.GET["date_end"]
     diff = datadiff.objects\
         .exclude(amount=0)\
+        .exclude(id_shop__sName__in=['元隆利嘉生活馆','满洲里友谊商厦'])\
         .filter(id_shop__shopType__in=["D", "C"], date__range=(sel_date_start,sel_date_end))\
         .order_by("id_shop", "date")
     # 创建一个excel表格对象
     F_styleB=styles.Font(color=styles.colors.BLACK,bold=True)
     F_styleR=styles.Font(color=styles.colors.RED,bold=True,italic=True)
-    F_styleCenter=styles.Alignment(horizontal='center',vertical='center',indent=1,readingOrder=2)
+    F_styleCenter=styles.Alignment(horizontal='center',vertical='center',indent=1,readingOrder=2,text_rotation=0)
+
     diff_excel_book = openpyxl.Workbook()
     diff_excel_book.remove_sheet(diff_excel_book.get_sheet_by_name(u'Sheet'))
     book_sheet = diff_excel_book.create_sheet(u"销售差异")
@@ -179,21 +194,28 @@ def diff_export_excel(request):
     row=2
     for diff_y in diff:
             book_sheet.cell(row=row, column=1).value = diff_y.id_shop.sysName
+            book_sheet.cell(row=row, column=1).alignment=F_styleCenter
             book_sheet.cell(row=row, column=2).value = diff_y.id_shop.managerId.name
+            book_sheet.cell(row=row, column=2).alignment = F_styleCenter
             book_sheet.cell(row=row, column=3).value = diff_y.date
+            book_sheet.cell(row=row, column=3).alignment = F_styleCenter
             book_sheet.cell(row=row, column=4).value = diff_y.sys_amount
+            book_sheet.cell(row=row, column=4).alignment = F_styleCenter
             book_sheet.cell(row=row, column=5).value = diff_y.shop_amount
+            book_sheet.cell(row=row, column=5).alignment = F_styleCenter
             if diff_y.true_amount == 0:
                 book_sheet.cell(row=row, column=5).font=F_styleR
             elif diff_y.true_amount==1:
                 book_sheet.cell(row=row, column=4).font=F_styleR
             book_sheet.cell(row=row, column=6).value = diff_y.amount
+            book_sheet.cell(row=row, column=6).alignment = F_styleCenter
             book_sheet.cell(row=row, column=7).value = diff_y.diff
             book_sheet.cell(row=row, column=7).alignment=F_styleCenter
             book_sheet.cell(row=row, column=8).value = diff_y.remark
+            book_sheet.cell(row=row, column=8).alignment = F_styleCenter
             row+=1
-    month_start = str(sel_date_start[5:7] + sel_date_start[8:10])
-    month_end = str(sel_date_end[5:7] + sel_date_end[8:10])
+    month_start = str(sel_date_start).replace('-','')
+    month_end = str(sel_date_end).replace('-','')
     response = HttpResponse(content_type='application/vnd.ms-excel')
     response['Content-Disposition'] = 'attachment; filename=销售差异%s-%%s.xlsx'%month_start %month_end
     diff_excel_book.save(response)
@@ -233,6 +255,7 @@ def excelindb(request):
     excel_sheets=excel_data.get_sheet_by_name(sheetnames[0])
     excel_rows=excel_sheets.max_row
     excel_columns=excel_sheets.max_column
+    date_excel_start=(excel_sheets.cell(row=1,column=2).value).strftime("%Y-%m-%d")
     #获取当前人员表总记录数数
     if excel_data_type=="sysamout":
         for row_excel in range(2, excel_rows + 1):
@@ -252,8 +275,7 @@ def excelindb(request):
                     sys_diff=datadiff(sys_amount=sys_amount_excel,date=date_excel,id_shop=shop_id)
                     sys_diff.save()
                 date_excel_str=date_excel.strftime("%Y-%m-%d")
-        return HttpResponseRedirect('/diff/?sel_none=&select_name=&man_name=&sel_date_end=&sel_date_start=%s' % date_excel_str)
-
+        return HttpResponseRedirect('/diff/?sel_none=&select_name=&man_name=&sel_date_end=%s&sel_date_start=%%s' % date_excel_str %date_excel_start)
     elif excel_data_type=="shopamout":
         for row_excel in range(2, excel_rows + 1):
                 for column_excel in range(2,excel_columns+1):
@@ -271,7 +293,7 @@ def excelindb(request):
                         shop_diff.save()
                 date_excel_str = date_excel.strftime("%Y-%m-%d")
         return HttpResponseRedirect(
-            '/diff/?sel_none=&select_name=&man_name=&sel_date_end=&sel_date_start=%s' % date_excel_str)
+            '/diff/?sel_none=&select_name=&man_name=&sel_date_end=%s&sel_date_start=%%s' % date_excel_str %date_excel_start)
         #批量导入人员信息
     elif excel_data_type=="staff":
         for row_excel in range(2, excel_rows + 1):
@@ -342,4 +364,9 @@ def excelindb(request):
                     shop_brand=shop_brand_excel
                 )
                 return render(request,'shop.html',locals())
+
+from django.forms.models import model_to_dict
+def fo(reqest):
+    manager=Managers.objects.all()
+    return render(reqest,'form.html',locals())
 
