@@ -86,9 +86,11 @@ DATABASES = {
         # 'NAME': os.path.join(BASE_DIR, 'diff.sqlite3'),
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'roydxcy',
-        'HOST': '127.0.0.1',
-        'USER': 'root',
-        'PASSWORD': 'lynn1206'
+        #'NAME': 'roydx',
+        #'HOST': '127.0.0.1',
+        'HOST': '192.168.3.158',
+        'USER': 'roydxcy',
+        'PASSWORD': 'nikose1206'
     }
 }
 
