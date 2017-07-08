@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load staticfiles %}
 {% block title %}档案管理{% endblock %}
 {% block content %}
 
@@ -106,7 +107,10 @@ $(document).ready(function () {
     )
 })
     </script>
+<script src="{% static 'js/tableedit.js' %}"></script>
+<script>
 
+</script>
  <style>
 .div1{
 float: left;
@@ -135,6 +139,9 @@ font-weight:800
     opacity:0;
     left:0px;
     top: 0px;
+}
+.mi{
+    vertical-align: middle !important;
 }
  </style>
  <div class="container" >
@@ -177,8 +184,6 @@ font-weight:800
 
           <!-- 添加人员 -->
    <button class="btn btn-success" data-toggle="modal" data-target="#mymodal-manager" type="button">添加人员</button>
-
-
  <div class="modal  " id="mymodal-manager" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
      <div class="modal-dialog">
          <div class="modal-content">
@@ -239,9 +244,7 @@ font-weight:800
      </div>
 </div>
   <!-- 添加人员窗口 -->
-
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-
   <button class="btn btn-success" data-toggle="modal" data-target="#mymodal-area" type="button">添加区域</button>
    <!-- 添加区域 -->
 <div class="modal  " id="mymodal-area" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
@@ -369,7 +372,7 @@ font-weight:800
 
                         <div class="input-group">
                               <span class="input-group-addon">卖场类型</span>
-                              <input type="text" class="form-control" name="mallType">
+                              <input type="text" class="form-control" name="mallType" value="A+">
                           </div>
                            <br>
 
@@ -468,42 +471,159 @@ font-weight:800
             </div>
             <!--人员档案弹窗主体 -->
         </div>
-
       <!--显示人员档案弹窗 -->
-     <button class="btn btn-info" data-toggle="modal" data-target="#area-info">区域档案</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-     <!--显示区域档案弹窗 -->
-        <div class="modal" id="area-info" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <!--区域档案弹窗主体 -->
+
+     <button class="btn btn-info" data-toggle="modal" data-target="#area-info">店铺档案</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+     <!--显示店铺档案弹窗 -->
+        <div class="modal" id="area-info" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" >
+            <div class="modal-dialog" style="width: 1024px;" >
+                <!--店铺档案弹窗主体 -->
                 <div class="modal-content">
-                    <!--人员档案弹窗头部 -->
+                    <!--店铺档案弹窗头部 -->
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal">
                              <span aria-hidden="true">×</span>
                              <span class="sr-only">Close</span>
                          </button>
-                        <h2 class="text-center">区域信息档案</h2>
+                        <h2 class="text-center">店铺档案</h2>
                     </div>
-                    <!--区域档案弹窗头部 -->
-
-                    <!--区域档案弹窗正文 -->
+                    <!--店铺档案弹窗头部 -->
+                      <script>
+                        $(document).ready(function(){
+                            $(".changecolor tr :even").addClass("success");//奇数行
+                            $(".changecolor tr :odd").addClass("info");//偶数行
+                        }
+                        );
+                    </script>
+                    <!--店铺档案弹窗正文 -->
                     <div class="modal-body">
+                        <table class="table  table-striped table-condensed table-responsive changecolor " >
+                    {% for shop in shop_list %}
+                             {% if forloop.revcounter0|divisibleby:'2' %}
+                             <tr>
+                              <td width="50%">
+                                <div class="card">
 
+                                    <div class="card-block">
+                                        {% ifequal shop.get_shopType_display "直营"  %}
+                                        <button class="btn btn-success card-title" id="">{{ shop.sysName }}</button>
+                                        {% else %}
+                                         <button class="btn btn-danger card-title">{{ shop.sysName }}</button>
+                                        {% endifequal %}
+                                        <p class="card-text">地址：{{ shop.shopAddress }}</p>
+                                    </div>
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item" id="{{ shop.Id }}{{ shop.managerId }}">销售经理：{{ shop.managerId.name}}</li>
+                                        <li class="list-group-item">店铺类型：{{ shop.get_shopType_display }}</li>
+                                        <li class="list-group-item">开业时间：{{ shop.openingDate |date:"Y-m-d" }}</li>
+                                        <li class="list-group-item">合同开始时间：{{ shop.contractBeginDate | date:"Y-m-d" }}</li>
+                                        <li class="list-group-item">合同结束时间：{{ shop.contractBeginDate | date:"Y-m-d"}}</li>
+                                    </ul>
+                                    <div class="card-footer text-center">
+                                      <button class="btn btn-info"
+                                              onclick="editshopinfo('{{ shop.areaId.name }}',
+                                                                    '{{ shop.sysName }}',
+                                                                    '{{ shop.sName }}',
+                                                                    '{{ shop.managerId.name }}',
+                                                                    '{{ shop.shopAddress }}',
+                                                                    '{{ shop.get_state_display }}',
+                                                                    '{{ shop.get_shopType_display }}',
+                                                                    '{{ shop.contractBeginDate }}',
+                                                                    '{{ shop.openingDate }}',
+                                                                    '{{ shop.contractEndDate }}',
+                                                                    '{{ shop.shop_brand }}')">
+                                          信息修改
+                                      </button>
+                                  </div>
+                                </div>
+                              </td>
+                             {% else %}
+                               <td style="width:50%;">
+                                <div class="card">
+                                    <div class="card-block">
+                                        {% ifequal shop.get_shopType_display "直营"  %}
+                                        <button class="btn btn-success card-title">{{ shop.sysName }}</button>
+                                        {% else %}
+                                         <button class="btn btn-danger card-title">{{ shop.sysName }}</button>
+                                        {% endifequal %}
+                                        <p class="card-text">地址：{{ shop.shopAddress }}</p>
+                                    </div>
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item">销售经理：{{ shop.managerId.name}}</li>
+                                        <li class="list-group-item">店铺类型：{{ shop.get_shopType_display }}</li>
+                                        <li class="list-group-item">开业时间：{{ shop.openingDate |date:"Y-m-d" }}</li>
+                                        <li class="list-group-item">合同开始时间：{{ shop.contractBeginDate | date:"Y-m-d" }}</li>
+                                        <li class="list-group-item">合同结束时间：{{ shop.contractBeginDate | date:"Y-m-d"}}</li>
+                                    </ul>
+                                  <div class="card-footer text-center">
+                                      <button class="btn btn-info" onclick="editshopinfo('{{ shop.areaId.name }}',
+                                                                                         '{{ shop.sysName }}',
+                                                                                         '{{ shop.sName }}',
+                                                                                         '{{ shop.managerId.name }}',
+                                                                                         '{{ shop.shopAddress }}',
+                                                                                         '{{ shop.get_state_display }}',
+                                                                                         '{{ shop.get_shopType_display }}',
+                                                                                         '{{ shop.contractBeginDate }}',
+                                                                                         '{{ shop.openingDate }}',
+                                                                                         '{{ shop.contractEndDate }}',
+                                                                                         '{{ shop.shop_brand }}')">
+                                          信息修改
+                                      </button>
+                                  </div>
+                                </div>
+                               </td>
+                             </tr>
+                             {% endif %}
+
+                          {% endfor %}
+                        </table>
                     </div>
-                    <!--区域档案弹窗正文 -->
+                    <!--店铺档案弹窗正文 -->
 
-                    <!--区域档案弹窗底部 -->
+                    <!--店铺档案弹窗底部 -->
                     <div class="modal-footer">
 
                     </div>
-                    <!--区域档案弹窗底部 -->
+                    <!--店铺档案弹窗底部 -->
                 </div>
             </div>
-            <!--区域档案弹窗主体 -->
+            <!--店铺档案弹窗主体 -->
         </div>
-      <!--显示区域档案弹窗 -->
+      <!--显示店铺档案弹窗 -->
+    <!--修改店铺档案弹窗 -->
+     <script>
+         function editshopinfo() {
+              area=arguments[0];
+              sysName=arguments[1];
+              sName=arguments[2];
+              manager=arguments[3];
+              shopaddress=arguments[4];
+              shopstate=arguments[5];
+              shoptype=arguments[6];
+              contractBeginDate=arguments[7]
+              openingdate=arguments[8];
+              contractEndDate=arguments[9];
+              brand=arguments[10];
+              modalhtml='<div class="modal  " id="mymodal-data" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true"> <div class="modal-dialog"><div class="modal-content"> <div class="modal-header"><button type="button" class="close" data-dismiss="modal"> <span aria-hidden="true">×</span><span class="sr-only">Close</span></button> <h4 class="modal-title text-center">请输入以下信息</h4> </div><div class="modal-body "> <div class="container"><form class="form-group col-md-5" method="get"  id="form_data">'+
+                           '<div class="input-group"><span class="input-group-addon">系统名称</span> <input type="text" class="form-control" name="sys_name"></div><br>'+
+                           '<div class="input-group"><span class="input-group-addon">店铺名称</span><input type="text" class="form-control" name="s_name"> </div><br>'+
+                           '<div class="input-group"> <span class="input-group-addon">所属大区</span> <select class="form-control" name="area"> <option value="" selected>------</option>{% for area in area_list %}<option name="{{ area.id }}" value="{{ area.id }}">{{ area.name }}</option> {% endfor %} </select></div><br>'+
+                           '<div class="input-group"><span class="input-group-addon">销售经理</span> <select class="form-control" name="salemanager"><option value="" selected>------</option> {% for man in man_list %} <option id="{{ man.id }}" value="{{ man.id }}">{{ man.name }}</option>{% endfor %} </select> </div><br>'+
+                           '<div class="input-group"><span class="input-group-addon">经营状态</span><select class="form-control selected" name="shopState"><option value="" selected>------</option><option value="S">正常营业</option><option VALUE="Z">装修</option><option value="C">撤店</option><option value="P">暂停整改</option></select> </div> <br>'+
+                           '<div class="input-group"><span class="input-group-addon">经营方式</span><select class="form-control" name="shoptye"><option value="" selected>------</option><option value="D">直营</option> <option VALUE="A">代理</option><option value="J">加盟</option><option value="C">承包</option></select></div><br>'+
+                           '<div class="input-group"><span class="input-group-addon">店铺地址</span><input type="text" class="form-control" name="shopAddress"> </div><br>'+
+                           '<div class="input-group"><span class="input-group-addon">卖场类型</span> <input type="text" class="form-control" name="mallType" value="A+"> </div><br>'+
+                           '<div class="input-group"><span class="input-group-addon">开业时间</span><input type="text" class="form-control openningdate" name="openningdate" readonly placeholder="请输入店铺开业时间,格式为2016-01-01"></div><br>'+
+                          '<div class="input-group"><span  class="input-group-addon">合同开始时间</span> <input type="text" class="form-control contractBeginDate"  readonly name="contractBeginDate" placeholder="请输入店铺合同开始时间,格式为2016-01-01"> </div><br>'+
+                         '<div class="input-group"> <span class="input-group-addon" >合同截至时间</span><input type="text" class="form-control contractEndDate" readonly name="contractEndDate" placeholder="请输入店铺合同结束时间,格式为2016-01-01"></div></form></div></div><div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">关闭</button><button type="submit" class="btn btn-primary" id="save_button" onclick="add_info()" >提交 </button></div></div></div></div>'
 
-     <button class="btn btn-info" data-toggle="modal" data-target="#shop-info">店铺档案</button>
+         };
+
+
+
+    </script>
+   <!--修改店铺档案弹窗 -->
+     <button class="btn btn-info" data-toggle="modal" data-target="#shop-info">区域档案</button>
      <!--显示店铺档案弹窗 -->
         <div class="modal" id="shop-info" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
             <div class="modal-dialog">

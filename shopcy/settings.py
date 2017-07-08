@@ -82,15 +82,15 @@ WSGI_APPLICATION = 'shopcy.wsgi.application'
 
 DATABASES = {
     'default': {
-        # 'ENGINE': 'django.db.backends.sqlite3',
-        # 'NAME': os.path.join(BASE_DIR, 'diff.sqlite3'),
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'roydxcy',
-        #'NAME': 'roydx',
-        #'HOST': '127.0.0.1',
-        'HOST': '192.168.3.158',
-        'USER': 'roydxcy',
-        'PASSWORD': 'nikose1206'
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'sq.sqlite3'),
+        # 'ENGINE': 'django.db.backends.mysql',
+        # 'NAME': 'roydxcy',
+        # #'NAME': 'roydx',
+        # #'HOST': '127.0.0.1',
+        # 'HOST': '192.168.3.160',
+        # 'USER': 'roydxcy',
+        # 'PASSWORD': 'nikose1206'
     }
 }
 

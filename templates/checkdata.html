@@ -160,10 +160,13 @@ $(document).ready(function () {
             minView: 'month',
             language: 'zh-CN',
             format: 'yyyy-mm-dd',
+            linkField: ".date_end_sel",
+            linkFormat: "yyyy-mm-dd"
 
         }
     ).on('changeDate',function () {
-      $(".date_end_sel").datetimepicker("setStartDate",$(".date_start_sel").val())
+      $(".date_end_sel").datetimepicker("setStartDate",$(".date_start_sel").val());
+
   });
   $(".date_end_sel").datetimepicker(
       {
@@ -177,7 +180,7 @@ $(document).ready(function () {
             format: 'yyyy-mm-dd',
       }
   ).on('changeDate',function () {
-      $(".date_start_sel").datetimepicker("setEndDate",$(".date_end_sel").val())//开始日期的结束时间不能大于结束日期
+      $(".date_start_sel").datetimepicker("setEndDate",$(".date_end_sel").val());//开始日期的结束时间不能大于结束日期
   });
 
 });

@@ -16,7 +16,7 @@ def area_arr(req):
                         datadiff.sys_amount AS amou,
                         `shop-info`.sName AS n,
                         area.`name` AS areaname,
-                        managers.`name` as man,
+                        Managers.`name` as man,
                         MONTH(datadiff.date) as m
                  
                     FROM
@@ -24,7 +24,7 @@ def area_arr(req):
                     
                     LEFT JOIN `shop-info` ON datadiff.id_shop = `shop-info`.Id
                     LEFT JOIN area ON `shop-info`.areaId = area.Id
-                    LEFT JOIN managers on `shop-info`.managerId=managers.id
+                    LEFT JOIN Managers on `shop-info`.managerId=Managers.id
                    WHERE MONTH (datadiff.date)=5
                 ) AS basicquery
             GROUP BY areaname

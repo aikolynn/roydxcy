@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="{% static 'easyui/themes/icon.css' %}">
 
     <div class="easyui-layout" style="height: 800px;">
-        <div region="west" title="菜单" style="width: 150px; height: 800px;" >
+        <div region="west" title="菜单" style="width: 150px; height: 450px;" >
             <ul class="easyui-tree">
                     <li >
                         <span>系统菜单</span>
@@ -39,7 +39,7 @@
                     </li>
             </ul>
         </div>
-        <div id="content" region="center" style="padding:5px; height: 800px;" >
+        <div id="content" region="center" style="padding:5px; height: 500px;" >
             {% block center %}{% endblock %}
         </div>
 

@@ -39,6 +39,14 @@ def read_shop_info(req):
      data_json={}
      row=[]
      for shopinfo in shop_info_all:
+         if shopinfo.contractBeginDate  is None:
+             contractBeginDate=shopinfo.contractBeginDate
+         else:
+             contractBeginDate=shopinfo.contractBeginDate.strftime("%Y-%m-%d")
+         if shopinfo.contractBeginDate is None:
+             contractEndDate = shopinfo.contractEndDate
+         else:
+             contractEndDate = shopinfo.contractEndDate.strftime("%Y-%m-%d")
          row.append(
              {
                  "sname":shopinfo.sName,
@@ -48,8 +56,11 @@ def read_shop_info(req):
                  "area":shopinfo.areaId.name,
                  "shopAddress":shopinfo.shopAddress,
                  "brand":shopinfo.shop_brand,
-                 "state":shopinfo.state,
-                 "shoptype":shopinfo.shopType,
+                 "state":shopinfo.get_state_display(),
+                 "shoptype":shopinfo.get_shopType_display(),
+                 "openingDate":shopinfo.openingDate.strftime("%Y-%m-%d"),
+                 "contractBeginDate":contractBeginDate,
+                 "contractEndDate":contractEndDate
 
              }
          )

@@ -86,7 +86,7 @@ def addcheckdata(req):
     return JsonResponse(sava_message)
 def checkall(req):
     shop_list = ShopInfo.objects.values('Id', 'sName', 'shopType', "managerId__name", "managerId").filter(
-        shopType__in=["D", "C"]).order_by("-sName")
+        shopType__in=["D", "C"]).order_by("sName")
     man_list = Managers.objects.values('id', 'name').filter(shopinfo__shopType__in=["D", "C"]).distinct()
     diff = datadiff.objects.exclude(amount=0)\
                            .exclude(id_shop__sName__in=['元隆利嘉生活馆','满洲里友谊商厦'])\
@@ -265,7 +265,7 @@ def excelindb(request):
                 shop_id=ShopInfo.objects.get(sysName=(excel_sheets.cell(row=row_excel,column=1).value))
                 date_excel = excel_sheets.cell(row=1, column=column_excel).value
                 #每行第二列为系统金额
-                print  row_excel,column_excel
+
                 sys_amount_excel=float(excel_sheets.cell(row=row_excel,column=column_excel).value)
                 #根据时间（excel_date）和店铺名称（shop_id）来判断记录是否存在，如果存在更新原有记录，否则新建记录
                 if datadiff.objects.filter(date=date_excel, id_shop=shop_id).count():
@@ -282,7 +282,9 @@ def excelindb(request):
                 #excel表格从第二行开始读取，每行第一列为店铺名
                     shop_id=ShopInfo.objects.get(sName=(excel_sheets.cell(row=row_excel,column=1).value))
                     #每行第二列为店铺金额
+
                     shopamount_excel=float(excel_sheets.cell(row=row_excel,column=column_excel).value)
+
                     date_excel=excel_sheets.cell(row=1,column=column_excel).value
                     #根据时间（excel_date）和店铺名称（shop_id）来判断记录是否存在，如果存在更新原有记录，否则新建记录
                     if datadiff.objects.filter(date=date_excel, id_shop=shop_id).count():
@@ -333,7 +335,7 @@ def excelindb(request):
                  #创建区域信息
                  area_name=excel_sheets.cell(row=row_excel,column=1).value
                  Area.objects.update_or_create(name=area_name,manager=manager_id)
-                 return render(request, 'shop.html', locals())
+                 return HttpResponseRedirect("/")
         #批量导入门店档案
     elif excel_data_type=='shopinfo':
         for row_excel in range(2, excel_rows + 1):
