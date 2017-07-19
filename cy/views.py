@@ -98,11 +98,11 @@ def checkdata(request):
     shop_list = ShopInfo.objects.values('Id', 'sName', 'shopType', "managerId__name", "managerId").filter(
         shopType__in=["D", "C"]).order_by("-sName")
     man_list=Managers.objects.values('id','name').filter(shopinfo__shopType__in=["D","C"]).distinct()
-    sel_shop_name=request.GET['select_name']
-    sel_man_name=request.GET['man_name']
-    sel_date=request.GET['sel_date_start']
-    sel_date_end=request.GET['sel_date_end']
-    sel_none=request.GET['sel_none']
+    sel_shop_name=request.POST['select_name']
+    sel_man_name=request.POST['man_name']
+    sel_date=request.POST['sel_date_start']
+    sel_date_end=request.POST['sel_date_end']
+    sel_none=request.POST['sel_none']
     #查询所有有差异的记录总数
     if sel_shop_name=='' and sel_man_name=='' and sel_date=='' and sel_none=='' and sel_date_end=='' :
         diff=datadiff.objects.exclude(amount=0)\
@@ -224,11 +224,10 @@ def diff_export_excel(request):
 #修改差异原因
 def update_diff(req):
     sava_message = {"sava_message": "提交成功"}
-    diff_new=req.GET["diff_new"]
-    remark_new = req.GET["remark"]
-    true_amount=req.GET["true_amount"]
-    diff_id=req.GET["diffid"]
-
+    diff_new=req.POST["diff_new"]
+    remark_new = req.POST["remark"]
+    true_amount=req.POST["true_amount"]
+    diff_id=req.POST["diffid"]
     if true_amount=="sys":
             datadiff.objects.filter(id=diff_id).update(diff=diff_new,remark=remark_new,true_amount=1)
     elif true_amount=="shop":
@@ -240,6 +239,11 @@ def update_diff(req):
 #导入excel读写库 openpyxl(只可读写2007版及之后的office文档)
 
 def excelindb(request):
+    #店铺列表
+    shop_list = ShopInfo.objects.values('Id', 'sName', 'shopType', "managerId__name", "managerId").filter(
+        shopType__in=["D", "C"]).order_by("-sName")
+    #销售经理列表
+    man_list = Managers.objects.values('id', 'name').filter(shopinfo__shopType__in=["D", "C"]).distinct()
     sava_message = {"sava_message": "上传成功"}
     excel_file = request.FILES['excelfile']
     excel_date = request.POST["exceldate"]
@@ -265,7 +269,6 @@ def excelindb(request):
                 shop_id=ShopInfo.objects.get(sysName=(excel_sheets.cell(row=row_excel,column=1).value))
                 date_excel = excel_sheets.cell(row=1, column=column_excel).value
                 #每行第二列为系统金额
-
                 sys_amount_excel=float(excel_sheets.cell(row=row_excel,column=column_excel).value)
                 #根据时间（excel_date）和店铺名称（shop_id）来判断记录是否存在，如果存在更新原有记录，否则新建记录
                 if datadiff.objects.filter(date=date_excel, id_shop=shop_id).count():
@@ -275,7 +278,12 @@ def excelindb(request):
                     sys_diff=datadiff(sys_amount=sys_amount_excel,date=date_excel,id_shop=shop_id)
                     sys_diff.save()
                 date_excel_str=date_excel.strftime("%Y-%m-%d")
-        return HttpResponseRedirect('/diff/?sel_none=&select_name=&man_name=&sel_date_end=%s&sel_date_start=%%s' % date_excel_str %date_excel_start)
+        diff = datadiff.objects.exclude(amount=0) \
+                    .exclude(id_shop__sName__in=['元隆利嘉生活馆', '满洲里友谊商厦']) \
+                    .filter(id_shop__shopType__in=["D", "C"],
+                            date__range=(date_excel_start, date_excel_str)) \
+                    .order_by("id_shop", "date")
+        return render(request,'checkdata.html',{"diff":diff,"shop_list":shop_list,"man_list":man_list})
     elif excel_data_type=="shopamout":
         for row_excel in range(2, excel_rows + 1):
                 for column_excel in range(2,excel_columns+1):
@@ -294,8 +302,13 @@ def excelindb(request):
                         shop_diff=datadiff(shop_amount=shopamount_excel,date=date_excel,id_shop=shop_id)
                         shop_diff.save()
                 date_excel_str = date_excel.strftime("%Y-%m-%d")
-        return HttpResponseRedirect(
-            '/diff/?sel_none=&select_name=&man_name=&sel_date_end=%s&sel_date_start=%%s' % date_excel_str %date_excel_start)
+        #数据导入后查询有差异的数据并将结果传递到前端渲染
+        diff = datadiff.objects.exclude(amount=0) \
+            .exclude(id_shop__sName__in=['元隆利嘉生活馆', '满洲里友谊商厦']) \
+            .filter(id_shop__shopType__in=["D", "C"],
+                    date__range=(date_excel_start, date_excel_str)) \
+            .order_by("id_shop", "date")
+        return render(request, 'checkdata.html', {"diff": diff, "shop_list": shop_list, "man_list": man_list})
         #批量导入人员信息
     elif excel_data_type=="staff":
         for row_excel in range(2, excel_rows + 1):
@@ -367,7 +380,7 @@ def excelindb(request):
                 )
                 return render(request,'shop.html',locals())
 
-from django.forms.models import model_to_dict
+
 def fo(reqest):
     manager=Managers.objects.all()
     return render(reqest,'form.html',locals())

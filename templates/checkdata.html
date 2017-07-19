@@ -27,7 +27,7 @@ function edit_event(eventid) {
     $.ajax(
         {
             url:"{% url 'update_diff' %}",
-            type:"get",
+            type:"POST",
             data:{
                 diff_new:diff,
                 remark:remark,
@@ -38,7 +38,7 @@ function edit_event(eventid) {
             success:(
                 function (data) {
                     if(data.success()){
-                        window.location.reload(true);
+                        location.reload(true);
                     }
 
             }
@@ -372,7 +372,8 @@ font-weight:800
        </tr>
         <tr >
           <td colspan="9" style="width: auto;">
-          <form action="{% url 'diff' %}" class="form-inline" role="form">
+          {% csrf_token %}
+          <form action="{% url 'diff' %}" class="form-inline" role="form" method="post">
              <div class=" form-group input-group" >
                  <button class="btn  glyphicon glyphicon-hourglass">筛选</button>
              </div>
