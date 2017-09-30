@@ -12,6 +12,7 @@
 
     <script src="{% static 'datepicker/js/bootstrap-datetimepicker.min.js' %}"></script>
     <script src="{% static 'datepicker/js/locales/bootstrap-datetimepicker.zh-CN.js' %}"></script>
+    <script src="{% static 'js/table2excel.js' %}"></script>
 
 
 
@@ -63,6 +64,9 @@
         </ul>
     </div>
     <!-- 导航主体 -->
+     <!-- 导航栏附加功能 -->
+    {% block nav-title %}{% endblock %}
+      <!-- 导航栏附加功能 -->
 </nav>
 <!-- 导航 -->
 <div class="container" style="padding-top: 50px;">

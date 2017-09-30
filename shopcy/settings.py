@@ -26,7 +26,7 @@ SECRET_KEY = 're^15--)9sc=fr_6$in1%h#t13!5xz*dvh9@xb4=j5!djh!n80'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -40,7 +40,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'cy',
     'product',
-    'debug_toolbar',
+
 )
 
 MIDDLEWARE_CLASSES = (
@@ -98,7 +98,7 @@ DATABASES = {
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
 
-LANGUAGE_CODE = 'en'
+LANGUAGE_CODE = 'zh_CN'
 
 TIME_ZONE = 'UTC'
 
@@ -118,4 +118,3 @@ STATICFILES_DIRS=(os.path.join(BASE_DIR,'static'),)
 
 MEDIA_URL='/static/upload/'
 MEDIA_ROOT=os.path.join(BASE_DIR,'static/upload')
-INTERNAL_IPS = ('127.0.0.1',)

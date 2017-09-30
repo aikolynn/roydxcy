@@ -1,6 +1,8 @@
 {% extends 'base.html' %}
 {% block title %}差异核对{% endblock %}
-
+{% block nav-title %}
+    
+{% endblock %}
 {% block content %}
     <script>
      function shopdata() {
@@ -250,8 +252,6 @@ font-weight:800
      font-weight:bold;
      font-style: inherit;
 
-
-
      border-top: solid black;
 
  }
@@ -269,16 +269,6 @@ font-weight:800
      color:green;
      border: dotted green;
  }
- .fixedThead{
-			display: block;
-
-		}
- .scrollTbody{
-			display: block;
-			height: 500px;
-			overflow: auto;
-
-		}
  </style>
 <div class="container" >
  <!-- 弹出添加店铺上报数据 -->
@@ -397,6 +387,7 @@ font-weight:800
         <tr >
 
           <td colspan="9" style="width: auto;">
+          <nav class="navbar navbar-default navbar-top " role="navigation">
           {% csrf_token %}
           <form action="{% url 'diff' %}" class="form-inline" role="form" method="post">
              <div class=" form-group input-group" >
@@ -433,16 +424,17 @@ font-weight:800
 
                   </select>
              </div>
+
              <div class="form-group " >
                   <button type="submit" class=" glyphicon glyphicon-search btn btn-primary"></button>
              </div>
           </form>
+</nav>
           </td>
       </tr>
   </table>
-
+<button id="btn">导出表格</button>
    <table class="table table-hover text-center table-striped table2excel" id="editTable">
-
        <tr>
            <td >店  铺</td>
            <td >销售经理</td>
@@ -454,10 +446,8 @@ font-weight:800
            <td>备&nbsp;&nbsp;注</td>
           <td>操作</td>
        </tr>
-
-
        {% for d in diff %}
-           <tr >
+           <tr>
               <td class="text-danger " style="vertical-align: middle !important;font-size:15px;">{{ d.id_shop.sysName }}</td>
               <td class="mi">{{ d.id_shop.managerId.name }}</td>
 
@@ -499,7 +489,6 @@ font-weight:800
               </td>
            </tr>
        {% endfor %}
-
    </table>
 </div>
 {% endblock %}

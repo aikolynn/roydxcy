@@ -55,7 +55,8 @@ def addinfo(req):
         conbengin = req.GET['contractBegindate']
         conEnd = req.GET['contractEndDate']
         shopstate = req.GET['shopstate']
-        ShopInfo.objects.create(sysName=sys_name,
+        print shopstate
+        ShopInfo.objects.update_or_create(sysName=sys_name,
                                 sName=s_name,
                                 managerId=sale_manager,
                                 areaId=aree,
@@ -66,6 +67,7 @@ def addinfo(req):
                                 contractBeginDate=conbengin,
                                 contractEndDate=conEnd,
                                 state=shopstate)
+        print  shopstate
     return JsonResponse(sava_message)
 
 def addcheckdata(req):
@@ -84,13 +86,27 @@ def addcheckdata(req):
         create_list = datadiff(date=data_date, shop_amount=shop_amount_report, id_shop=shopname)
         create_list.save()
     return JsonResponse(sava_message)
+import calendar
+import time
 def checkall(req):
+    '''
+    得到当月第一天的日期和最后一天的日期
+    查询当月有差异的数据
+    '''
+    #获取当前时间
+    day_now=time.localtime()
+    #当月第一天日期
+    day_begin='%d-%02d-01'%(day_now.tm_year,day_now.tm_mon)
+    wday,monthRange=calendar.monthrange(day_now.tm_year,day_now.tm_mon)
+    #当月最后一天日期
+    day_end='%d-%02d-%02d'%(day_now.tm_year, day_now.tm_mon, monthRange)
     shop_list = ShopInfo.objects.values('Id', 'sName', 'shopType', "managerId__name", "managerId").filter(
         shopType__in=["D", "C"]).order_by("sName")
     man_list = Managers.objects.values('id', 'name').filter(shopinfo__shopType__in=["D", "C"]).distinct()
     diff = datadiff.objects.exclude(amount=0)\
                            .exclude(id_shop__sName__in=['元隆利嘉生活馆','满洲里友谊商厦'])\
-                           .filter(id_shop__shopType__in=["D", "C"])\
+                           .filter(id_shop__shopType__in=["D", "C"],
+                                   date__range=(day_begin,day_end))\
                            .order_by("id_shop", "-date")
     return render(req,'checkdata.html',locals())
 #获取所有有差异的数据
