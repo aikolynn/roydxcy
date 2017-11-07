@@ -10,6 +10,8 @@ def easy_ui_test(req):
     return render(req,'diff.html',locals())
 
 def read_staff_info(req):
+    page = req.GET['page']
+    rows = req.GET['rows']
     manager = Managers.objects.all()
     total = {}
     row = []

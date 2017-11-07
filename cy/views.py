@@ -86,6 +86,24 @@ def addcheckdata(req):
         create_list = datadiff(date=data_date, shop_amount=shop_amount_report, id_shop=shopname)
         create_list.save()
     return JsonResponse(sava_message)
+
+def addsyscheckdata(req):
+    sava_message = {"sava_message": "提交成功"}
+    shopname=ShopInfo.objects.get(Id=req.GET["shop_name"])
+    data_date=req.GET["data_date"]
+    sys_amount_report = float(req.GET["money"])
+    #根据data_date和shopname查询是否存在记录，如存在则更新，否则新建
+    if datadiff.objects.filter(date=data_date,id_shop=shopname).count():
+        #获取原有记录中的sys_amount
+        shop_amount_exists=datadiff.objects.get(date=data_date, id_shop=shopname).shop_amount
+        #更新记录中的shop_amount和amount
+        datadiff.objects.filter(date=data_date, id_shop=shopname).update(sys_amount=sys_amount_report,amount=sys_amount_report-shop_amount_exists)
+    else:
+
+        create_list = datadiff(date=data_date, shop_amount=sys_amount_report, id_shop=shopname)
+        create_list.save()
+    return JsonResponse(sava_message)
+
 import calendar
 import time
 def checkall(req):
@@ -111,10 +129,11 @@ def checkall(req):
     return render(req,'checkdata.html',locals())
 #获取所有有差异的数据
 def checkdata(request):
-    shop_list = ShopInfo.objects.values('Id', 'sName', 'shopType', "managerId__name", "managerId").filter(
+    shop_list = ShopInfo.objects.values('Id', 'sName', 'sysName','shopType', "managerId__name", "managerId").filter(
         shopType__in=["D", "C"]).order_by("-sName")
     man_list=Managers.objects.values('id','name').filter(shopinfo__shopType__in=["D","C"]).distinct()
     sel_shop_name=request.POST['select_name']
+    print  sel_shop_name
     sel_man_name=request.POST['man_name']
     sel_date=request.POST['sel_date_start']
     sel_date_end=request.POST['sel_date_end']
@@ -129,7 +148,7 @@ def checkdata(request):
     elif sel_shop_name and sel_man_name=='' and sel_date=='' and sel_none=='' and sel_date_end=='':
         diff = datadiff.objects.exclude(amount=0)\
                                .filter(id_shop__shopType__in=["D", "C"],
-                                        id_shop=sel_shop_name)\
+                                        id_shop__sName=sel_shop_name)\
                                .order_by("id_shop", "-date")
     #按到销售经理查询
     elif sel_man_name and sel_shop_name=='' and sel_date=='' and sel_none=='' and sel_date_end=='':
@@ -180,7 +199,7 @@ def checkdata(request):
     elif sel_none == '1' and sel_date == '' and sel_man_name=='' and sel_shop_name and sel_date_end=='' :
         diff = datadiff.objects.exclude(amount=0).filter(id_shop__shopType__in=['D', 'C'],
                                                          remark=u'未核查',
-                                                         id_shop=sel_shop_name).order_by("id_shop", "-date")
+                                                         id_shop__sName=sel_shop_name).order_by("id_shop", "-date")
     #查询单店给定时间段内的结果
     elif sel_date_end and sel_date and sel_shop_name and sel_man_name=='' and sel_none=='':
         diff=datadiff.objects.exclude(amount=0).filter(id_shop__shopType__in=['D','C'],
@@ -223,6 +242,9 @@ def diff_export_excel(request):
                 book_sheet.cell(row=row, column=5).font=F_styleR
             elif diff_y.true_amount==1:
                 book_sheet.cell(row=row, column=4).font=F_styleR
+                # book_sheet.cell(row=row, column=4).style.fill.fill_type =styles.Fill.FILL_SOLID
+                # book_sheet.cell(row=row, column=4).style.fill.start_color = 'FFFFFF'
+                # book_sheet.cell(row=row, column=4).style.fill.end_color = '000000'
             book_sheet.cell(row=row, column=6).value = diff_y.amount
             book_sheet.cell(row=row, column=6).alignment = F_styleCenter
             book_sheet.cell(row=row, column=7).value = diff_y.diff
@@ -256,7 +278,7 @@ def update_diff(req):
 
 def excelindb(request):
     #店铺列表
-    shop_list = ShopInfo.objects.values('Id', 'sName', 'shopType', "managerId__name", "managerId").filter(
+    shop_list = ShopInfo.objects.values('sysName','Id', 'sName', 'shopType', "managerId__name", "managerId").filter(
         shopType__in=["D", "C"]).order_by("-sName")
     #销售经理列表
     man_list = Managers.objects.values('id', 'name').filter(shopinfo__shopType__in=["D", "C"]).distinct()
