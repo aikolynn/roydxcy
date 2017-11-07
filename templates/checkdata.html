@@ -1,7 +1,11 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block title %}差异核对{% endblock %}
 
 {% block content %}
+    <link href="{% static 'css/jquery.searchableSelect.css' %}">
+
+    <script src="{% static 'js/jquery.searchableSelect.js' %}"></script>
     <script>
      function shopdata() {
       shop_name = $.trim($("select[name=shop_name]").val());
@@ -10,6 +14,24 @@
                $.ajax(
              {
                  url:"{% url 'check' %}",
+                 type:"get",
+                 data:{shop_name:shop_name,money:money,data_date:data_date},
+                 datatype:"json",
+                 success:function(data) {
+                        window.location.reload();
+
+
+                    }
+        }
+     )
+ }
+  function sysdata() {
+      shop_name = $.trim($("select[name=sys_shop_name]").val());
+      money = $.trim($("input[name=sys_sale_money]").val());
+     data_date=$.trim($("input[name=sys_data_date]").val());
+               $.ajax(
+             {
+                 url:"{% url 'syscheck' %}",
                  type:"get",
                  data:{shop_name:shop_name,money:money,data_date:data_date},
                  datatype:"json",
@@ -285,7 +307,10 @@ font-weight:800
 
 <p class="col-xs-2">
     <button class="btn btn-info " data-toggle="modal" data-target="#diffmodal-data" type="button">店铺上报数据</button>
+    <br>
+    <button class="btn btn-info " data-toggle="modal" data-target="#diffsystem" type="button">系统数据修正</button>
 </p>
+
 
 {% csrf_token %}
 <form action="{% url 'upinfo' %}" enctype="multipart/form-data" method="post" class=" col-xs-4" role="form">
@@ -325,7 +350,54 @@ font-weight:800
 
 
 </form>
+<!--系统数据修正弹窗内容 -->
+<div class="modal  " id="diffsystem" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+     <div class="modal-dialog">
+         <div class="modal-content">
+             <div class="modal-header">
+                 <button type="button" class="close" data-dismiss="modal">
+                     <span aria-hidden="true">×</span>
+                     <span class="sr-only">Close</span>
+                 </button>
+                 <h4 class="modal-title text-center">系统数据修正</h4>
+             </div>
 
+             <div class="modal-body ">
+                   <div class="container">
+                       <form class="form-group col-md-5" method="get"  id="form_data">
+
+                           <div class="input-group">
+                                <span class="input-group-addon">店铺名称</span>
+                               <select class="form-control" name="sys_shop_name">
+                                   {% for shop in shop_list %}
+                                       <option value="{{ shop.Id }}">{{ shop.sysName }}</option>
+                                   {% endfor %}
+                               </select>
+                           </div>
+                           <br>
+                        <div class="input-group">
+                              <span class="input-group-addon">日&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;期</span>
+                              <input size="10" type="text"  readonly name="sys_data_date" class="datetime_shop_up form-control">
+                          </div>
+                           <br>
+
+                           <div class="input-group">
+                               <span  class="input-group-addon">销售金额</span>
+                              <input type="text" class="form-control" name="sys_sale_money" >
+                           </div>
+
+                      </form>
+                   </div>
+             </div>
+             <div class="modal-footer">
+                 <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                 <button type="submit" class="btn btn-primary" id="save_button" onclick="sysdata()" >提交 </button>
+             </div>
+
+         </div>
+     </div>
+</div>
+<!--系统数据修正弹窗-->
 
 <!-- 店铺添加弹窗内容 -->
 <div class="modal  " id="diffmodal-data" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
@@ -336,7 +408,7 @@ font-weight:800
                      <span aria-hidden="true">×</span>
                      <span class="sr-only">Close</span>
                  </button>
-                 <h4 class="modal-title text-center">请输入以下信息</h4>
+                 <h4 class="modal-title text-center">店铺销售数据上报</h4>
              </div>
 
              <div class="modal-body ">
@@ -403,14 +475,19 @@ font-weight:800
                  <button class="btn  glyphicon glyphicon-hourglass">筛选</button>
              </div>
              <div class=" form-group input-group" >
+
                      <select name="select_name" class="form-control" id="sel"  style="width:110px" >
                          <option value="" class="selected">店铺名称</option>
                          {% for item in shop_list %}
-                             <option value="{{ item.Id}}">{{ item.sName }}</option>
+                             <option value="{{ item.sName}}">{{ item.sName }}</option>
                          {% endfor %}
                      </select>
              </div>
-
+{#                <script>#}
+{#                    $(function () {#}
+{#                        $('#sel').searchableSelect();#}
+{#                    });#}
+{#                </script>#}
               <div class=" form-group input-group" >
                      <select name="man_name" class="form-control " id="sel" style="width: 110px">
                          <option value="" class="selected">销售经理</option>

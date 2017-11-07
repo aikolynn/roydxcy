@@ -5,6 +5,7 @@ from cy.views import *
 from cy.infoedit import *
 from cy.highcharts import *
 from product.views import *
+from django.views.generic.base import RedirectView
 from shopcy import settings
 urlpatterns = [
     # Examples:
@@ -18,6 +19,7 @@ urlpatterns = [
     url(r'^upinfo/',excelindb,name='upinfo'),
     url(r"^upload/(?P<path>.*)$", "django.views.static.serve", {"document_root": settings.MEDIA_ROOT,}),
     url(r'^check/', addcheckdata, name='check'),
+    url(r'^syscheck/', addsyscheckdata, name='syscheck'),
     url(r'^diff/', checkdata, name='diff'),
     url(r'^checkall/',checkall,name='checkall'),
     url(r'^diff_excel_export',diff_export_excel,name="diff_export_excel"),
@@ -34,4 +36,5 @@ urlpatterns = [
     url(r'^firstui/',easy_ui_test,name='easyui'),
     url(r'^shopinfo/',shop_info,name='shopinfo'),
     url(r'^readshopinfo',read_shop_info,name='readshopinfo'),
+	url(r'^favicon.ico$',RedirectView.as_view(url=r'static/favicon.ico')),
 ]

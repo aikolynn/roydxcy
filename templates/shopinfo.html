@@ -1,9 +1,9 @@
 {% extends 'diff.html' %}
 
 {% block center %}
-    <table id="readshopinfo" title="区域管理人员" class="easyui-datagrid" style="height:500px;"
+    <table id="readshopinfo" title="区域管理人员" class="easyui-datagrid" style="height:600px;"
             url="{% url 'readshopinfo' %}"
-            toolbar="#toolbar" pagination="true"
+            toolbar="#editbar" pagination="true"
             rownumbers="true" fitColumns="true" singleSelect="true">
         <thead>
             <tr>
@@ -22,172 +22,112 @@
             </tr>
         </thead>
     </table>
-    <div id="toolbar">
-            <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="newUser()">新增用户</a>
-            <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="editUser()">编辑用户</a>
-            <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="destroyUser()">删除用户</a>
-        </div>
-    <div id="shopinfo" class="easyui-dialog" style="width:500px" closed="true" buttons="#dlg-buttons">
-                    <form id="fm" method="post" novalidate style="margin:0;padding:20px 50px">
-                       <div class="input-group">
-                                <span class="input-group-addon">系统名称</span>
-                                <input type="text" class="form-control" name="sysname">
-                           </div>
-                           <br>
-                           <div class="input-group">
-                                <span class="input-group-addon">店铺名称</span>
-                                <input type="text" class="form-control" name="sname">
-                           </div>
-                           <br>
-
-                           <div class="input-group">
-                               <span class="input-group-addon">所属大区</span>
-                               <input class="form-control" name="area">
-                           </div>
-                           <br>
-
-                         <div class="input-group">
-                               <span class="input-group-addon">销售经理</span>
-                               <input class="form-control" name="manager">
-                           </div>
-                           <br>
-
-                       <div class="input-group">
-                              <span class="input-group-addon">经营状态</span>
-                               <select class="form-control selected" name="state">
-                                   <option value="" selected>------</option>
-                                   <option value="S">正常营业</option>
-                                   <option VALUE="Z">装修</option>
-                                   <option value="C">撤店</option>
-                                   <option value="P">暂停整改</option>
-                             </select>
-                          </div>
-                           <br>
-
-                          <div class="input-group">
-                              <span class="input-group-addon">经营方式</span>
-                               <select class="form-control" name="shoptye">
-                                   <option value="" selected>------</option>
-                                   <option value="D">直营</option>
-                                   <option VALUE="A">代理</option>
-                                   <option value="J">加盟</option>
-                                   <option value="C">承包</option>
-                             </select>
-                          </div>
-                           <br>
-
-                       <div class="input-group">
-                              <span class="input-group-addon">店铺地址</span>
-                            <input type="text" class="form-control" name="shopAddress">
-                          </div>
-                           <br>
-
-                        <div class="input-group">
-                              <span class="input-group-addon">卖场类型</span>
-                              <input type="text" class="form-control" name="malltype">
-                          </div>
-                           <br>
-
-                        <div class="input-group">
-                              <span class="input-group-addon">开业时间</span>
-                            <input type="text" class="form-control openningdate" name="openingDate" readonly placeholder="请输入店铺开业时间,格式为2016-01-01">
-
-                          </div>
-                           <br>
-
-                           <div class="input-group">
-                               <span  class="input-group-addon">合同开始时间</span>
-                              <input type="text" class="form-control contractBeginDate"  readonly name="contractBeginDate" placeholder="请输入店铺合同开始时间,格式为2016-01-01">
-                           </div><br>
-                           <div class="input-group">
-                               <span class="input-group-addon" >合同截至时间</span>
-                               <input type="text" class="form-control contractEndDate" readonly name="contractEndDate" placeholder="请输入店铺合同结束时间,格式为2016-01-01">
-                           </div>
-
-                    </form>
+    <div id="editbar">
+        <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="newNews()">新增用户</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="editNews()">编辑用户</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="destroyNews()">删除用户</a>
+    </div>
+    <div id="dlg" class="easyui-dialog" style="width:400px"
+            closed="true" buttons="#dlg-buttons">
+        <form id="fm" method="post" novalidate style="margin:0;padding:20px 50px">
+            <div style="margin-bottom:20px;font-size:20px;border-bottom:1px solid #ccc">店铺详情</div>
+            <div style="margin-bottom:10px">
+                <input name="sname" class="easyui-textbox" required="true" label="系统名称:" style="width:100%">
             </div>
-            <div id="dlg-buttons">
-             <a href="javascript:void(0)" class="easyui-linkbutton c6" iconCls="icon-ok" onclick="saveUser()" style="width:90px">保存</a>
-             <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-cancel" onclick="javascript:$('#shopinfo').dialog('close')" style="width:90px">取消</a>
-          </div>
+            <div style="margin-bottom:10px">
+                <input name="news_date" class="easyui-textbox" required="true" label="报表名称:" style="width:100%">
+            </div>
+            <div style="margin-bottom:10px">
+                <input name="news_detail_time" class="easyui-textbox" required="true" label="销售经理:" style="width:100%">
+            </div>
+            <div style="margin-bottom:10px">
+                <input name="news_content" class="easyui-textbox" required="true" label="所属区域" style="width:100%">
+            </div>
+            <div style="margin-bottom:10px">
+                <input name="news_url" class="easyui-textbox" required="true" label="通讯地址:" style="width:100%">
+            </div>
+            <div style="margin-bottom:10px">
+                <input name="news_source" class="easyui-textbox" required="true" label="卖场类型" style="width:100%">
+            </div>
+            <div style="margin-bottom:10px">
+                <input name="news_web" class="easyui-textbox" required="true"  label="品牌" style="width:100%">
+            </div>
+            <div style="margin-bottom:10px">
+                <input name="news_logtime" class="easyui-textbox" required="true"  label="店铺类型:" style="width:100%">
+            </div>
+        </form>
+    </div>
+    <div id="dlg-buttons">
+        <a href="javascript:void(0)" class="easyui-linkbutton c6" iconCls="icon-ok" onclick="saveNews()" style="width:90px ">保存</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-cancel" onclick="javascript:$('#dlg').dialog('close')" style="width:90px" >取消</a>
+    </div>
 <script type="text/javascript">
-              //设置ajax全局Header  请求头$.cookie('csrftoken')
-        $(function (){
-            $.ajaxSetup({
-                beforeSend: function(xhr,settings){
-                    xhr.setRequestHeader('X-CSRFtoken', $.cookie('csrftoken'))}
-            });
-        });
-
-        var url;
-        // 显示 编辑框
-        function newUser(){
-            $('#shopinfo').dialog('open').dialog('center').dialog('创建','新增');
-            $('#fm').form('clear');
-            url = '{% url 'addinfo' %}';
+    var url;
+        //显示编辑框
+        function newNews(){
+        $('#dlg').dialog('open').dialog('center').dialog('setTitle','新增新闻');
+        $('#fm').form('clear');
+        url = '/start/';
         }
-
-        //编辑 USER
-        function editUser(){
-            var row = $('#readshopinfo').datagrid('getSelected');
-            if (row){
-                $('#shopinfo').dialog('open').dialog('center').dialog('setTitle','编辑用户');
-                $('#fm').form('load',row);
-                //  ajax 编辑USER 并且 通过ajax 保存到后端 SQL
-                url = '/edit/'+row.id;
+        //编辑新闻
+        function editNews(){
+        var row = $('#dg').datagrid('getSelected');
+        console.log(row);
+        if (row){
+            $('#dlg').dialog('open').dialog('center').dialog('setTitle','Edit News');
+            $('#fm').form('load',row);
+            //  ajax 编辑News 并且 通过ajax 保存到后端 SQL
+            url = '/edit/'+row.news_id;
+        }
+        }
+        // 保存新闻
+        function saveNews(){
+        $('#fm').form('submit',{
+            url: url,
+            onSubmit: function(){
+                return $(this).form('validate');
+            },
+            success: function(result){
+                if (result=="save"){
+                   $('#dlg').dialog('close');
+                    $('#dg').datagrid('reload');
+                }else
+                if (result.errorMsg){
+                    $.messager.show({
+                        title: 'Error',
+                        msg: result.errorMsg
+                    });
+                } else {
+                    $('#dlg').dialog('close');        // close the dialog
+                    $('#dg').datagrid('reload');    // reload the News data
+                }
             }
+        });
         }
 
-        // 创建——USER 并 SAVE  保存
-        function saveUser(){
-           $('#fm').form('submit',{
-                url: url,
-                onSubmit: function(){
-                    return $(this).form('validate');
-                },
-                success: function(result){
-                    if (result=="save"){
-                       $('#shopinfo').dialog('close');
-                        $('#readshopinfo').datagrid('reload');
-                    }else
-                    if (result.errorMsg){
-                        $.messager.show({
-                            title: 'Error',
-                            msg: result.errorMsg
-                        });
-                    } else {
-                        $('#shopinfo').dialog('close');        // close the dialog
-                        $('#readshopinfo').datagrid('reload');    // reload the user data
-                    }
+
+        //删除新闻
+        function destroyNews(){
+        var row = $('#dg').datagrid('getSelected');
+        console.log(row);
+        if (row){
+            $.messager.confirm('再次确认','你确定要删除这条新闻？',function(r){
+                if (r){
+                    $.ajax({
+                        url: '/remove/',
+                        type: 'POST',
+                        data: {'id':row.news_id},
+                        success: function(data) {
+                            if (data=="REMOVE"){
+                                $('#dg').datagrid('reload');
+                            }
+                        },
+                        error: function(data) {alert("error")}
+                    });
                 }
             });
         }
-
-        // 根据ID 删除   user
-        function destroyUser(){
-            var row = $('#readshopinfo').datagrid('getSelected');
-            if (row){
-                $.messager.confirm('确认','确定删除该店铺信息？',function(r){
-          if (r){
-    $.ajax({
-        url: '/remove/',
-        type: 'POST',
-        data: {id:row.id},
-        headers: {'X-CSRFtoken': $.cookie('csrftoken')},
-        success: function(data) {
-             if (data=="REMOVE"){
-            $('#readshopinfo').datagrid('reload');    // reload the user data
-           }
-        },
-        error: function(data) {
-            alert("error")
-  }
-       });
-             }
-                     });
-                        }
-                              }
-
+        }
  $(document).ready(function () {
     $(".exceldate,.openningdate,.contractBeginDate,.contractEndDate").datetimepicker(
         {
