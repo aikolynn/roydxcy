@@ -80,7 +80,8 @@ def addcheckdata(req):
         #获取原有记录中的sys_amount
         sys_amount_exists=datadiff.objects.get(date=data_date, id_shop=shopname).sys_amount
         #更新记录中的shop_amount和amount
-        datadiff.objects.filter(date=data_date, id_shop=shopname).update(shop_amount=shop_amount_report,amount=sys_amount_exists-shop_amount_report)
+        datadiff.objects.filter(date=data_date, id_shop=shopname).update(shop_amount=shop_amount_report,\
+                                                                         amount=sys_amount_exists-shop_amount_report)
     else:
 
         create_list = datadiff(date=data_date, shop_amount=shop_amount_report, id_shop=shopname)
@@ -97,7 +98,8 @@ def addsyscheckdata(req):
         #获取原有记录中的sys_amount
         shop_amount_exists=datadiff.objects.get(date=data_date, id_shop=shopname).shop_amount
         #更新记录中的shop_amount和amount
-        datadiff.objects.filter(date=data_date, id_shop=shopname).update(sys_amount=sys_amount_report,amount=sys_amount_report-shop_amount_exists)
+        datadiff.objects.filter(date=data_date, id_shop=shopname).update(sys_amount=sys_amount_report,\
+                                                                         amount=sys_amount_report-shop_amount_exists)
     else:
 
         create_list = datadiff(date=data_date, shop_amount=sys_amount_report, id_shop=shopname)
@@ -118,8 +120,8 @@ def checkall(req):
     wday,monthRange=calendar.monthrange(day_now.tm_year,day_now.tm_mon)
     #当月最后一天日期
     day_end='%d-%02d-%02d'%(day_now.tm_year, day_now.tm_mon, monthRange)
-    shop_list = ShopInfo.objects.values('Id', 'sName', 'shopType', "managerId__name", "managerId").filter(
-        shopType__in=["D", "C"]).order_by("sName")
+    shop_list = ShopInfo.objects.values('Id', 'sysName', 'shopType', "managerId__name", "managerId").filter(
+        shopType__in=["D", "C"]).order_by("sysName")
     man_list = Managers.objects.values('id', 'name').filter(shopinfo__shopType__in=["D", "C"]).distinct()
     diff = datadiff.objects.exclude(amount=0)\
                            .exclude(id_shop__sName__in=['元隆利嘉生活馆','满洲里友谊商厦'])\
@@ -133,7 +135,6 @@ def checkdata(request):
         shopType__in=["D", "C"]).order_by("-sName")
     man_list=Managers.objects.values('id','name').filter(shopinfo__shopType__in=["D","C"]).distinct()
     sel_shop_name=request.POST['select_name']
-    print  sel_shop_name
     sel_man_name=request.POST['man_name']
     sel_date=request.POST['sel_date_start']
     sel_date_end=request.POST['sel_date_end']
@@ -148,7 +149,7 @@ def checkdata(request):
     elif sel_shop_name and sel_man_name=='' and sel_date=='' and sel_none=='' and sel_date_end=='':
         diff = datadiff.objects.exclude(amount=0)\
                                .filter(id_shop__shopType__in=["D", "C"],
-                                        id_shop__sName=sel_shop_name)\
+                                        id_shop__Id=sel_shop_name)\
                                .order_by("id_shop", "-date")
     #按到销售经理查询
     elif sel_man_name and sel_shop_name=='' and sel_date=='' and sel_none=='' and sel_date_end=='':
@@ -167,7 +168,7 @@ def checkdata(request):
     elif sel_date and  sel_date_end and sel_shop_name and sel_man_name=='' and sel_none=='' :
         diff = datadiff.objects.exclude(amount=0).filter(id_shop__shopType__in=["D","C"],
                                                          date__range=(sel_date,sel_date_end),
-                                                         id_shop=sel_shop_name).order_by("id_shop", "-date")
+                                                         id_shop__Id=sel_shop_name).order_by("id_shop", "-date")
     #按销售经理和时间查询
     elif sel_man_name and sel_date and sel_date_end and sel_shop_name=='' and sel_none=='':
         diff = datadiff.objects.exclude(amount=0) \
@@ -199,11 +200,11 @@ def checkdata(request):
     elif sel_none == '1' and sel_date == '' and sel_man_name=='' and sel_shop_name and sel_date_end=='' :
         diff = datadiff.objects.exclude(amount=0).filter(id_shop__shopType__in=['D', 'C'],
                                                          remark=u'未核查',
-                                                         id_shop__sName=sel_shop_name).order_by("id_shop", "-date")
+                                                         id_shop__Id=sel_shop_name).order_by("id_shop", "-date")
     #查询单店给定时间段内的结果
     elif sel_date_end and sel_date and sel_shop_name and sel_man_name=='' and sel_none=='':
         diff=datadiff.objects.exclude(amount=0).filter(id_shop__shopType__in=['D','C'],
-                                                       id_shop=sel_shop_name,
+                                                       id_shop__Id=sel_shop_name,
                                                        date__range=(sel_date,sel_date_end)).order_by('id_shop',"date")
     return render(request,'checkdata.html',locals())
 #差异Excel导出
@@ -311,7 +312,8 @@ def excelindb(request):
                 #根据时间（excel_date）和店铺名称（shop_id）来判断记录是否存在，如果存在更新原有记录，否则新建记录
                 if datadiff.objects.filter(date=date_excel, id_shop=shop_id).count():
                     shop_amount_base = datadiff.objects.get(date=date_excel, id_shop=shop_id).shop_amount
-                    datadiff.objects.filter(date=date_excel, id_shop=shop_id).update(sys_amount=sys_amount_excel, amount=sys_amount_excel-shop_amount_base)
+                    datadiff.objects.filter(date=date_excel, id_shop=shop_id).update(sys_amount=sys_amount_excel,\
+                                                                                     amount=sys_amount_excel-shop_amount_base)
                 else:
                     sys_diff=datadiff(sys_amount=sys_amount_excel,date=date_excel,id_shop=shop_id)
                     sys_diff.save()
@@ -335,7 +337,8 @@ def excelindb(request):
                     #根据时间（excel_date）和店铺名称（shop_id）来判断记录是否存在，如果存在更新原有记录，否则新建记录
                     if datadiff.objects.filter(date=date_excel, id_shop=shop_id).count():
                         sys_amount_base = datadiff.objects.get(date=date_excel, id_shop=shop_id).sys_amount
-                        datadiff.objects.filter(date=date_excel, id_shop=shop_id).update(shop_amount=shopamount_excel, amount=sys_amount_base-shopamount_excel)
+                        datadiff.objects.filter(date=date_excel, id_shop=shop_id).update(shop_amount=shopamount_excel,\
+                                                                                         amount=sys_amount_base-shopamount_excel)
                     else:
                         shop_diff=datadiff(shop_amount=shopamount_excel,date=date_excel,id_shop=shop_id)
                         shop_diff.save()
@@ -357,7 +360,8 @@ def excelindb(request):
                 staff_qq=excel_sheets.cell(row=row_excel,column=5).value
                 staff_title=excel_sheets.cell(row=row_excel,column=6).value
                 staff_address=excel_sheets.cell(row=row_excel,column=7).value
-                if Managers.objects.filter(name=staff_name,personal_cellphone=staff_personal_phone).count() or Managers.objects.filter(name=staff_name,company_cellphone=staff_c_phone).count():
+                if Managers.objects.filter(name=staff_name,personal_cellphone=staff_personal_phone).count() or \
+                    Managers.objects.filter(name=staff_name,company_cellphone=staff_c_phone).count():
                     Managers.objects.filter(name=staff_name, personal_cellphone=staff_personal_phone).update(
                         name=staff_name,
                         personal_cellphone=staff_personal_phone,
