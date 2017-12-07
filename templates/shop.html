@@ -3,8 +3,7 @@
 {% block title %}档案管理{% endblock %}
 {% block content %}
 
-
-    <script>
+<script>
     function add_info() {
         sys_name = $.trim($("input[name=sys_name]").val());
         s_name = $.trim($("input[name=s_name]").val());
@@ -108,9 +107,7 @@ $(document).ready(function () {
 })
     </script>
 <script src="{% static 'js/tableedit.js' %}"></script>
-<script>
 
-</script>
  <style>
 .div1{
 float: left;
@@ -144,523 +141,532 @@ font-weight:800
     vertical-align: middle !important;
 }
  </style>
- <div class="container" >
-   <!--批量导入档案开始-->
-     <div class="col-xs-3">
-         <p class="text-center h2">批量导入档案</p>
-         {% csrf_token %}
-            <form action="{% url 'upinfo' %}" enctype="multipart/form-data" method="post" class="form-group " role="form">
-             <div class="form-group" >
-                 <div class="input-group">
-                     <span  class="input-group-addon">档案类型</span>
-                     <select name="upinfo_type" class="form-control">
-                         <option value="shopinfo">店铺信息</option>
-                         <option value="areainfo">区域信息</option>
-                         <option value="staff">人员信息</option>
-                     </select>
-                 </div><br>
-                 <div class="input-group">
-                    <span  class="input-group-addon btn-success">档案日期</span>
+<div class="container text-center" >
 
-                     <input type="text" name="exceldate" readonly class="exceldate form-control"  placeholder="">
-                 </div><br>
-                 <div class="div1">
-                    <div class="div2 ">浏览文件</div>
-                    <input type="file" class="inputstyle" name="excelfile" >
-                </div>
-                <div class="input-group">
-                    <button type="submit" class="btn btn-info">上传文件</button>
-                </div>
-             </div>
-        </form>
-     </div>
-  <!--批量导入档案结束-->
+    <div class="row ">
+          <!--批量导入档案开始-->
+         <div class="col-md-3 col-xs-3">
+             <p class="text-center h2">批量导入档案</p>
+             {% csrf_token %}
+                <form action="{% url 'upinfo' %}" enctype="multipart/form-data" method="post" class="form-group " role="form">
+                 <div class="form-group" >
+                     <div class="input-group">
+                         <span  class="input-group-addon">档案类型</span>
+                         <select name="upinfo_type" class="form-control">
+                             <option value="shopinfo">店铺信息</option>
+                             <option value="areainfo">区域信息</option>
+                             <option value="staff">人员信息</option>
+                         </select>
+                     </div><br>
+                     <div class="input-group">
+                        <span  class="input-group-addon btn-success">档案日期</span>
 
-  <!--档案录入开始-->
- <div class="col-xs-4 col-xs-offset-1 ">
-  <p class="text-center h2">
-      档案录入
-  </p>
+                         <input type="text" name="exceldate" readonly class="exceldate form-control"  placeholder="">
+                     </div><br>
+                     <div class="div1">
+                        <div class="div2 ">浏览文件</div>
+                        <input type="file" class="inputstyle" name="excelfile" >
+                    </div>
+                    <div class="input-group">
+                        <button type="submit" class="btn btn-info">上传文件</button>
+                    </div>
+                 </div>
+            </form>
+         </div>
+         <!--批量导入档案结束-->
 
-          <!-- 添加人员 -->
-   <button class="btn btn-success" data-toggle="modal" data-target="#mymodal-manager" type="button">添加人员</button>
- <div class="modal  " id="mymodal-manager" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
-     <div class="modal-dialog">
-         <div class="modal-content">
-             <div class="modal-header">
-                 <button type="button" class="close" data-dismiss="modal">
-                     <span aria-hidden="true">×</span>
-                     <span class="sr-only">关闭</span>
-                 </button>
-                 <h4 class="modal-title text-center">请输入以下信息</h4>
-             </div>
-             <div class="modal-body ">
-                   <div class="container">
-                       <form class="form-group col-md-5"  id="manager_data">
-                           <div class="input-group">
-                                <span class="input-group-addon">姓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;名</span>
-                                <input type="text" class="form-control" name="m_name">
-                           </div>
-                           <br>
-                           <div class="input-group">
-                                <span class="input-group-addon">私人手机</span>
-                                <input type="text" class="form-control" name="personal_phone">
-                           </div>
-                           <br>
-                         <div class="input-group">
-                               <span class="input-group-addon">公司手机</span>
-                               <input type="text" class="form-control" name="c_phone">
-                           </div>
-                           <br>
-                           <div class="input-group">
-                               <span class="input-group-addon">电子邮箱</span>
-                               <input type="text" class="form-control" name="s_email">
-                           </div>
-                           <br>
-                           <div class="input-group">
-                               <span class="input-group-addon">&nbsp;&nbsp;&nbsp;&nbsp;QQ&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                               <input type="text" class="form-control" name="s_qq">
-                           </div>
-                           <br>
+        <!--档案录入开始-->
+        <div class="col-md-4 col-xs-4">
+
+
+      <p class="text-center h2">
+          档案录入
+      </p>
+
+              <!-- 添加人员 -->
+       <button class="btn btn-success" data-toggle="modal" data-target="#mymodal-manager" type="button">添加人员</button>
+     <div class="modal  " id="mymodal-manager" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+         <div class="modal-dialog">
+             <div class="modal-content">
+                 <div class="modal-header">
+                     <button type="button" class="close" data-dismiss="modal">
+                         <span aria-hidden="true">×</span>
+                         <span class="sr-only">关闭</span>
+                     </button>
+                     <h4 class="modal-title text-center">请输入以下信息</h4>
+                 </div>
+                 <div class="modal-body ">
+                       <div class="container">
+                           <form class="form-group col-md-5"  id="manager_data">
+                               <div class="input-group">
+                                    <span class="input-group-addon">姓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;名</span>
+                                    <input type="text" class="form-control" name="m_name">
+                               </div>
+                               <br>
+                               <div class="input-group">
+                                    <span class="input-group-addon">私人手机</span>
+                                    <input type="text" class="form-control" name="personal_phone">
+                               </div>
+                               <br>
                              <div class="input-group">
-                               <span class="input-group-addon">职&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;务</span>
-                               <input type="text" class="form-control" name="s_title">
-                           </div>
-                           <br>
-                             <div class="input-group">
-                               <span class="input-group-addon">通讯地址</span>
-                               <input type="text" class="form-control" name="s_address">
-                           </div>
-                           <br>
-                      </form>
-                   </div>
-             </div>
-             <div class="modal-footer">
-                 <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-                 <button type="submit" class="btn btn-primary" id="save_button" onclick="add_manager()"  name="manager">提交 </button>
-             </div>
+                                   <span class="input-group-addon">公司手机</span>
+                                   <input type="text" class="form-control" name="c_phone">
+                               </div>
+                               <br>
+                               <div class="input-group">
+                                   <span class="input-group-addon">电子邮箱</span>
+                                   <input type="text" class="form-control" name="s_email">
+                               </div>
+                               <br>
+                               <div class="input-group">
+                                   <span class="input-group-addon">&nbsp;&nbsp;&nbsp;&nbsp;QQ&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                   <input type="text" class="form-control" name="s_qq">
+                               </div>
+                               <br>
+                                 <div class="input-group">
+                                   <span class="input-group-addon">职&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;务</span>
+                                   <input type="text" class="form-control" name="s_title">
+                               </div>
+                               <br>
+                                 <div class="input-group">
+                                   <span class="input-group-addon">通讯地址</span>
+                                   <input type="text" class="form-control" name="s_address">
+                               </div>
+                               <br>
+                          </form>
+                       </div>
+                 </div>
+                 <div class="modal-footer">
+                     <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                     <button type="submit" class="btn btn-primary" id="save_button" onclick="add_manager()"  name="manager">提交 </button>
+                 </div>
 
+             </div>
          </div>
-     </div>
-</div>
-  <!-- 添加人员窗口 -->
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  <button class="btn btn-success" data-toggle="modal" data-target="#mymodal-area" type="button">添加区域</button>
-   <!-- 添加区域 -->
-<div class="modal  " id="mymodal-area" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
-     <div class="modal-dialog">
-         <div class="modal-content">
-             <div class="modal-header">
-                 <button type="button" class="close" data-dismiss="modal">
-                     <span aria-hidden="true">×</span>
-                     <span class="sr-only">关闭</span>
-                 </button>
-                 <h4 class="modal-title text-center">请输入以下信息</h4>
-             </div>
-
-             <div class="modal-body ">
-                   <div class="container">
-                       <form class="form-group col-md-5" method="get"  id="area_data">
-
-                           <div class="input-group">
-                                <span class="input-group-addon">区域名称</span>
-                                <input type="text" class="form-control" name="area_name">
-                           </div>
-                           <br>
-                         <div class="input-group">
-                               <span class="input-group-addon">区域负责人</span>
-                               <select class="form-control" name="area_manager">
-                                   <option value="" selected>------</option>
-                                   {% for man in man_list %}
-                                     <option id="{{ man.id }}" value="{{ man.id }}">{{ man.name }}</option>
-                                   {% endfor %}
-                               </select>
-                           </div>
-                           <br>
-                      </form>
-                   </div>
-             </div>
-             <div class="modal-footer">
-                 <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-                 <button type="submit" class="btn btn-primary" id="save_button" onclick="add_area()"  name="area">提交 </button>
-             </div>
-
-         </div>
-     </div>
-</div>
-  <!-- 添加区域窗口 -->
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
- <!-- 弹出添加店铺窗口 -->
-<button class="btn btn-success" data-toggle="modal" data-target="#mymodal-data" type="button">添加店铺</button>
-<!-- 店铺添加弹窗内容 -->
-<div class="modal  " id="mymodal-data" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
-     <div class="modal-dialog">
-         <div class="modal-content">
-             <div class="modal-header">
-                 <button type="button" class="close" data-dismiss="modal">
-                     <span aria-hidden="true">×</span>
-                     <span class="sr-only">Close</span>
-                 </button>
-                 <h4 class="modal-title text-center">请输入以下信息</h4>
-             </div>
-
-             <div class="modal-body ">
-                   <div class="container">
-                       <form class="form-group col-md-5" method="get"  id="form_data">
-                           <div class="input-group">
-                                <span class="input-group-addon">系统名称</span>
-                                <input type="text" class="form-control" name="sys_name">
-                           </div>
-                           <br>
-                           <div class="input-group">
-                                <span class="input-group-addon">店铺名称</span>
-                                <input type="text" class="form-control" name="s_name">
-                           </div>
-                           <br>
-
-                           <div class="input-group">
-                               <span class="input-group-addon">所属大区</span>
-                               <select class="form-control" name="area">
-                                  <option value="" selected>------</option>
-                                  {% for area in area_list %}
-                                      <option name="{{ area.id }}" value="{{ area.id }}">{{ area.name }}</option>
-                                   {% endfor %}
-                           </select>
-                           </div>
-                           <br>
-
-                         <div class="input-group">
-                               <span class="input-group-addon">销售经理</span>
-                               <select class="form-control" name="salemanager">
-                                   <option value="" selected>------</option>
-                                   {% for man in man_list %}
-                                     <option id="{{ man.id }}" value="{{ man.id }}">{{ man.name }}</option>
-                                   {% endfor %}
-                               </select>
-                           </div>
-                           <br>
-
-                       <div class="input-group">
-                              <span class="input-group-addon">经营状态</span>
-                               <select class="form-control selected" name="shopState">
-                                   <option value="" selected>------</option>
-                                   <option value="S">正常营业</option>
-                                   <option VALUE="Z">装修</option>
-                                   <option value="C">撤店</option>
-                                   <option value="P">暂停整改</option>
-                             </select>
-                          </div>
-                           <br>
-
-                          <div class="input-group">
-                              <span class="input-group-addon">经营方式</span>
-                               <select class="form-control" name="shoptye">
-                                   <option value="" selected>------</option>
-                                   <option value="D">直营</option>
-                                   <option VALUE="A">代理</option>
-                                   <option value="J">加盟</option>
-                                   <option value="C">承包</option>
-                             </select>
-                          </div>
-                           <br>
-
-                       <div class="input-group">
-                              <span class="input-group-addon">店铺地址</span>
-                            <input type="text" class="form-control" name="shopAddress">
-                          </div>
-                           <br>
-
-                        <div class="input-group">
-                              <span class="input-group-addon">卖场类型</span>
-                              <input type="text" class="form-control" name="mallType" value="A+">
-                          </div>
-                           <br>
-
-                        <div class="input-group">
-                              <span class="input-group-addon">开业时间</span>
-                            <input type="text" class="form-control openningdate" name="openningdate" readonly placeholder="请输入店铺开业时间,格式为2016-01-01">
-
-                          </div>
-                           <br>
-
-                           <div class="input-group">
-                               <span  class="input-group-addon">合同开始时间</span>
-                              <input type="text" class="form-control contractBeginDate"  readonly name="contractBeginDate" placeholder="请输入店铺合同开始时间,格式为2016-01-01">
-                           </div><br>
-                           <div class="input-group">
-                               <span class="input-group-addon" >合同截至时间</span>
-                               <input type="text" class="form-control contractEndDate" readonly name="contractEndDate" placeholder="请输入店铺合同结束时间,格式为2016-01-01">
-                           </div>
-
-                      </form>
-                   </div>
-             </div>
-             <div class="modal-footer">
-                 <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-                 <button type="submit" class="btn btn-primary" id="save_button" onclick="add_info()" >提交 </button>
-             </div>
-
-         </div>
-      </div>
     </div>
- </div>
+      <!-- 添加人员窗口 -->
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      <button class="btn btn-success" data-toggle="modal" data-target="#mymodal-area" type="button">添加区域</button>
+       <!-- 添加区域 -->
+    <div class="modal  " id="mymodal-area" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+         <div class="modal-dialog">
+             <div class="modal-content">
+                 <div class="modal-header">
+                     <button type="button" class="close" data-dismiss="modal">
+                         <span aria-hidden="true">×</span>
+                         <span class="sr-only">关闭</span>
+                     </button>
+                     <h4 class="modal-title text-center">请输入以下信息</h4>
+                 </div>
 
-  <!--档案录入结束-->
- <div class="col-xs-4">
-     <p class="text-center h2">
-         档案查询
-     </p>
-     <button class="btn btn-info"  data-toggle="modal" data-target="#staff-info" ><span class="glyphicon glyphicon-user"></span>人员档案</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-      <!--显示人员档案弹窗 -->
-        <div class="modal" id="staff-info" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
-            <div class="modal-dialog" style="width: auto">
+                 <div class="modal-body ">
+                       <div class="container">
+                           <form class="form-group col-md-5" method="get"  id="area_data">
+
+                               <div class="input-group">
+                                    <span class="input-group-addon">区域名称</span>
+                                    <input type="text" class="form-control" name="area_name">
+                               </div>
+                               <br>
+                             <div class="input-group">
+                                   <span class="input-group-addon">区域负责人</span>
+                                   <select class="form-control" name="area_manager">
+                                       <option value="" selected>------</option>
+                                       {% for man in man_list %}
+                                         <option id="{{ man.id }}" value="{{ man.id }}">{{ man.name }}</option>
+                                       {% endfor %}
+                                   </select>
+                               </div>
+                               <br>
+                          </form>
+                       </div>
+                 </div>
+                 <div class="modal-footer">
+                     <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                     <button type="submit" class="btn btn-primary" id="save_button" onclick="add_area()"  name="area">提交 </button>
+                 </div>
+
+             </div>
+         </div>
+    </div>
+      <!-- 添加区域窗口 -->
+     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+     <!-- 弹出添加店铺窗口 -->
+    <button class="btn btn-success" data-toggle="modal" data-target="#mymodal-data" type="button">添加店铺</button>
+    <!-- 店铺添加弹窗内容 -->
+    <div class="modal  " id="mymodal-data" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+         <div class="modal-dialog">
+             <div class="modal-content">
+                 <div class="modal-header">
+                     <button type="button" class="close" data-dismiss="modal">
+                         <span aria-hidden="true">×</span>
+                         <span class="sr-only">Close</span>
+                     </button>
+                     <h4 class="modal-title text-center">请输入以下信息</h4>
+                 </div>
+
+                 <div class="modal-body ">
+                       <div class="container">
+                           <form class="form-group col-md-5" method="get"  id="form_data">
+                               <div class="input-group">
+                                    <span class="input-group-addon">系统名称</span>
+                                    <input type="text" class="form-control" name="sys_name">
+                               </div>
+                               <br>
+                               <div class="input-group">
+                                    <span class="input-group-addon">店铺名称</span>
+                                    <input type="text" class="form-control" name="s_name">
+                               </div>
+                               <br>
+
+                               <div class="input-group">
+                                   <span class="input-group-addon">所属大区</span>
+                                   <select class="form-control" name="area">
+                                      <option value="" selected>------</option>
+                                      {% for area in area_list %}
+                                          <option name="{{ area.id }}" value="{{ area.id }}">{{ area.name }}</option>
+                                       {% endfor %}
+                               </select>
+                               </div>
+                               <br>
+
+                             <div class="input-group">
+                                   <span class="input-group-addon">销售经理</span>
+                                   <select class="form-control" name="salemanager">
+                                       <option value="" selected>------</option>
+                                       {% for man in man_list %}
+                                         <option id="{{ man.id }}" value="{{ man.id }}">{{ man.name }}</option>
+                                       {% endfor %}
+                                   </select>
+                               </div>
+                               <br>
+
+                           <div class="input-group">
+                                  <span class="input-group-addon">经营状态</span>
+                                   <select class="form-control selected" name="shopState">
+                                       <option value="" selected>------</option>
+                                       <option value="S">正常营业</option>
+                                       <option VALUE="Z">装修</option>
+                                       <option value="C">撤店</option>
+                                       <option value="P">暂停整改</option>
+                                 </select>
+                              </div>
+                               <br>
+
+                              <div class="input-group">
+                                  <span class="input-group-addon">经营方式</span>
+                                   <select class="form-control" name="shoptye">
+                                       <option value="" selected>------</option>
+                                       <option value="D">直营</option>
+                                       <option VALUE="A">代理</option>
+                                       <option value="J">加盟</option>
+                                       <option value="C">承包</option>
+                                 </select>
+                              </div>
+                               <br>
+
+                           <div class="input-group">
+                                  <span class="input-group-addon">店铺地址</span>
+                                <input type="text" class="form-control" name="shopAddress">
+                              </div>
+                               <br>
+
+                            <div class="input-group">
+                                  <span class="input-group-addon">卖场类型</span>
+                                  <input type="text" class="form-control" name="mallType" value="A+">
+                              </div>
+                               <br>
+
+                            <div class="input-group">
+                                  <span class="input-group-addon">开业时间</span>
+                                <input type="text" class="form-control openningdate" name="openningdate" readonly placeholder="请输入店铺开业时间,格式为2016-01-01">
+
+                              </div>
+                               <br>
+
+                               <div class="input-group">
+                                   <span  class="input-group-addon">合同开始时间</span>
+                                  <input type="text" class="form-control contractBeginDate"  readonly name="contractBeginDate" placeholder="请输入店铺合同开始时间,格式为2016-01-01">
+                               </div><br>
+                               <div class="input-group">
+                                   <span class="input-group-addon" >合同截至时间</span>
+                                   <input type="text" class="form-control contractEndDate" readonly name="contractEndDate" placeholder="请输入店铺合同结束时间,格式为2016-01-01">
+                               </div>
+
+                          </form>
+                       </div>
+                 </div>
+                 <div class="modal-footer">
+                     <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                     <button type="submit" class="btn btn-primary" id="save_button" onclick="add_info()" >提交 </button>
+                 </div>
+
+             </div>
+          </div>
+        </div>
+
+
+        </div>
+        <!--档案录入结束-->
+
+         <!--档案查询开始-->
+         <div class="col-xs-4">
+         <p class="text-center h2">
+             档案查询
+         </p>
+         <button class="btn btn-info"  data-toggle="modal" data-target="#staff-info" ><span class="glyphicon glyphicon-user"></span>人员档案</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <!--显示人员档案弹窗 -->
+            <div class="modal" id="staff-info" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+                <div class="modal-dialog" style="width: auto">
+                    <!--人员档案弹窗主体 -->
+                    <div class="modal-content">
+                        <!--人员档案弹窗头部 -->
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">
+                                 <span aria-hidden="true">×</span>
+                                 <span class="sr-only">Close</span>
+                             </button>
+                            <h2 class="text-center">人员信息档案</h2>
+                        </div>
+                        <!--人员档案弹窗头部 -->
+
+                        <!--人员档案弹窗正文 -->
+                        <div class="modal-body">
+                            <table class="table  table-striped table-condensed table-responsive ">
+                                <tr class="text-center h3">
+                                    <td > <span class="glyphicon glyphicon-user"></span> 姓名</td>
+                                    <td>职务</td>
+                                    <td ><span class="glyphicon glyphicon-phone"></span> 手机</td>
+                                    <td>公司手机</td>
+                                    <td>QQ</td>
+                                    <td>电子邮箱</td>
+                                    <td>联系地址</td>
+                                </tr>
+                                 {% for m in man_list %}
+                                <tr class="text-center">
+                                        <td>{{ m.name }}</td>
+                                        <td>{{ m.title }}</td>
+                                        <td>{{ m.personal_cellphone }}</td>
+                                        {% if m.company_cellphone %}
+                                            <td>{{ m.company_cellphone }}</td>
+                                         {% else %}
+                                            <td class="danger">未配备</td>
+                                        {% endif %}
+                                        {% if m.qq %}
+                                            <td>{{ m.qq }}</td>
+                                        {% else %}
+                                            <td class="glyphicon">未提供</td>
+                                        {% endif %}
+                                        <td>{{ m.email }}</td>
+                                        <td>{{ m.address }}</td>
+
+                                </tr>
+                                {% endfor %}
+                            </table>
+                        </div>
+                        <!--人员档案弹窗正文 -->
+
+                        <!--人员档案弹窗底部 -->
+                        <div class="modal-footer">
+
+                        </div>
+                        <!--人员档案弹窗底部 -->
+                    </div>
+                </div>
                 <!--人员档案弹窗主体 -->
-                <div class="modal-content">
-                    <!--人员档案弹窗头部 -->
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal">
-                             <span aria-hidden="true">×</span>
-                             <span class="sr-only">Close</span>
-                         </button>
-                        <h2 class="text-center">人员信息档案</h2>
-                    </div>
-                    <!--人员档案弹窗头部 -->
-
-                    <!--人员档案弹窗正文 -->
-                    <div class="modal-body">
-                        <table class="table  table-striped table-condensed table-responsive ">
-                            <tr class="text-center h3">
-                                <td > <span class="glyphicon glyphicon-user"></span> 姓名</td>
-                                <td>职务</td>
-                                <td ><span class="glyphicon glyphicon-phone"></span> 手机</td>
-                                <td>公司手机</td>
-                                <td>QQ</td>
-                                <td>电子邮箱</td>
-                                <td>联系地址</td>
-                            </tr>
-                             {% for m in man_list %}
-                            <tr class="text-center">
-                                    <td>{{ m.name }}</td>
-                                    <td>{{ m.title }}</td>
-                                    <td>{{ m.personal_cellphone }}</td>
-                                    {% if m.company_cellphone %}
-                                        <td>{{ m.company_cellphone }}</td>
-                                     {% else %}
-                                        <td class="danger">未配备</td>
-                                    {% endif %}
-                                    {% if m.qq %}
-                                        <td>{{ m.qq }}</td>
-                                    {% else %}
-                                        <td class="glyphicon">未提供</td>
-                                    {% endif %}
-                                    <td>{{ m.email }}</td>
-                                    <td>{{ m.address }}</td>
-
-                            </tr>
-                            {% endfor %}
-                        </table>
-                    </div>
-                    <!--人员档案弹窗正文 -->
-
-                    <!--人员档案弹窗底部 -->
-                    <div class="modal-footer">
-
-                    </div>
-                    <!--人员档案弹窗底部 -->
-                </div>
             </div>
-            <!--人员档案弹窗主体 -->
-        </div>
-      <!--显示人员档案弹窗 -->
+          <!--显示人员档案弹窗 -->
 
-     <button class="btn btn-info" data-toggle="modal" data-target="#area-info">店铺档案</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-     <!--显示店铺档案弹窗 -->
-        <div class="modal" id="area-info" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" >
-            <div class="modal-dialog" style="width: 1024px;" >
-                <!--店铺档案弹窗主体 -->
-                <div class="modal-content">
-                    <!--店铺档案弹窗头部 -->
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal">
-                             <span aria-hidden="true">×</span>
-                             <span class="sr-only">Close</span>
-                         </button>
-                        <h2 class="text-center">店铺档案</h2>
-                    </div>
-                    <!--店铺档案弹窗头部 -->
-                      <script>
-                        $(document).ready(function(){
-                            $(".changecolor tr :even").addClass("success");//奇数行
-                            $(".changecolor tr :odd").addClass("info");//偶数行
-                        }
-                        );
-                    </script>
-                    <!--店铺档案弹窗正文 -->
-                    <div class="modal-body">
-                        <table class="table  table-striped table-condensed table-responsive changecolor " >
-                    {% for shop in shop_list %}
-                             {% if forloop.revcounter0|divisibleby:'2' %}
-                             <tr>
-                              <td width="50%">
-                                <div class="card">
+         <button class="btn btn-info" data-toggle="modal" data-target="#area-info">店铺档案</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+         <!--显示店铺档案弹窗 -->
+            <div class="modal" id="area-info" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" >
+                <div class="modal-dialog" style="width: 1024px;" >
+                    <!--店铺档案弹窗主体 -->
+                    <div class="modal-content">
+                        <!--店铺档案弹窗头部 -->
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">
+                                 <span aria-hidden="true">×</span>
+                                 <span class="sr-only">Close</span>
+                             </button>
+                            <h2 class="text-center">店铺档案</h2>
+                        </div>
+                        <!--店铺档案弹窗头部 -->
+                          <script>
+                            $(document).ready(function(){
+                                $(".changecolor tr :even").addClass("success");//奇数行
+                                $(".changecolor tr :odd").addClass("info");//偶数行
+                            }
+                            );
+                        </script>
+                        <!--店铺档案弹窗正文 -->
+                        <div class="modal-body">
+                            <table class="table  table-striped table-condensed table-responsive changecolor " >
+                        {% for shop in shop_list %}
+                                 {% if forloop.revcounter0|divisibleby:'2' %}
+                                 <tr>
+                                  <td width="50%">
+                                    <div class="card">
 
-                                    <div class="card-block">
-                                        {% ifequal shop.get_shopType_display "直营"  %}
-                                        <button class="btn btn-success card-title" id="">{{ shop.sysName }}</button>
-                                        {% else %}
-                                         <button class="btn btn-danger card-title">{{ shop.sysName }}</button>
-                                        {% endifequal %}
-                                        <p class="card-text">地址：{{ shop.shopAddress }}</p>
+                                        <div class="card-block">
+                                            {% ifequal shop.get_shopType_display "直营"  %}
+                                            <button class="btn btn-success card-title" id="">{{ shop.sysName }}</button>
+                                            {% else %}
+                                             <button class="btn btn-danger card-title">{{ shop.sysName }}</button>
+                                            {% endifequal %}
+                                            <p class="card-text">地址：{{ shop.shopAddress }}</p>
+                                        </div>
+                                        <ul class="list-group list-group-flush">
+                                            <li class="list-group-item" id="{{ shop.Id }}{{ shop.managerId }}">销售经理：{{ shop.managerId.name}}</li>
+                                            <li class="list-group-item">店铺类型：{{ shop.get_shopType_display }}</li>
+                                            <li class="list-group-item">开业时间：{{ shop.openingDate |date:"Y-m-d" }}</li>
+                                            <li class="list-group-item">合同开始时间：{{ shop.contractBeginDate | date:"Y-m-d" }}</li>
+                                            <li class="list-group-item">合同结束时间：{{ shop.contractBeginDate | date:"Y-m-d"}}</li>
+                                        </ul>
+                                        <div class="card-footer text-center">
+                                          <button class="btn btn-info"
+                                                  onclick="editshopinfo('{{ shop.areaId.name }}',
+                                                                        '{{ shop.sysName }}',
+                                                                        '{{ shop.sName }}',
+                                                                        '{{ shop.managerId.name }}',
+                                                                        '{{ shop.shopAddress }}',
+                                                                        '{{ shop.get_state_display }}',
+                                                                        '{{ shop.get_shopType_display }}',
+                                                                        '{{ shop.contractBeginDate }}',
+                                                                        '{{ shop.openingDate }}',
+                                                                        '{{ shop.contractEndDate }}',
+                                                                        '{{ shop.shop_brand }}')">
+                                              信息修改
+                                          </button>
+                                      </div>
                                     </div>
-                                    <ul class="list-group list-group-flush">
-                                        <li class="list-group-item" id="{{ shop.Id }}{{ shop.managerId }}">销售经理：{{ shop.managerId.name}}</li>
-                                        <li class="list-group-item">店铺类型：{{ shop.get_shopType_display }}</li>
-                                        <li class="list-group-item">开业时间：{{ shop.openingDate |date:"Y-m-d" }}</li>
-                                        <li class="list-group-item">合同开始时间：{{ shop.contractBeginDate | date:"Y-m-d" }}</li>
-                                        <li class="list-group-item">合同结束时间：{{ shop.contractBeginDate | date:"Y-m-d"}}</li>
-                                    </ul>
-                                    <div class="card-footer text-center">
-                                      <button class="btn btn-info"
-                                              onclick="editshopinfo('{{ shop.areaId.name }}',
-                                                                    '{{ shop.sysName }}',
-                                                                    '{{ shop.sName }}',
-                                                                    '{{ shop.managerId.name }}',
-                                                                    '{{ shop.shopAddress }}',
-                                                                    '{{ shop.get_state_display }}',
-                                                                    '{{ shop.get_shopType_display }}',
-                                                                    '{{ shop.contractBeginDate }}',
-                                                                    '{{ shop.openingDate }}',
-                                                                    '{{ shop.contractEndDate }}',
-                                                                    '{{ shop.shop_brand }}')">
-                                          信息修改
-                                      </button>
-                                  </div>
-                                </div>
-                              </td>
-                             {% else %}
-                               <td style="width:50%;">
-                                <div class="card">
-                                    <div class="card-block">
-                                        {% ifequal shop.get_shopType_display "直营"  %}
-                                        <button class="btn btn-success card-title">{{ shop.sysName }}</button>
-                                        {% else %}
-                                         <button class="btn btn-danger card-title">{{ shop.sysName }}</button>
-                                        {% endifequal %}
-                                        <p class="card-text">地址：{{ shop.shopAddress }}</p>
+                                  </td>
+                                 {% else %}
+                                   <td style="width:50%;">
+                                    <div class="card">
+                                        <div class="card-block">
+                                            {% ifequal shop.get_shopType_display "直营"  %}
+                                            <button class="btn btn-success card-title">{{ shop.sysName }}</button>
+                                            {% else %}
+                                             <button class="btn btn-danger card-title">{{ shop.sysName }}</button>
+                                            {% endifequal %}
+                                            <p class="card-text">地址：{{ shop.shopAddress }}</p>
+                                        </div>
+                                        <ul class="list-group list-group-flush">
+                                            <li class="list-group-item">销售经理：{{ shop.managerId.name}}</li>
+                                            <li class="list-group-item">店铺类型：{{ shop.get_shopType_display }}</li>
+                                            <li class="list-group-item">开业时间：{{ shop.openingDate |date:"Y-m-d" }}</li>
+                                            <li class="list-group-item">合同开始时间：{{ shop.contractBeginDate | date:"Y-m-d" }}</li>
+                                            <li class="list-group-item">合同结束时间：{{ shop.contractBeginDate | date:"Y-m-d"}}</li>
+                                        </ul>
+                                      <div class="card-footer text-center">
+                                          <button class="btn btn-info" onclick="editshopinfo('{{ shop.areaId.name }}',
+                                                                                             '{{ shop.sysName }}',
+                                                                                             '{{ shop.sName }}',
+                                                                                             '{{ shop.managerId.name }}',
+                                                                                             '{{ shop.shopAddress }}',
+                                                                                             '{{ shop.get_state_display }}',
+                                                                                             '{{ shop.get_shopType_display }}',
+                                                                                             '{{ shop.contractBeginDate }}',
+                                                                                             '{{ shop.openingDate }}',
+                                                                                             '{{ shop.contractEndDate }}',
+                                                                                             '{{ shop.shop_brand }}')">
+                                              信息修改
+                                          </button>
+                                      </div>
                                     </div>
-                                    <ul class="list-group list-group-flush">
-                                        <li class="list-group-item">销售经理：{{ shop.managerId.name}}</li>
-                                        <li class="list-group-item">店铺类型：{{ shop.get_shopType_display }}</li>
-                                        <li class="list-group-item">开业时间：{{ shop.openingDate |date:"Y-m-d" }}</li>
-                                        <li class="list-group-item">合同开始时间：{{ shop.contractBeginDate | date:"Y-m-d" }}</li>
-                                        <li class="list-group-item">合同结束时间：{{ shop.contractBeginDate | date:"Y-m-d"}}</li>
-                                    </ul>
-                                  <div class="card-footer text-center">
-                                      <button class="btn btn-info" onclick="editshopinfo('{{ shop.areaId.name }}',
-                                                                                         '{{ shop.sysName }}',
-                                                                                         '{{ shop.sName }}',
-                                                                                         '{{ shop.managerId.name }}',
-                                                                                         '{{ shop.shopAddress }}',
-                                                                                         '{{ shop.get_state_display }}',
-                                                                                         '{{ shop.get_shopType_display }}',
-                                                                                         '{{ shop.contractBeginDate }}',
-                                                                                         '{{ shop.openingDate }}',
-                                                                                         '{{ shop.contractEndDate }}',
-                                                                                         '{{ shop.shop_brand }}')">
-                                          信息修改
-                                      </button>
-                                  </div>
-                                </div>
-                               </td>
-                             </tr>
-                             {% endif %}
+                                   </td>
+                                 </tr>
+                                 {% endif %}
 
-                          {% endfor %}
-                        </table>
+                              {% endfor %}
+                            </table>
+                        </div>
+                        <!--店铺档案弹窗正文 -->
+
+                        <!--店铺档案弹窗底部 -->
+                        <div class="modal-footer">
+
+                        </div>
+                        <!--店铺档案弹窗底部 -->
                     </div>
-                    <!--店铺档案弹窗正文 -->
-
-                    <!--店铺档案弹窗底部 -->
-                    <div class="modal-footer">
-
-                    </div>
-                    <!--店铺档案弹窗底部 -->
                 </div>
-            </div>
-            <!--店铺档案弹窗主体 -->
-        </div>
-      <!--显示店铺档案弹窗 -->
-    <!--修改店铺档案弹窗 -->
-     <script>
-         function editshopinfo() {
-              area=arguments[0];
-              sysName=arguments[1];
-              sName=arguments[2];
-              manager=arguments[3];
-              shopaddress=arguments[4];
-              shopstate=arguments[5];
-              shoptype=arguments[6];
-              contractBeginDate=arguments[7]
-              openingdate=arguments[8];
-              contractEndDate=arguments[9];
-              brand=arguments[10];
-              modalhtml='<div class="modal  " id="mymodal-data" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true"> <div class="modal-dialog"><div class="modal-content"> <div class="modal-header"><button type="button" class="close" data-dismiss="modal"> <span aria-hidden="true">×</span><span class="sr-only">Close</span></button> <h4 class="modal-title text-center">请输入以下信息</h4> </div><div class="modal-body "> <div class="container"><form class="form-group col-md-5" method="get"  id="form_data">'+
-                           '<div class="input-group"><span class="input-group-addon">系统名称</span> <input type="text" class="form-control" name="sys_name"></div><br>'+
-                           '<div class="input-group"><span class="input-group-addon">店铺名称</span><input type="text" class="form-control" name="s_name"> </div><br>'+
-                           '<div class="input-group"> <span class="input-group-addon">所属大区</span> <select class="form-control" name="area"> <option value="" selected>------</option>{% for area in area_list %}<option name="{{ area.id }}" value="{{ area.id }}">{{ area.name }}</option> {% endfor %} </select></div><br>'+
-                           '<div class="input-group"><span class="input-group-addon">销售经理</span> <select class="form-control" name="salemanager"><option value="" selected>------</option> {% for man in man_list %} <option id="{{ man.id }}" value="{{ man.id }}">{{ man.name }}</option>{% endfor %} </select> </div><br>'+
-                           '<div class="input-group"><span class="input-group-addon">经营状态</span><select class="form-control selected" name="shopState"><option value="" selected>------</option><option value="S">正常营业</option><option VALUE="Z">装修</option><option value="C">撤店</option><option value="P">暂停整改</option></select> </div> <br>'+
-                           '<div class="input-group"><span class="input-group-addon">经营方式</span><select class="form-control" name="shoptye"><option value="" selected>------</option><option value="D">直营</option> <option VALUE="A">代理</option><option value="J">加盟</option><option value="C">承包</option></select></div><br>'+
-                           '<div class="input-group"><span class="input-group-addon">店铺地址</span><input type="text" class="form-control" name="shopAddress"> </div><br>'+
-                           '<div class="input-group"><span class="input-group-addon">卖场类型</span> <input type="text" class="form-control" name="mallType" value="A+"> </div><br>'+
-                           '<div class="input-group"><span class="input-group-addon">开业时间</span><input type="text" class="form-control openningdate" name="openningdate" readonly placeholder="请输入店铺开业时间,格式为2016-01-01"></div><br>'+
-                          '<div class="input-group"><span  class="input-group-addon">合同开始时间</span> <input type="text" class="form-control contractBeginDate"  readonly name="contractBeginDate" placeholder="请输入店铺合同开始时间,格式为2016-01-01"> </div><br>'+
-                         '<div class="input-group"> <span class="input-group-addon" >合同截至时间</span><input type="text" class="form-control contractEndDate" readonly name="contractEndDate" placeholder="请输入店铺合同结束时间,格式为2016-01-01"></div></form></div></div><div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">关闭</button><button type="submit" class="btn btn-primary" id="save_button" onclick="add_info()" >提交 </button></div></div></div></div>'
-
-         };
-
-
-
-    </script>
-   <!--修改店铺档案弹窗 -->
-     <button class="btn btn-info" data-toggle="modal" data-target="#shop-info">区域档案</button>
-     <!--显示店铺档案弹窗 -->
-        <div class="modal" id="shop-info" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
                 <!--店铺档案弹窗主体 -->
-                <div class="modal-content">
-                    <!--店铺档案弹窗头部 -->
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal">
-                             <span aria-hidden="true">×</span>
-                             <span class="sr-only">Close</span>
-                         </button>
-                        <h2 class="text-center">店铺信息档案</h2>
-                    </div>
-                    <!--店铺档案弹窗头部 -->
-
-                    <!--店铺档案弹窗正文 -->
-                    <div class="modal-body">
-
-                    </div>
-                    <!--店铺档案弹窗正文 -->
-
-                    <!--店铺档案弹窗底部 -->
-                    <div class="modal-footer">
-
-                    </div>
-                    <!--店铺档案弹窗底部 -->
-                </div>
             </div>
-            <!--店铺档案弹窗主体 -->
-        </div>
-      <!--显示店铺档案弹窗 -->
+          <!--显示店铺档案弹窗 -->
+        <!--修改店铺档案弹窗 -->
+         <script>
+             function editshopinfo() {
+                  area=arguments[0];
+                  sysName=arguments[1];
+                  sName=arguments[2];
+                  manager=arguments[3];
+                  shopaddress=arguments[4];
+                  shopstate=arguments[5];
+                  shoptype=arguments[6];
+                  contractBeginDate=arguments[7]
+                  openingdate=arguments[8];
+                  contractEndDate=arguments[9];
+                  brand=arguments[10];
+                  modalhtml='<div class="modal  " id="mymodal-data" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true"> <div class="modal-dialog"><div class="modal-content"> <div class="modal-header"><button type="button" class="close" data-dismiss="modal"> <span aria-hidden="true">×</span><span class="sr-only">Close</span></button> <h4 class="modal-title text-center">请输入以下信息</h4> </div><div class="modal-body "> <div class="container"><form class="form-group col-md-5" method="get"  id="form_data">'+
+                               '<div class="input-group"><span class="input-group-addon">系统名称</span> <input type="text" class="form-control" name="sys_name"></div><br>'+
+                               '<div class="input-group"><span class="input-group-addon">店铺名称</span><input type="text" class="form-control" name="s_name"> </div><br>'+
+                               '<div class="input-group"> <span class="input-group-addon">所属大区</span> <select class="form-control" name="area"> <option value="" selected>------</option>{% for area in area_list %}<option name="{{ area.id }}" value="{{ area.id }}">{{ area.name }}</option> {% endfor %} </select></div><br>'+
+                               '<div class="input-group"><span class="input-group-addon">销售经理</span> <select class="form-control" name="salemanager"><option value="" selected>------</option> {% for man in man_list %} <option id="{{ man.id }}" value="{{ man.id }}">{{ man.name }}</option>{% endfor %} </select> </div><br>'+
+                               '<div class="input-group"><span class="input-group-addon">经营状态</span><select class="form-control selected" name="shopState"><option value="" selected>------</option><option value="S">正常营业</option><option VALUE="Z">装修</option><option value="C">撤店</option><option value="P">暂停整改</option></select> </div> <br>'+
+                               '<div class="input-group"><span class="input-group-addon">经营方式</span><select class="form-control" name="shoptye"><option value="" selected>------</option><option value="D">直营</option> <option VALUE="A">代理</option><option value="J">加盟</option><option value="C">承包</option></select></div><br>'+
+                               '<div class="input-group"><span class="input-group-addon">店铺地址</span><input type="text" class="form-control" name="shopAddress"> </div><br>'+
+                               '<div class="input-group"><span class="input-group-addon">卖场类型</span> <input type="text" class="form-control" name="mallType" value="A+"> </div><br>'+
+                               '<div class="input-group"><span class="input-group-addon">开业时间</span><input type="text" class="form-control openningdate" name="openningdate" readonly placeholder="请输入店铺开业时间,格式为2016-01-01"></div><br>'+
+                              '<div class="input-group"><span  class="input-group-addon">合同开始时间</span> <input type="text" class="form-control contractBeginDate"  readonly name="contractBeginDate" placeholder="请输入店铺合同开始时间,格式为2016-01-01"> </div><br>'+
+                             '<div class="input-group"> <span class="input-group-addon" >合同截至时间</span><input type="text" class="form-control contractEndDate" readonly name="contractEndDate" placeholder="请输入店铺合同结束时间,格式为2016-01-01"></div></form></div></div><div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">关闭</button><button type="submit" class="btn btn-primary" id="save_button" onclick="add_info()" >提交 </button></div></div></div></div>'
 
- </div>
+             };
+
+
+
+        </script>
+       <!--修改店铺档案弹窗 -->
+         <button class="btn btn-info" data-toggle="modal" data-target="#shop-info">区域档案</button>
+         <!--显示店铺档案弹窗 -->
+            <div class="modal" id="shop-info" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <!--店铺档案弹窗主体 -->
+                    <div class="modal-content">
+                        <!--店铺档案弹窗头部 -->
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">
+                                 <span aria-hidden="true">×</span>
+                                 <span class="sr-only">Close</span>
+                             </button>
+                            <h2 class="text-center">店铺信息档案</h2>
+                        </div>
+                        <!--店铺档案弹窗头部 -->
+
+                        <!--店铺档案弹窗正文 -->
+                        <div class="modal-body">
+
+                        </div>
+                        <!--店铺档案弹窗正文 -->
+
+                        <!--店铺档案弹窗底部 -->
+                        <div class="modal-footer">
+
+                        </div>
+                        <!--店铺档案弹窗底部 -->
+                    </div>
+                </div>
+                <!--店铺档案弹窗主体 -->
+            </div>
+          <!--显示店铺档案弹窗 -->
+
+     </div>
+         <!--档案查询结束-->
 
     </div>
-    <!--鼠标划过销售经理名字后显示信息-->
-    <script>
+</div>
+<!--鼠标划过销售经理名字后显示信息-->
+<script>
    $(function(){
         $("[rel=drevil]").popover({
             trigger:'manual',
@@ -686,7 +692,5 @@ font-weight:800
                 });
 	});
     </script>
-    <!--鼠标划过销售经理名字后显示信息-->
-
-
+<!--鼠标划过销售经理名字后显示信息-->
 {% endblock %}
