@@ -5,10 +5,12 @@ from models import  *
 from forms import *
 from django.http import JsonResponse
 from  django.core import serializers
+from django.db.models import Q
 import  openpyxl
 from openpyxl import styles
 import  os
 import json
+from django.core.paginator import *
 from datetime import *
 # Create your views here.
 #展示店铺信息并增加修改店铺信息
@@ -120,8 +122,8 @@ def checkall(req):
     wday,monthRange=calendar.monthrange(day_now.tm_year,day_now.tm_mon)
     #当月最后一天日期
     day_end='%d-%02d-%02d'%(day_now.tm_year, day_now.tm_mon, monthRange)
-    shop_list = ShopInfo.objects.values('Id', 'sysName', 'shopType', "managerId__name", "managerId").filter(
-        shopType__in=["D", "C"]).order_by("sysName")
+    shop_list = ShopInfo.objects.values('Id', 'sName', 'sysName', 'shopType', "managerId__name", "managerId").filter(
+        shopType__in=["D", "C"]).exclude(state='C').order_by("-sName")
     man_list = Managers.objects.values('id', 'name').filter(shopinfo__shopType__in=["D", "C"]).distinct()
     diff = datadiff.objects.exclude(amount=0)\
                            .exclude(id_shop__sName__in=['元隆利嘉生活馆','满洲里友谊商厦'])\
@@ -132,7 +134,7 @@ def checkall(req):
 #获取所有有差异的数据
 def checkdata(request):
     shop_list = ShopInfo.objects.values('Id', 'sName', 'sysName','shopType', "managerId__name", "managerId").filter(
-        shopType__in=["D", "C"]).order_by("-sName")
+        shopType__in=["D", "C"]).exclude(state='C').order_by("-sName")
     man_list=Managers.objects.values('id','name').filter(shopinfo__shopType__in=["D","C"]).distinct()
     sel_shop_name=request.POST['select_name']
     sel_man_name=request.POST['man_name']
@@ -425,5 +427,56 @@ def excelindb(request):
 
 def fo(reqest):
     manager=Managers.objects.all()
-    return render(reqest,'form.html',locals())
+    return render(reqest,'difftable.html',locals())
+
+
+def read_diff_info(req):
+    # 获取当前时间
+    day_now = time.localtime()
+    # 当月第一天日期
+    day_begin = '%d-%02d-01' % (day_now.tm_year, day_now.tm_mon)
+    wday, monthRange = calendar.monthrange(day_now.tm_year, day_now.tm_mon)
+    # 当月最后一天日期
+    day_end = '%d-%02d-%02d' % (day_now.tm_year, day_now.tm_mon, monthRange)
+    limit=req.GET.get('limit')
+    order=req.GET.get('order')
+    offset=req.GET.get('offset')
+    search=req.GET.get('search')
+    if search:
+        diff_info_all=datadiff.objects.filter(Q(id_shop__sysName__contains=search)|
+                                              Q(id_shop__managerId__name__contains=search)|\
+                                              Q(remark__contains=search)).filter(id_shop__shopType__in=['D','C']).\
+                                       exclude(amount=0).exclude(id_shop__sName__in=['元隆利嘉生活馆','满洲里友谊商厦'])
+    else:
+        diff_info_all=datadiff.objects.exclude(amount=0)\
+                           .exclude(id_shop__sName__in=['元隆利嘉生活馆','满洲里友谊商厦'])\
+                           .filter(id_shop__shopType__in=["D", "C"],
+                                   date__range=(day_begin,day_end))\
+                           .order_by("id_shop", "-date")
+    if not offset:
+        offset=0
+    if not limit:
+        limit=15
+    pageinator=Paginator(diff_info_all,limit)
+    pages=int(int(offset) /int(limit)+1)
+    data_json = {'total':diff_info_all.count(),'rows':[]}
+    print diff_info_all.count()
+    for diffinfo in pageinator.page(pages):
+
+        data_json['rows'].append(
+            {
+
+             "sysName":diffinfo.id_shop.sysName,
+             "manager":diffinfo.id_shop.managerId.name,
+             "diffdate": diffinfo.date.strftime('%Y-%m-%d') if diffinfo.date else "",
+             "shopamount":diffinfo.shop_amount,
+             "sysamount":diffinfo.sys_amount,
+             "amount":diffinfo.amount,
+             "diff":diffinfo.diff,
+             "remark":diffinfo.remark,
+             "trueamount":diffinfo.true_amount,
+            }
+        )
+    data_json_response = json.dumps(data_json)
+    return HttpResponse(data_json_response)
 

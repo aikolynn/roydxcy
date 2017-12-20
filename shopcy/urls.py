@@ -30,6 +30,8 @@ urlpatterns = [
 
     url(r'^highchart/',area_arr,name="highchartarea"),
 
+    url(r'^diffinfo/',read_diff_info,name='diffinfo'),
+
     #档案管理相关
     url(r'^easy/',read_staff_info,name='easy'),
     url(r'^test/',staff,name='test'),

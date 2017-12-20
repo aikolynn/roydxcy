@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% load static %}{% load staticfiles %}
+{% block content %}
+
+    <div class="container">
+
+        <div class="row">
+
+            <div class="col-md-12 table table-hover text-center">
+
+                <table class="display table table-hover " data-toggle="table" data-url="{% url 'diffinfo' %}"
+                       data-method="get"
+                data-pagination="true"
+                data-side-pagination="server"
+                data-page-list="[10, 20, 50, 100, 200]"
+                data-search="true" data-mobile-responsive="true" searchOnEnterKey="true"
+                data-show-refresh="true" data-show-columns="true"
+                data-show-toggle="true" data-page-size=13 data-unique-id="diffdate"
+                data-striped="true" data-height="650" data-id-field="sysName"
+                >
+                    <thead >
+                        <tr class="text-center">
+                            <th data-field="sysName">店铺</th>
+                            <th data-field="manager">销售经理</th>
+                            <th data-field="diffdate">日期</th>
+                            <th data-field="shopamount" data-cell-style="cellStyle">上报金额</th>
+                            <th data-field="sysamount">系统金额</th>
+                            <th data-field="amount">差异金额</th>
+                            <th data-field="diff">差异原因</th>
+                            <th data-field="remark">备注</th>
+                        </tr>
+                    </thead>
+                </table>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+<script>
+    function cellStyle(value,field) {
+        var classes = ['active', 'success', 'info', 'warning', 'danger'];
+
+        if (field==1) {
+            return {
+                classes:'btn btn-info',
+
+            };
+        }
+        return {};
+    }
+</script>
+    <!--加载bootstrap-table.css-->
+        <link  href="{% static 'bootstraptable/bootstrap-table.css' %}" rel="stylesheet">
+    <!--加载bootstrap-table.css-->
+
+    <!--加载bootstrap-table.js-->
+        <script src="{% static 'bootstraptable/bootstrap-table.js' %}"></script>
+    <!--加载bootstrap-table.js-->
+
+     <!--加载bootstrap-table本地化文件-->
+        <script src="{% static 'bootstraptable/locale/bootstrap-table-zh-CN.js' %}"></script>
+    <!--加载bootstrap-table本地化文件-->
+
+{% endblock %}
