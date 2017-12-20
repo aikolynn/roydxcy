@@ -304,7 +304,7 @@ font-weight:800
  </style>
 <div class="container" >
  <!-- 弹出添加店铺上报数据 -->
-    <div class="row text-center">
+    <div class="row text-center" style="padding-top: 10px;">
         <!--单店数据录入-->
         <div class="col-md-3 col-sm-3 ">
 
@@ -474,14 +474,16 @@ font-weight:800
     }
     );
 </script>
-<div class="row" style="padding-bottom: 10px;">
-    <div class="col-md-12 lead text-center">
-        <span class="h3"><b>ERP系统数据差异核对表</b></span>
-        <span class=" btn btn-danger">绿色与蓝色方框圈中的数字为正确数据</span>
-    </div>
-    <div class="col-md-12 text-center">
-        {% csrf_token %}
-          <form action="{% url 'diff' %}" class="form-inline" role="form" method="post">
+
+<div class="row" >
+    <div class="col-md-12 text-center table-responsive">
+           <table class="table table-hover  table-striped table2excel" id="editTable">
+            <caption class="text-center">
+
+                <span ><b class="h2">ERP系统数据差异核对表</b><cite class="btn btn-sm btn-danger">绿色与蓝色方框圈中的数字为正确数据</cite></span>
+                 <div class="col-md-12 text-center">
+                    {% csrf_token %}
+                      <form action="{% url 'diff' %}" class="form-inline" role="form" method="post">
             <b class="lead">差异查询</b>
              <div class=" form-group input-group" >
                      <select name="select_name" class="form-control" id="sel"  style="width:110px" >
@@ -522,28 +524,24 @@ font-weight:800
                   <button type="submit" class=" glyphicon glyphicon-search btn btn-primary">筛选</button>
              </div>
           </form>
-    </div>
-
-</div>
-<div class="row">
-    <div class="col-md-12 text-center ">
-           <table class="table table-hover  table-striped table2excel" id="editTable">
-
-       <tr>
-           <td >店  铺</td>
-           <td >销售经理</td>
-           <td>日&nbsp;&nbsp;期</td>
-           <td>系统金额</td>
-           <td>上报金额</td>
-           <td>差异金额</td>
-           <td>差异原因</td>
-           <td>备&nbsp;&nbsp;注</td>
-          <td>操作</td>
-       </tr>
-
-
-       {% for d in diff %}
-           <tr  >
+                 </div>
+            </caption>
+           <thead class=" h5 text-center">
+                <tr class=" h5 text-center" >
+                   <th >店  铺</th>
+                   <th >销售经理</th>
+                   <th>日&nbsp;&nbsp;期</th>
+                   <th>系统金额</th>
+                   <th>上报金额</th>
+                   <th>差异金额</th>
+                   <th>差异原因</th>
+                   <th>备&nbsp;&nbsp;注</th>
+                  <th>操作</th>
+                </tr>
+           </thead>
+           <tbody>
+            {% for d in diff %}
+           <tr >
               <td class="text-danger mi" style="vertical-align: middle !important;">{{ d.id_shop.sysName }}</td>
               <td class="mi" >{{ d.id_shop.managerId.name }}</td>
               <td class="mi" style="width: auto;">{{ d.date|date:"Y-m-d "}}</td>
@@ -588,6 +586,8 @@ font-weight:800
                  <!--操作-->
            </tr>
        {% endfor %}
+           </tbody>
+
 
    </table>
     </div>
