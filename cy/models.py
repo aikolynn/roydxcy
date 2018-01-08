@@ -77,13 +77,7 @@ class datadiff(models.Model):
     amount = models.FloatField(blank=True, null=True,verbose_name=u'差异金额',default=0)
     diff=models.TextField(blank=True,null=True,verbose_name=u'差异原因')
     remark=models.TextField(blank=True,null=True,verbose_name=u'备注',default=u'未核查')
-    '''
-    指定shop_amount和sys_amount那个值为正确,
-    true_amount=1表示sys_amount为正确值，
-    true_amount=0表示shop_amount为正确值,
-    true_amount为其他值表示暂时不确定正确值
-    '''
-    true_amount=models.IntegerField(default=2,db_column='true_amount',verbose_name=u'正确值')
+    true_amount=models.FloatField(default=shop_amount,null=True,db_column='true_amount',verbose_name=u'正确值')
 
     class Meta:
         ordering=['-date']
@@ -94,10 +88,12 @@ class datadiff(models.Model):
     def save(self,*args,**kwargs):
         if not self.pk:
             self.amount=self.sys_amount-self.shop_amount
+            self.true_amount=self.shop_amount
             if self.amount != 0:
                 self.remark = u'未核查'
         else:
             self.amount = self.sys_amount - self.shop_amount
+            self.true_amount = self.shop_amount
             if self.amount != 0:
                self.remark = u'未核查'
         return super(datadiff,self).save(*args,**kwargs)
