@@ -604,28 +604,16 @@ font-weight:800
               openingdate=arguments[8];
               contractEndDate=arguments[9];
               brand=arguments[10];
-              modalhtml='<div class="modal  " id="mymodal-data" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true"> <div class="modal-dialog"><div class="modal-content"> <div class="modal-header"><button type="button" class="close" data-dismiss="modal"> <span aria-hidden="true">×</span><span class="sr-only">Close</span></button> <h4 class="modal-title text-center">请输入以下信息</h4> </div><div class="modal-body "> <div class="container"><form class="form-group col-md-5" method="get"  id="form_data">'+
-                           '<div class="input-group"><span class="input-group-addon">系统名称</span> <input type="text" class="form-control" name="sys_name"></div><br>'+
-                           '<div class="input-group"><span class="input-group-addon">店铺名称</span><input type="text" class="form-control" name="s_name"> </div><br>'+
-                           '<div class="input-group"> <span class="input-group-addon">所属大区</span> <select class="form-control" name="area"> <option value="" selected>------</option>{% for area in area_list %}<option name="{{ area.id }}" value="{{ area.id }}">{{ area.name }}</option> {% endfor %} </select></div><br>'+
-                           '<div class="input-group"><span class="input-group-addon">销售经理</span> <select class="form-control" name="salemanager"><option value="" selected>------</option> {% for man in man_list %} <option id="{{ man.id }}" value="{{ man.id }}">{{ man.name }}</option>{% endfor %} </select> </div><br>'+
-                           '<div class="input-group"><span class="input-group-addon">经营状态</span><select class="form-control selected" name="shopState"><option value="" selected>------</option><option value="S">正常营业</option><option VALUE="Z">装修</option><option value="C">撤店</option><option value="P">暂停整改</option></select> </div> <br>'+
-                           '<div class="input-group"><span class="input-group-addon">经营方式</span><select class="form-control" name="shoptye"><option value="" selected>------</option><option value="D">直营</option> <option VALUE="A">代理</option><option value="J">加盟</option><option value="C">承包</option></select></div><br>'+
-                           '<div class="input-group"><span class="input-group-addon">店铺地址</span><input type="text" class="form-control" name="shopAddress"> </div><br>'+
-                           '<div class="input-group"><span class="input-group-addon">卖场类型</span> <input type="text" class="form-control" name="mallType" value="A+"> </div><br>'+
-                           '<div class="input-group"><span class="input-group-addon">开业时间</span><input type="text" class="form-control openningdate" name="openningdate" readonly placeholder="请输入店铺开业时间,格式为2016-01-01"></div><br>'+
-                          '<div class="input-group"><span  class="input-group-addon">合同开始时间</span> <input type="text" class="form-control contractBeginDate"  readonly name="contractBeginDate" placeholder="请输入店铺合同开始时间,格式为2016-01-01"> </div><br>'+
-                         '<div class="input-group"> <span class="input-group-addon" >合同截至时间</span><input type="text" class="form-control contractEndDate" readonly name="contractEndDate" placeholder="请输入店铺合同结束时间,格式为2016-01-01"></div></form></div></div><div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">关闭</button><button type="submit" class="btn btn-primary" id="save_button" onclick="add_info()" >提交 </button></div></div></div></div>'
-
+              alert(area)
          };
 
 
 
     </script>
    <!--修改店铺档案弹窗 -->
-     <button class="btn btn-info" data-toggle="modal" data-target="#shop-info">区域档案</button>
+     <button class="btn btn-info" data-toggle="modal" data-target="#area-info">区域档案</button>
      <!--显示店铺档案弹窗 -->
-        <div class="modal" id="shop-info" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+        <div class="modal" id="area-info" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <!--店铺档案弹窗主体 -->
                 <div class="modal-content">
@@ -659,34 +647,7 @@ font-weight:800
  </div>
 
     </div>
-    <!--鼠标划过销售经理名字后显示信息-->
-    <script>
-   $(function(){
-        $("[rel=drevil]").popover({
-            trigger:'manual',
-            placement : 'bottom', //placement of the popover. also can use top, bottom, left or right
-            title : '<div style="text-align:center; color:red; text-decoration:underline; font-size:14px;"> '+ $(this).parent().prev().text()+'</div>', //this is the top title bar of the popover. add some basic css
-            html: 'true', //needed to show html of course
-            content : '<div id="popOverBox"><img src="http://www.hd-report.com/wp-content/uploads/2008/08/mr-evil.jpg" width="251" height="201" /></div>', //this is the content of the html box. add the image here or anything you want really.
-            animation: false
-        }).on("mouseenter", function () {
-                    var _this = this;
-                    $(this).popover("show");
-                    $(this).siblings(".popover").on("mouseleave", function () {
-                        $(_this).popover('hide');
-                    });
-                }).on("mouseleave", function () {
-                   <!--设置鼠标离开后弹窗可保持的时间 单位毫秒-->
-                    var _this = this;
-                    setTimeout(function () {
-                        if (!$(".popover:hover").length) {
-                            $(_this).popover("hide")
-                        }
-                    }, 1000);
-                });
-	});
-    </script>
-    <!--鼠标划过销售经理名字后显示信息-->
+
 
 
 {% endblock %}

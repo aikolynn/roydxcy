@@ -16,6 +16,7 @@ urlpatterns = [
     url(r'^$',shop,name='shop'),
     url(r'^addinfo/', addinfo, name='addinfo'),
     url(r'^update_diff/', update_diff, name='update_diff'),
+    url(r'^changediff/',changediff,name='changediff'),
     url(r'^upinfo/',excelindb,name='upinfo'),
     url(r"^upload/(?P<path>.*)$", "django.views.static.serve", {"document_root": settings.MEDIA_ROOT,}),
     url(r'^check/', addcheckdata, name='check'),

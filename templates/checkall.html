@@ -1,0 +1,220 @@
+{% extends 'checkbase.html' %}
+{% block title %}差异筛选{% endblock %}
+{% block zw %}
+
+
+<!--页面主体内容-->
+<script>
+    $(document).ready(function(){
+        $("#editTable tr :even").addClass("warning");//奇数行
+        $("#editTable tr :odd").addClass("info");//偶数行
+        $("#editTable tr :first").removeClass("warning");
+        $("#editTable tr :first").addClass("fr");
+    }
+    );
+</script>
+<div class="row" style="padding-bottom: 10px;">
+    <div class="col-md-12 lead text-center">
+        <span class="h3"><b>ERP系统数据差异核对表</b></span>
+        <span class=" btn btn-danger">绿色与蓝色方框圈中的数字为正确数据</span>
+    </div>
+    <div class="col-md-12 text-center">
+        {% csrf_token %}
+          <form action="{% url 'diff' %}" class="form-inline" role="form" method="get">
+            <b class="lead">差异查询</b>
+             <div class=" form-group input-group" >
+                     <select name="select_name" class="form-control" id="sel" data-live-search="true"  style="width:110px" >
+                         <option value="" class="selected">店铺名称</option>
+                         {% for item in shop_list %}
+                             <option value="{{ item.Id}}">{{ item.sysName }}</option>
+                         {% endfor %}
+                     </select>
+             <!--带搜索功能的下拉菜单-->
+                      <script>
+                            $(function(){
+                                $('select[name="select_name"]').selectpicker(
+                                        {
+                                            size:10,//显示条目为10
+                                        }
+                                )
+                            })
+                      </script>
+             </div>
+
+              <div class=" form-group input-group" >
+                     <select name="man_name" class="form-control " id="sel" style="width: 110px">
+                         <option value="" class="selected">销售经理</option>
+                         {% for item in man_list %}
+                             <option value="{{ item.id }}">{{ item.name }}</option>
+                         {% endfor %}
+                     </select>
+             </div>
+
+             <div class="form-group " >
+                 <input size="10" type="text" id="datetimeStart" placeholder="开始日期" readonly name="sel_date_start" class="sel_date_start form-control">
+             </div>
+             <div class="form-group">
+                 <input size="10" type="text" id="datetimeEnd" placeholder="结束日期" readonly name="sel_date_end" class="sel_date_end form-control">
+             </div>
+             <div class="form-group " >
+                  <select class="form-control" name="sel_none" style="width: 110px">
+                      <option class="selected" value="">核查状态</option>
+                      <option value="1">未核查</option>
+
+                  </select>
+             </div>
+             <div class="form-group " >
+                  <button type="submit" class=" glyphicon glyphicon-search btn btn-primary">筛选</button>
+             </div>
+          </form>
+    </div>
+
+</div>
+<div class="row">
+    <div class="col-md-12 text-center ">
+     <table class="table table-hover  table-striped table2excel" id="editTable">
+
+       <tr>
+           <td >店  铺</td>
+           <td >销售经理</td>
+           <td>日&nbsp;&nbsp;期</td>
+           <td>系统金额</td>
+           <td>上报金额</td>
+           <td>差异金额</td>
+           <td>差异原因</td>
+           <td>备&nbsp;&nbsp;注</td>
+          <td>正确金额</td>
+       </tr>
+
+
+       {% for d in diff %}
+           <tr  >
+              <td class="text-danger mi" style="vertical-align: middle !important;">{{ d.id_shop.sysName }}</td>
+              <td class="mi" >{{ d.id_shop.managerId.name }}</td>
+              <td class="mi" style="width: auto;">{{ d.date|date:"Y-m-d "}}</td>
+             <!--系统金额-->
+              {% if  d.true_amount == 1 %}
+                <td  class="mi" ><button class="btn btn-success">{{ d.sys_amount }}</button></td>
+              {% else %}
+                 <td class="mi" >{{ d.sys_amount }}</td>
+              {% endif %}
+                <!--上报金额-->
+               {% if  d.true_amount == 0 %}
+                   <td  class="mi"><button class="btn btn-info">{{ d.shop_amount }}</button></td>
+               {% else   %}
+                   <td  class="mi">{{ d.shop_amount }}</td>
+               {% endif %}
+                 <!--差异金额-->
+               {% if d.amount > 0 %}
+                    <td class="mi"><button class="btn  btn-size btn-b-pg glyphicon glyphicon-arrow-up">{{ d.amount }}</button></td>
+               {% elif d.amount < 0 %}
+                   <td class="mi"><button class="btn  btn-size  btn-b-pr glyphicon glyphicon-arrow-down">{{ d.amount }}</button></td>
+               {% endif %}
+                <!--差异原因-->
+               {% if d.diff %}
+                    <td id="diff{{ d.id }}" class=" mi" style="width: 250px ">
+                        <a href="#" id="diff{{ d.id }}">{{ d.diff }}</a>
+                    </td>
+               {% else %}
+                    <td id="diff{{ d.id }}" class="mi"  >
+                      <a href="#" id="diff{{ d.id }}">-</a>
+                    </td>
+               {% endif %}
+                <script>
+                    $('#diff{{ d.id }}').editable(
+                        {
+                            url:"{% url 'changediff' %}",
+                            pk:{{ d.id }},
+                            type:'text',
+                            mode:'inline',
+                        }
+                    );
+                </script>
+                <!--备注信息-->
+                <td id="remark{{ d.id }}" class="edit mi">
+                    <a href="#" id="remark{{ d.id }}">
+                        {{ d.remark }}
+                    </a>
+                </td>
+                <script>
+                    $('#remark{{ d.id }}').editable(
+                        {
+                           url:"{% url 'changediff' %}",
+                            pk:{{ d.id }},
+                            type:'select',
+                            source:[{value:'未核查',text:'未核查'},{value:'已核查',text:'已核查'}],
+                            mode:'inline',
+                            validate:function (value) {
+                          if(!$.trim(value)){return '不能为空'};},
+                        }
+                    )
+                </script>
+                <!--操作-->
+                <td class=" mi">
+                 <a href="#" id="true_amount{{ d.id }}">
+                     {{ d.true_amount }}
+                 </a>
+                 </td>
+           <script>
+              $('#true_amount{{ d.id }}').editable(
+                  {
+                    url:"{% url 'changediff' %}",
+                      pk:{{ d.id }},
+                      type:'text',
+                      mode:'inline',
+                      validate:function (value) {
+                          if(isNaN(value)){return '请输入数字'};},
+                  }
+              )
+           </script>
+                 <!--操作-->
+
+           </tr>
+        {% endfor %}
+     <tr>
+        <td>
+            <ul class="pagination" style="margin: 0 0;">
+                 {% ifnotequal curPage 1 %}
+                    <li>
+                        <a href="?curPage={{ curPage }}&allPage={{ allPage }}&pageType=p_up">
+                            <span class="glyphicon glyphicon-chevron-left">上一页</span>
+                        </a>
+                    </li>
+                 {% endifnotequal %}
+                </ul>
+        </td>
+         <td colspan="7">
+            <ul class="pagination" style="margin: 0 0;">
+                 {% for i in page_list %}
+                    {% ifequal curPage i  %}
+                        <li>
+                          <span class="btn btn-danger glyphicon glyphicon-lock disabled"></span>
+                        </li>
+                        {% else %}
+                         <li>
+                            <a href="?curPage={{ i}}&allPage={{ allPage }}">
+                                {{ i }}
+                            </a>
+                         </li>
+                    {% endifequal %}
+                 {% endfor %}
+            </ul>
+         </td>
+        <td>
+            <ul class="pagination">
+                 {% ifnotequal curPage 1 %}
+                    <li>
+                        <a href="?curPage={{ curPage }}&allPage={{ allPage }}&pageType=p_down">
+                            下一页<span class="glyphicon glyphicon-chevron-right"></span>
+                        </a>
+                    </li>
+                 {% endifnotequal %}
+            </ul>
+        </td>
+     </tr>
+
+     </table>
+    </div>
+</div>
+
+{%endblock  %}

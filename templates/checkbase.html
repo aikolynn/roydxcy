@@ -1,11 +1,12 @@
+
 {% extends 'base.html' %}
 {% load static %}
-{% block title %}差异核对{% endblock %}
-
 {% block content %}
-    <link href="{% static 'css/jquery.searchableSelect.css' %}">
-
-    <script src="{% static 'js/jquery.searchableSelect.js' %}"></script>
+<link href="{% static 'bootstrap-select/css/bootstrap-select.min.css'  %}" rel="stylesheet">
+<link href="{% static 'bootstrap3-editable/css/bootstrap-editable.css' %}" rel="stylesheet">
+<script src="{% static 'bootstrap-select/js/bootstrap-select.min.js' %}"></script>
+<script src="{% static 'bootstrap3-editable/js/bootstrap-editable.js' %}" ></script>
+<script src="{% static 'bootstrap-select/js/i18n/defaults-zh_CN.min.js' %}"></script>
     <script>
      function shopdata() {
       shop_name = $.trim($("select[name=shop_name]").val());
@@ -46,7 +47,7 @@
 function edit_event(eventid) {
     diff=$("#diff"+eventid).text()
     remark=$("#remark"+eventid).text()
-    true_amount=$.trim($("select[name=true_amount"+eventid+"]").val())
+    true_amount=$.trim($("input[name=true_amount"+eventid+"]").val())
     $.ajax(
         {
             url:"{% url 'update_diff' %}",
@@ -304,14 +305,12 @@ font-weight:800
  </style>
 <div class="container" >
  <!-- 弹出添加店铺上报数据 -->
-    <div class="row text-center" style="background: #a6e1ec;padding-top: 10px;">
-        <!--单店数据录入-->
-        <div class="col-md-3 col-sm-3 ">
-
+    <div class="row text-center">
+        <div class="col-md-12 col-sm-12 ">
+                <button class="btn btn-info " data-toggle="modal" data-target="#uplodefile" type="button">上传数据</button>
                 <button class="btn btn-info " data-toggle="modal" data-target="#diffmodal-data" type="button">店铺上报数据</button>
-                <br>
-                <br>
                 <button class="btn btn-info " data-toggle="modal" data-target="#diffsystem" type="button">系统数据修正</button>
+                <button class="btn btn-info " data-toggle="modal" data-target="#downlode_diff" type="button">下载差异表</button>
              <!--系统数据修正弹窗内容 -->
         <div class="modal  " id="diffsystem" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
              <div class="modal-dialog">
@@ -330,11 +329,16 @@ font-weight:800
 
                                    <div class="input-group">
                                         <span class="input-group-addon">店铺名称</span>
-                                       <select class="form-control" name="sys_shop_name">
+                                       <select class="form-control" name="sys_shop_name" data-live-search="true">
                                            {% for shop in shop_list %}
                                                <option value="{{ shop.Id }}">{{ shop.sysName }}</option>
                                            {% endfor %}
                                        </select>
+                                       <script>
+                                           $(function(){
+                                               $('select[name="sys_shop_name"]').selectpicker()
+                                           })
+                                       </script>
                                    </div>
                                    <br>
                                 <div class="input-group">
@@ -361,8 +365,8 @@ font-weight:800
         </div>
         <!--系统数据修正弹窗-->
 
-        <!-- 店铺添加弹窗内容 -->
-        <div class="modal  " id="diffmodal-data" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+        <!-- 单店添加数据弹窗内容 -->
+    <div class="modal  " id="diffmodal-data" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
      <div class="modal-dialog">
          <div class="modal-content">
              <div class="modal-header">
@@ -379,11 +383,16 @@ font-weight:800
 
                            <div class="input-group">
                                 <span class="input-group-addon">店铺名称</span>
-                               <select class="form-control" name="shop_name">
+                               <select class="form-control" name="shop_name" data-live-search="true">
                                    {% for shop in shop_list %}
                                        <option value="{{ shop.Id }}">{{ shop.sName }}</option>
                                    {% endfor %}
                                </select>
+                           <script>
+                                           $(function(){
+                                               $('select[name="shop_name"]').selectpicker()
+                                           })
+                           </script>
                            </div>
                            <br>
                         <div class="input-group">
@@ -409,44 +418,80 @@ font-weight:800
      </div>
 </div>
         <!--添加数据弹窗-->
-        </div>
+        <!-- 上传数据弹窗 -->
+    <div class="modal  " id="uplodefile" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+     <div class="modal-dialog">
+         <div class="modal-content">
+             <div class="modal-header">
+                 <button type="button" class="close" data-dismiss="modal">
+                     <span aria-hidden="true">×</span>
+                     <span class="sr-only">Close</span>
+                 </button>
+                 <h4 class="modal-title text-center">批量上传数据</h4>
+             </div>
 
-         <!--单店数据录入-->
-         <!--上传明细表-->
-        <div class="col-md-4 col-sm-5 ">
-            {% csrf_token %}
-            <form action="{% url 'upinfo' %}" enctype="multipart/form-data" method="post"  role="form">
-            <div class="form-group" >
-                 <div class="input-group">
-                     <span  class="input-group-addon">数据类型</span>
-                     <select name="upinfo_type" class="form-control" style="width:120px;">
-                         <option value="sysamout">系统数据</option>
-                         <option value="shopamout">店铺数据</option>
-                     </select>
-                 </div>
-                <br>
-                 <div class="input-group">
-                    <span class="input-group-addon" >数据日期</span>
-                     <input size="10" type="text" placeholder="" readonly name="exceldate" class="form_datetime_excel form-control" style="width: 120px">
-                 </div>
-                <br>
-                 <div class="div1">
-                    <div class="div2 ">浏览文件</div>
-                    <input type="file" class="inputstyle" name="excelfile" >
-                </div>
-                <div class="input-group">
-                    <button type="submit" class="btn btn-info glyphicon glyphicon-upload">上传文件</button>
-                </div>
+             <div class="modal-body ">
+             <div class="container">
+                 <div class="row text-center">
+                     <div class="col-md-4 col-sm-4 col-md-offset-1">
+                     {% csrf_token %}
+                <form action="{% url 'upinfo' %}" enctype="multipart/form-data" method="post"  role="form">
+                    <div class="form-group" >
+                         <div class="input-group">
+                             <span  class="input-group-addon">数据类型</span>
+                             <select name="upinfo_type" class="form-control" >
+                                 <option value="sysamout">系统数据</option>
+                                 <option value="shopamout">店铺数据</option>
+                             </select>
+                         </div>
+                        <br>
+                         <div class="input-group">
+                            <span class="input-group-addon" >数据日期</span>
+                             <input size="10" type="text"  readonly name="exceldate" class="form_datetime_excel form-control" >
+                         </div>
+                        <br>
+                         <div class="div1">
+                            <div class="div2 ">浏览文件</div>
+                            <input type="file" class="inputstyle" name="excelfile" >
+                        </div>
+                        <div class="input-group">
+                            <button type="submit" class="btn btn-info glyphicon glyphicon-upload">上传文件</button>
+                        </div>
 
-            </div>
-        </form>
-        </div>
-         <!--上传明细表-->
-         <!--下载差异表-->
-        <div class="col-md-3 col-sm-4">
-            <span class="lead"><b>差异表下载</b></span>
-            {% csrf_token %}
-            <form  role="form" action="{% url 'diff_export_excel' %}">
+                    </div>
+                </form>
+                 </div>
+                 </div>
+
+
+             </div>
+             </div>
+             <div class="modal-footer">
+                 <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+             </div>
+
+         </div>
+     </div>
+</div>
+        <!--上传数据弹窗-->
+       <!-- 下载差异表弹窗 -->
+    <div class="modal  " id="downlode_diff" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+     <div class="modal-dialog">
+         <div class="modal-content">
+             <div class="modal-header">
+                 <button type="button" class="close" data-dismiss="modal">
+                     <span aria-hidden="true">×</span>
+                     <span class="sr-only">Close</span>
+                 </button>
+                 <h4 class="modal-title text-center">下载差异表</h4>
+             </div>
+
+             <div class="modal-body ">
+                   <div class="container">
+                      <div class="row">
+                          <div class="col-md-4 col-sm-4 col-md-offset-1">
+                              {% csrf_token %}
+                        <form  role="form" action="{% url 'diff_export_excel' %}">
                   <div class="input-group text-center">
                       <span class="input-group-addon">查询时间</span>
                       <input type="text" name="date_start" placeholder="起始时间" class="date_start_sel form-control" readonly >
@@ -459,138 +504,26 @@ font-weight:800
 
                 <button class="glyphicon glyphicon-download-alt btn btn-info" type="submit" >下载差异表</button>
             </form>
+                          </div>
+                      </div>
 
-        </div>
-        <!--下载差异表-->
-    </div>
-
-<!--页面主体内容-->
-<script>
-    $(document).ready(function(){
-        $("#editTable tr :even").addClass("warning");//奇数行
-        $("#editTable tr :odd").addClass("info");//偶数行
-        $("#editTable tr :first").removeClass("warning");
-        $("#editTable tr :first").addClass("fr");
-    }
-    );
-</script>
-<div class="row" style="padding-bottom: 10px;padding-top:10px;background: #efefe0;">
-    <div class="col-md-12 lead text-center">
-        <span class="h3"><b>ERP系统数据差异核对表</b></span>
-        <span class=" btn btn-danger">绿色与蓝色方框圈中的数字为正确数据</span>
-    </div>
-    <div class="col-md-12 text-center">
-        {% csrf_token %}
-          <form action="{% url 'diff' %}" class="form-inline" role="form" method="post">
-            <b class="lead">差异查询</b>
-             <div class=" form-group input-group" >
-                     <select name="select_name" class="form-control" id="sel"  style="width:110px" >
-                         <option value="" class="selected">店铺名称</option>
-                         {% for item in shop_list %}
-                             <option value="{{ item.Id}}">{{ item.sysName }}</option>
-                         {% endfor %}
-                     </select>
+                   </div>
              </div>
-{#                <script>#}
-{#                    $(function () {#}
-{#                        $('#sel').searchableSelect();#}
-{#                    });#}
-{#                </script>#}
-              <div class=" form-group input-group" >
-                     <select name="man_name" class="form-control " id="sel" style="width: 110px">
-                         <option value="" class="selected">销售经理</option>
-                         {% for item in man_list %}
-                             <option value="{{ item.id }}">{{ item.name }}</option>
-                         {% endfor %}
-                     </select>
+             <div class="modal-footer">
+                 <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
              </div>
 
-             <div class="form-group " >
-                 <input size="10" type="text" id="datetimeStart" placeholder="开始日期" readonly name="sel_date_start" class="sel_date_start form-control">
-             </div>
-             <div class="form-group">
-                 <input size="10" type="text" id="datetimeEnd" placeholder="结束日期" readonly name="sel_date_end" class="sel_date_end form-control">
-             </div>
-             <div class="form-group " >
-                  <select class="form-control" name="sel_none" style="width: 110px">
-                      <option class="selected" value="">核查状态</option>
-                      <option value="1">未核查</option>
-
-                  </select>
-             </div>
-             <div class="form-group " >
-                  <button type="submit" class=" glyphicon glyphicon-search btn btn-primary">筛选</button>
-             </div>
-          </form>
-    </div>
-
+         </div>
+     </div>
 </div>
-<div class="row" >
-    <div class="col-md-12 text-center ">
-           <table class="table table-hover  table-striped table2excel" id="editTable">
-
-       <tr>
-           <td >店  铺</td>
-           <td >销售经理</td>
-           <td>日&nbsp;&nbsp;期</td>
-           <td>系统金额</td>
-           <td>上报金额</td>
-           <td>差异金额</td>
-           <td>差异原因</td>
-           <td>备&nbsp;&nbsp;注</td>
-          <td>操作</td>
-       </tr>
-
-
-       {% for d in diff %}
-           <tr  >
-              <td class="text-danger mi" style="vertical-align: middle !important;">{{ d.id_shop.sysName }}</td>
-              <td class="mi" >{{ d.id_shop.managerId.name }}</td>
-              <td class="mi" style="width: auto;">{{ d.date|date:"Y-m-d "}}</td>
-             <!--系统金额-->
-              {% if  d.true_amount == 1 %}
-                <td  class="mi" ><button class="btn btn-success">{{ d.sys_amount }}</button></td>
-              {% else %}
-                 <td class="mi" >{{ d.sys_amount }}</td>
-              {% endif %}
-                <!--上报金额-->
-               {% if  d.true_amount == 0 %}
-                   <td  class="mi"><button class="btn btn-info">{{ d.shop_amount }}</button></td>
-               {% else   %}
-                   <td  class="mi">{{ d.shop_amount }}</td>
-               {% endif %}
-                 <!--差异金额-->
-               {% if d.amount > 0 %}
-                    <td class="mi"><button class="btn  btn-size btn-b-pg glyphicon glyphicon-arrow-up">{{ d.amount }}</button></td>
-               {% elif d.amount < 0 %}
-                   <td class="mi"><button class="btn  btn-size  btn-b-pr glyphicon glyphicon-arrow-down">{{ d.amount }}</button></td>
-               {% endif %}
-                <!--差异原因-->
-               {% if d.diff %}
-                    <td id="diff{{ d.id }}" class="edit h4 mi" style="color:darkblue;font-family:楷体;width: 250px "><b>{{ d.diff}}</b></td>
-               {% else %}
-                    <td id="diff{{ d.id }}" class="edit"  ></td>
-               {% endif %}
-                <!--备注信息-->
-                <td id="remark{{ d.id }}" class="edit mi">{{ d.remark}}</td>
-                <!--操作-->
-                <td class="noExl mi">
-                 <p>
-                     <button class="btn btn-sm btn-default glyphicon glyphicon-ok"  onclick="edit_event({{ d.id }})">保存</button>
-                     <select name="true_amount{{ d.id }}" class="btn-danger" >
-                              <option value="show" selected>请选择正确值</option>
-                              <option value="sys">系统金额</option>
-                              <option value="shop">上报金额</option>
-                     </select>
-                 </p>
-
-                 </td>
-                 <!--操作-->
-           </tr>
-       {% endfor %}
-
-   </table>
-    </div>
+        <!--下载差异表弹窗-->
+ </div>
 </div>
-</div>
+<br>
+{% block zw %}
+
+{% endblock %}
+
+ </div>
+
 {% endblock %}

@@ -46,7 +46,7 @@
 function edit_event(eventid) {
     diff=$("#diff"+eventid).text()
     remark=$("#remark"+eventid).text()
-    true_amount=$.trim($("select[name=true_amount"+eventid+"]").val())
+    true_amount=$.trim($("input[name=true_amount"+eventid+"]").val())
     $.ajax(
         {
             url:"{% url 'update_diff' %}",
@@ -483,15 +483,20 @@ font-weight:800
                 <span ><b class="h2">ERP系统数据差异核对表</b><cite class="btn btn-sm btn-danger">绿色与蓝色方框圈中的数字为正确数据</cite></span>
                  <div class="col-md-12 text-center">
                     {% csrf_token %}
-                      <form action="{% url 'diff' %}" class="form-inline" role="form" method="post">
+                      <form action="{% url 'diff' %}" class="form-inline" role="form" method="get">
             <b class="lead">差异查询</b>
              <div class=" form-group input-group" >
-                     <select name="select_name" class="form-control" id="sel"  style="width:110px" >
+                     <select name="select_name" class="form-control" id="sel_shop" data-live-search="true"  style="width:110px" >
                          <option value="" class="selected">店铺名称</option>
                          {% for item in shop_list %}
                              <option value="{{ item.Id}}">{{ item.sysName }}</option>
                          {% endfor %}
                      </select>
+             <script>
+                 $(function () {
+                     $('#sel_shop').selectpicker()
+                 })
+             </script>
              </div>
 {#                <script>#}
 {#                    $(function () {#}
@@ -575,17 +580,55 @@ font-weight:800
                 <td class="noExl mi">
                  <p>
                      <button class="btn btn-sm btn-default glyphicon glyphicon-ok"  onclick="edit_event({{ d.id }})">保存</button>
-                     <select name="true_amount{{ d.id }}" class="btn-danger" >
-                              <option value="show" selected>请选择正确值</option>
-                              <option value="sys">系统金额</option>
-                              <option value="shop">上报金额</option>
-                     </select>
+                     <input type="text" class="inputstyle" name="true_amount{{ d.id }}" >
+{#                     <select name="true_amount{{ d.id }}" class="btn-danger" >#}
+{#                              <option value="show" selected>请选择正确值</option>#}
+{#                              <option value="sys">系统金额</option>#}
+{#                              <option value="shop">上报金额</option>#}
+{#                     </select>#}
                  </p>
 
                  </td>
                  <!--操作-->
            </tr>
        {% endfor %}
+           <tr>
+               <td>
+                   <ul class="pagination">
+                       {% ifnotequal curPage 1 %}
+                       <li>
+                           <a href="?curPage={{ curPage }}&allPage={{ allPage }}&pageType='p_Up'&man_name={{ request.GET.man_name }}&select_name={{ request.GET.select_name }}&sel_date_start={{ request.GET.sel_date_start }}&sel_date_end={{ request.GET.sel_date_end }}&sel_none={{ request.GET.sel_none }}">
+                               <span class="btn btn-info">上一页</span>
+                           </a>
+                       </li>
+                       {% endifnotequal  %}
+                   </ul>
+               </td>
+                <td colspan="7">
+                    <ul class="pagination">
+                        {% for i in page_list %}
+
+                            <li>
+                                <a href="?curPage={{ i }}&allPage={{ allPage }}&man_name={{ request.GET.man_name }}&select_name={{ request.GET.select_name }}&sel_date_start={{ request.GET.sel_date_start }}&sel_date_end={{ request.GET.sel_date_end }}&sel_none={{ request.GET.sel_none }}">
+                                 {{ i }}
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+
+                </td>
+                <td>
+                   <ul class="pagination">
+                       {% ifnotequal curPage allPage %}
+                       <li>
+                           <a href="?curPage={{ curPage }}&allPage={{ allPage }}&pageType='p_Down'&man_name={{ request.GET.man_name }}&select_name={{ request.GET.select_name }}&sel_date_start={{ request.GET.sel_date_start }}&sel_date_end={{ request.GET.sel_date_end }}&sel_none={{ request.GET.sel_none }}">
+                               <span class="btn btn-info">下一页</span>
+                           </a>
+                       </li>
+                       {% endifnotequal  %}
+                   </ul>
+               </td>
+           </tr>
            </tbody>
 
 

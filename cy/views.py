@@ -57,7 +57,7 @@ def addinfo(req):
         conbengin = req.GET['contractBegindate']
         conEnd = req.GET['contractEndDate']
         shopstate = req.GET['shopstate']
-        print shopstate
+
         ShopInfo.objects.update_or_create(sysName=sys_name,
                                 sName=s_name,
                                 managerId=sale_manager,
@@ -69,7 +69,7 @@ def addinfo(req):
                                 contractBeginDate=conbengin,
                                 contractEndDate=conEnd,
                                 state=shopstate)
-        print  shopstate
+
     return JsonResponse(sava_message)
 
 def addcheckdata(req):
@@ -110,7 +110,19 @@ def addsyscheckdata(req):
 
 import calendar
 import time
+one_page_data=7
 def checkall(req):
+    try:
+        curPage = int(req.GET.get('curPage', 1))
+        allPage = int(req.GET.get('allPage', 1))
+        pageType = str(req.GET.get('pageType', ''))
+    except:
+        curPage = 1
+        allPage = 1
+    if pageType == 'p_down':
+        curPage += 1
+    elif pageType == 'p_up':
+        curPage -= 1
     '''
     得到当月第一天的日期和最后一天的日期
     查询当月有差异的数据
@@ -122,93 +134,109 @@ def checkall(req):
     wday,monthRange=calendar.monthrange(day_now.tm_year,day_now.tm_mon)
     #当月最后一天日期
     day_end='%d-%02d-%02d'%(day_now.tm_year, day_now.tm_mon, monthRange)
-    shop_list = ShopInfo.objects.values('Id', 'sName', 'sysName', 'shopType', "managerId__name", "managerId").filter(
-        shopType__in=["D", "C"]).exclude(state='C').order_by("-sName")
+    shop_list = ShopInfo.objects.values('Id', 'sysName','sName', 'shopType', "managerId__name", "managerId").filter(
+        shopType__in=["D", "C"]).order_by("sysName")
+
     man_list = Managers.objects.values('id', 'name').filter(shopinfo__shopType__in=["D", "C"]).distinct()
+
+    startDiff = (curPage - 1) * one_page_data
+    endDiff = startDiff + one_page_data
+    print curPage,allPage
     diff = datadiff.objects.exclude(amount=0)\
                            .exclude(id_shop__sName__in=['元隆利嘉生活馆','满洲里友谊商厦'])\
                            .filter(id_shop__shopType__in=["D", "C"],
                                    date__range=(day_begin,day_end))\
-                           .order_by("id_shop", "-date")
-    return render(req,'checkdata.html',locals())
+                           .order_by("id_shop", "-date")[startDiff:endDiff]
+
+    if curPage ==1 and allPage==1:
+        diffcounts= datadiff.objects.exclude(amount=0).exclude(id_shop__sName__in=['元隆利嘉生活馆', '满洲里友谊商厦']) \
+                            .filter(id_shop__shopType__in=["D", "C"],date__range=(day_begin, day_end)) \
+                            .order_by("id_shop", "-date").count()
+        allPage=diffcounts/one_page_data
+        remainDiff=diffcounts % one_page_data
+        if remainDiff>0:
+            allPage+=1
+    page_list=range(1,allPage+1)
+
+    return render(req,'checkall.html',locals())
 #获取所有有差异的数据
 def checkdata(request):
+
+    try:
+        curPage=int(request.GET.get('curPage',1))
+        allPage=int(request.GET.get('allPage',1))
+        pageType=str(request.GET.get('pageType',''))
+    except ValueError:
+        curPage=1
+        allPage=1
+    if pageType=='p_down':
+        curPage+=1
+    elif pageType=='p_up':
+        curPage-=1
+    startDiff=(curPage-1)*one_page_data
+    endDiff=startDiff+one_page_data
     shop_list = ShopInfo.objects.values('Id', 'sName', 'sysName','shopType', "managerId__name", "managerId").filter(
-        shopType__in=["D", "C"]).exclude(state='C').order_by("-sName")
+        shopType__in=["D", "C"]).order_by("-sName")
     man_list=Managers.objects.values('id','name').filter(shopinfo__shopType__in=["D","C"]).distinct()
-    sel_shop_name=request.POST['select_name']
-    sel_man_name=request.POST['man_name']
-    sel_date=request.POST['sel_date_start']
-    sel_date_end=request.POST['sel_date_end']
-    sel_none=request.POST['sel_none']
-    #查询所有有差异的记录总数
-    if sel_shop_name=='' and sel_man_name=='' and sel_date=='' and sel_none=='' and sel_date_end=='' :
-        diff=datadiff.objects.exclude(amount=0)\
-                             .exclude(id_shop__sName__in=['元隆利嘉生活馆','满洲里友谊商厦'])\
-                             .filter(id_shop__shopType__in=["D","C"],)\
-                             .order_by("id_shop","-date")
-    #按店铺查询
+    sel_shop_name=request.GET['select_name']
+    sel_man_name=request.GET['man_name']
+    sel_none = request.GET['sel_none']
+    sel_date=request.GET['sel_date_start']
+    sel_date_end=request.GET['sel_date_end']
+
+    #构造查询条件字典
+        #查询所有有差异的记录
+    if sel_shop_name == '' and sel_man_name == '' and sel_date == '' and sel_none == '' and sel_date_end == '':
+        filter_dic={'id_shop__shopType__in':["D","C"]}
+        #按门店查询
     elif sel_shop_name and sel_man_name=='' and sel_date=='' and sel_none=='' and sel_date_end=='':
-        diff = datadiff.objects.exclude(amount=0)\
-                               .filter(id_shop__shopType__in=["D", "C"],
-                                        id_shop__Id=sel_shop_name)\
-                               .order_by("id_shop", "-date")
-    #按到销售经理查询
+        filter_dic={'id_shop__shopType__in':["D","C"],'id_shop__Id':sel_shop_name}
+        #按销售经理查询
     elif sel_man_name and sel_shop_name=='' and sel_date=='' and sel_none=='' and sel_date_end=='':
-        diff = datadiff.objects.exclude(amount=0)\
-                               .filter(id_shop__shopType__in=["D", "C"],
-                                       id_shop__managerId=sel_man_name)\
-                               .order_by("id_shop", "-date")
-    #按时间查询
-    elif sel_date and sel_shop_name=='' and sel_man_name=='' and sel_none=='' and sel_date_end:
-        diff = datadiff.objects.exclude(amount=0) \
-                               .exclude(id_shop__sName__in=['元隆利嘉生活馆', '满洲里友谊商厦']) \
-                               .filter(id_shop__shopType__in=["D", "C"],
-                                        date__range=(sel_date,sel_date_end))\
-                               .order_by("id_shop","date" )
-    #按店铺和时间查询
-    elif sel_date and  sel_date_end and sel_shop_name and sel_man_name=='' and sel_none=='' :
-        diff = datadiff.objects.exclude(amount=0).filter(id_shop__shopType__in=["D","C"],
-                                                         date__range=(sel_date,sel_date_end),
-                                                         id_shop__Id=sel_shop_name).order_by("id_shop", "-date")
-    #按销售经理和时间查询
-    elif sel_man_name and sel_date and sel_date_end and sel_shop_name=='' and sel_none=='':
-        diff = datadiff.objects.exclude(amount=0) \
+        filter_dic = {'id_shop__shopType__in': ["D", "C"], 'id_shop__managerId': sel_man_name}
+        # 按时间查询
+    elif sel_date and sel_shop_name == '' and sel_man_name == '' and sel_none == '' and sel_date_end:
+        filter_dic = {'id_shop__shopType__in':["D", "C"],'date__range':(sel_date, sel_date_end)}
+         # 按店铺和时间查询
+    elif sel_date and sel_date_end and sel_shop_name and sel_man_name == '' and sel_none == '':
+        filter_dic = {'id_shop__shopType__in':["D", "C"],'date__range':(sel_date, sel_date_end),'id_shop__Id':sel_shop_name}
+        # 按销售经理和时间查询
+    elif sel_man_name and sel_date and sel_date_end and sel_shop_name == '' and sel_none == '':
+        filter_dic = {'id_shop__shopType__in':['D', 'C'],'date__range':(sel_date, sel_date_end),'id_shop__managerId':sel_man_name}
+        # 查询所有未核查的结果
+    elif sel_none == '1' and sel_shop_name == '' and sel_man_name == '' and sel_date == '' and sel_date_end == '':
+        filter_dic = {'id_shop__shopType__in':['D', 'C'],'remark':u'未核查'}
+        # 查询某段时间内的未核查结果
+    elif sel_none == '1' and sel_date and sel_date_end and sel_man_name == '' and sel_shop_name == '':
+        filter_dic = {'id_shop__shopType__in':['D', 'C'],'remark':u'未核查','date__range':(sel_date, sel_date_end)}
+         # 查询销售经理未核查的结果
+    elif sel_none == '1' and sel_date == '' and sel_man_name and sel_shop_name == '':
+        filter_dic = {'id_shop__shopType__in':['D', 'C'],'remark':u'未核查','id_shop__managerId':sel_man_name}
+        # 查询单店未核查的结果
+    elif sel_none == '1' and sel_date == '' and sel_man_name == '' and sel_shop_name and sel_date_end == '':
+        filter_dic = {'id_shop__shopType__in':['D', 'C'],'remark':u'未核查','id_shop__Id':sel_shop_name}
+        # 查询单店给定时间段内的结果
+    elif sel_date_end and sel_date and sel_shop_name and sel_man_name == '' and sel_none == '':
+        filter_dic={'id_shop__shopType__in':['D', 'C'],'id_shop__Id' :sel_shop_name,'date__range' : (sel_date, sel_date_end)}
+    # 构造查询条件字典
+
+    #依据查询字典查询记录
+    diff=datadiff.objects.exclude(amount=0)\
+                         .exclude(id_shop__sName__in=['元隆利嘉生活馆','满洲里友谊商厦'])\
+                         .filter(**filter_dic)\
+                         .order_by("id_shop","-date")[startDiff:endDiff]
+    #计算总分页数
+    if curPage == 1 and allPage == 1:
+        diffcounts = datadiff.objects.exclude(amount=0) \
             .exclude(id_shop__sName__in=['元隆利嘉生活馆', '满洲里友谊商厦']) \
-            .filter(id_shop__shopType__in=['D','C'],
-                    date__range=(sel_date, sel_date_end),
-                    id_shop__managerId=sel_man_name)\
-            .order_by("id_shop", "-date")
-    #查询所有未核查的结果
-    elif sel_none=='1' and sel_shop_name=='' and sel_man_name==''and sel_date=='' and sel_date_end=='' :
-        diff = datadiff.objects.exclude(amount=0) \
-            .exclude(id_shop__sName__in=['元隆利嘉生活馆', '满洲里友谊商厦']) \
-            .filter(id_shop__shopType__in=['D', 'C'],
-                    remark=u'未核查')\
-            .order_by("id_shop", "-date")
-    # 查询某段时间内的未核查结果
-    elif sel_none=='1' and sel_date and sel_date_end and sel_man_name=='' and sel_shop_name=='':
-        diff = datadiff.objects.exclude(amount=0) \
-            .exclude(id_shop__sName__in=['元隆利嘉生活馆', '满洲里友谊商厦']) \
-            .filter(id_shop__shopType__in=['D', 'C'],
-                                                         remark=u'未核查',
-                                                         date__range=(sel_date, sel_date_end)).order_by("id_shop", "-date")
-    #查询销售经理未核查的结果
-    elif sel_none == '1' and sel_date=='' and sel_man_name and sel_shop_name == '':
-        diff = datadiff.objects.exclude(amount=0).filter(id_shop__shopType__in=['D', 'C'],
-                                                         remark=u'未核查',
-                                                         id_shop__managerId=sel_man_name).order_by("id_shop", "-date")
-    #查询单店未核查的结果
-    elif sel_none == '1' and sel_date == '' and sel_man_name=='' and sel_shop_name and sel_date_end=='' :
-        diff = datadiff.objects.exclude(amount=0).filter(id_shop__shopType__in=['D', 'C'],
-                                                         remark=u'未核查',
-                                                         id_shop__Id=sel_shop_name).order_by("id_shop", "-date")
-    #查询单店给定时间段内的结果
-    elif sel_date_end and sel_date and sel_shop_name and sel_man_name=='' and sel_none=='':
-        diff=datadiff.objects.exclude(amount=0).filter(id_shop__shopType__in=['D','C'],
-                                                       id_shop__Id=sel_shop_name,
-                                                       date__range=(sel_date,sel_date_end)).order_by('id_shop',"date")
-    return render(request,'checkdata.html',locals())
+            .filter(**filter_dic) \
+            .order_by("id_shop", "-date").count()
+        allPage = diffcounts / one_page_data
+        remainDiff = diffcounts % one_page_data
+        if remainDiff > 0:
+            allPage += 1
+    page_list=range(1,allPage+1)
+    return render(request,'checkdatanew.html',locals())
 #差异Excel导出
 def diff_export_excel(request):
     sel_date_start=request.GET['date_start']
@@ -226,7 +254,7 @@ def diff_export_excel(request):
     diff_excel_book = openpyxl.Workbook()
     diff_excel_book.remove_sheet(diff_excel_book.get_sheet_by_name(u'Sheet'))
     book_sheet = diff_excel_book.create_sheet(u"销售差异")
-    book_sheet.append([u"店铺",u'销售经理', u"日期", u"系统金额", u"上报金额", u"差异金额", u"差异原因", u"备注"])
+    book_sheet.append([u"店铺",u'销售经理', u"日期", u"系统金额", u"上报金额", u"差异金额",u'正确金额', u"差异原因", u"备注"])
     for i in range(1,8):
         book_sheet.cell(row=1,column=i).font=F_styleB
     row=2
@@ -241,19 +269,16 @@ def diff_export_excel(request):
             book_sheet.cell(row=row, column=4).alignment = F_styleCenter
             book_sheet.cell(row=row, column=5).value = diff_y.shop_amount
             book_sheet.cell(row=row, column=5).alignment = F_styleCenter
-            if diff_y.true_amount == 0:
-                book_sheet.cell(row=row, column=5).font=F_styleR
-            elif diff_y.true_amount==1:
-                book_sheet.cell(row=row, column=4).font=F_styleR
-                # book_sheet.cell(row=row, column=4).style.fill.fill_type =styles.Fill.FILL_SOLID
-                # book_sheet.cell(row=row, column=4).style.fill.start_color = 'FFFFFF'
-                # book_sheet.cell(row=row, column=4).style.fill.end_color = '000000'
             book_sheet.cell(row=row, column=6).value = diff_y.amount
             book_sheet.cell(row=row, column=6).alignment = F_styleCenter
-            book_sheet.cell(row=row, column=7).value = diff_y.diff
-            book_sheet.cell(row=row, column=7).alignment=F_styleCenter
-            book_sheet.cell(row=row, column=8).value = diff_y.remark
-            book_sheet.cell(row=row, column=8).alignment = F_styleCenter
+            book_sheet.cell(row=row, column=7).value = diff_y.true_amount
+            if diff_y.true_amount!=diff_y.shop_amount:
+                book_sheet.cell(row=row, column=7).font = F_styleR
+            book_sheet.cell(row=row, column=7).alignment = F_styleCenter
+            book_sheet.cell(row=row, column=8).value = diff_y.diff
+            book_sheet.cell(row=row, column=8).alignment=F_styleCenter
+            book_sheet.cell(row=row, column=9).value = diff_y.remark
+            book_sheet.cell(row=row, column=9).alignment = F_styleCenter
             row+=1
     month_start = str(sel_date_start).replace('-','')
     month_end = str(sel_date_end).replace('-','')
@@ -269,16 +294,29 @@ def update_diff(req):
     remark_new = req.POST["remark"]
     true_amount=req.POST["true_amount"]
     diff_id=req.POST["diffid"]
-    if true_amount=="sys":
-            datadiff.objects.filter(id=diff_id).update(diff=diff_new,remark=remark_new,true_amount=1)
-    elif true_amount=="shop":
-            datadiff.objects.filter(id=diff_id).update(diff=diff_new, remark=remark_new,true_amount=0)
-    elif true_amount=="show":
-        datadiff.objects.filter(id=diff_id).update(diff=diff_new, remark=remark_new,true_amount=3)
+    datadiff.objects.filter(id=diff_id).update(diff=diff_new, remark=remark_new, true_amount=true_amount)
+    # if true_amount=="sys":
+    #         datadiff.objects.filter(id=diff_id).update(diff=diff_new,remark=remark_new,true_amount=1)
+    # elif true_amount=="shop":
+    #         datadiff.objects.filter(id=diff_id).update(diff=diff_new, remark=remark_new,true_amount=0)
+    # elif true_amount=="show":
+    #     datadiff.objects.filter(id=diff_id).update(diff=diff_new, remark=remark_new,true_amount=3)
     return  JsonResponse(sava_message)
 
 #导入excel读写库 openpyxl(只可读写2007版及之后的office文档)
-
+def changediff(req):
+    if req.method=='POST':
+        post_dict=req.POST
+    id_pk=post_dict['pk']
+    value_post=post_dict['value']
+    name_post=post_dict['name']
+    if 'remark' in name_post:
+        datadiff.objects.filter(id=id_pk).update(remark=value_post)
+    elif 'diff' in name_post:
+        datadiff.objects.filter(id=id_pk).update(diff=value_post)
+    elif 'true_amount' in name_post:
+        datadiff.objects.filter(id=id_pk).update(true_amount=value_post)
+    return  HttpResponse('YES')
 def excelindb(request):
     #店铺列表
     shop_list = ShopInfo.objects.values('sysName','Id', 'sName', 'shopType', "managerId__name", "managerId").filter(
@@ -431,6 +469,9 @@ def fo(reqest):
 
 
 def read_diff_info(req):
+    data=req.GET
+    for i in data:
+        print i
     # 获取当前时间
     day_now = time.localtime()
     # 当月第一天日期
@@ -442,6 +483,7 @@ def read_diff_info(req):
     order=req.GET.get('order')
     offset=req.GET.get('offset')
     search=req.GET.get('search')
+
     if search:
         diff_info_all=datadiff.objects.filter(Q(id_shop__sysName__contains=search)|
                                               Q(id_shop__managerId__name__contains=search)|\
@@ -460,7 +502,7 @@ def read_diff_info(req):
     pageinator=Paginator(diff_info_all,limit)
     pages=int(int(offset) /int(limit)+1)
     data_json = {'total':diff_info_all.count(),'rows':[]}
-    print diff_info_all.count()
+
     for diffinfo in pageinator.page(pages):
 
         data_json['rows'].append(
