@@ -92,17 +92,9 @@
               <td class="mi" >{{ d.id_shop.managerId.name }}</td>
               <td class="mi" style="width: auto;">{{ d.date|date:"Y-m-d "}}</td>
              <!--系统金额-->
-              {% if  d.true_amount == 1 %}
-                <td  class="mi" ><button class="btn btn-success">{{ d.sys_amount }}</button></td>
-              {% else %}
                  <td class="mi" >{{ d.sys_amount }}</td>
-              {% endif %}
                 <!--上报金额-->
-               {% if  d.true_amount == 0 %}
-                   <td  class="mi"><button class="btn btn-info">{{ d.shop_amount }}</button></td>
-               {% else   %}
-                   <td  class="mi">{{ d.shop_amount }}</td>
-               {% endif %}
+               <td  class="mi">{{ d.shop_amount }}</td>
                  <!--差异金额-->
                {% if d.amount > 0 %}
                     <td class="mi">

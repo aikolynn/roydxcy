@@ -66,7 +66,26 @@ class ShopInfo(models.Model):
         db_table = 'shop-info'
     def __unicode__(self):
         return  self.sName
+class saleflow(models.Model):
+    sid=models.AutoField(auto_created=True,unique=False,verbose_name=u'流水ID',primary_key=True)
+    id_shop=models.ForeignKey(ShopInfo,db_column='id_shop',verbose_name=u'店铺ID')
+    flowNo=models.CharField(max_length=27,db_column='flowNo',verbose_name=u'销售单号')
+    flow_No=models.CharField(max_length=5,db_column='flow_No',verbose_name=u'流水号')
+    saleDate=models.DateField(blank=False,verbose_name=u'销售日期',db_column='saledate')
+    productNo=models.CharField(max_length=255,db_column='productno',verbose_name=u'商品编码')
+    productUnit=models.CharField(max_length=10,db_column='productunit',verbose_name=u'单位')
+    productName=models.CharField(max_length=255,db_column='productname',verbose_name=u'商品名称')
+    unitPrice=models.FloatField(blank=False,db_column='unitprice',verbose_name=u'商品单价')
+    saleNumber=models.FloatField(blank=False,db_column='saleNumber',verbose_name=u'销售数量')
+    saleAmount=models.FloatField(blank=False,db_column='saleAmount',verbose_name=u'应销金额')
+    discountAmount=models.FloatField(blank=False,db_column='discountAmount',verbose_name='实收金额')
 
+    class Meta:
+        verbose_name=u'销售流水'
+        verbose_name_plural=verbose_name
+        db_table='saleflow'
+    def __unicode__(self):
+        return self.id_shop.sysName
 
 class datadiff(models.Model):
     id = models.AutoField( unique=False, auto_created=True, verbose_name=u'账目ID',primary_key=True)

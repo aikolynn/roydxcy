@@ -9,68 +9,68 @@
 <script src="{% static 'bootstrap-select/js/i18n/defaults-zh_CN.min.js' %}"></script>
     <script>
      function shopdata() {
-      shop_name = $.trim($("select[name=shop_name]").val());
-      money = $.trim($("input[name=sale_money]").val());
-     data_date=$.trim($("input[name=data_date]").val());
-               $.ajax(
-             {
-                 url:"{% url 'check' %}",
-                 type:"get",
-                 data:{shop_name:shop_name,money:money,data_date:data_date},
-                 datatype:"json",
-                 success:function(data) {
-                        window.location.reload();
+          shop_name = $.trim($("select[name=shop_name]").val());
+          money = $.trim($("input[name=sale_money]").val());
+         data_date=$.trim($("input[name=data_date]").val());
+                   $.ajax(
+                 {
+                     url:"{% url 'check' %}",
+                     type:"get",
+                     data:{shop_name:shop_name,money:money,data_date:data_date},
+                     datatype:"json",
+                     success:function(data) {
+                            window.location.reload();
 
 
-                    }
-        }
-     )
- }
-  function sysdata() {
-      shop_name = $.trim($("select[name=sys_shop_name]").val());
-      money = $.trim($("input[name=sys_sale_money]").val());
-     data_date=$.trim($("input[name=sys_data_date]").val());
-               $.ajax(
-             {
-                 url:"{% url 'syscheck' %}",
-                 type:"get",
-                 data:{shop_name:shop_name,money:money,data_date:data_date},
-                 datatype:"json",
-                 success:function(data) {
-                        window.location.reload();
-
-
-                    }
-        }
-     )
- }
-function edit_event(eventid) {
-    diff=$("#diff"+eventid).text()
-    remark=$("#remark"+eventid).text()
-    true_amount=$.trim($("input[name=true_amount"+eventid+"]").val())
-    $.ajax(
-        {
-            url:"{% url 'update_diff' %}",
-            type:"POST",
-            data:{
-                diff_new:diff,
-                remark:remark,
-                true_amount:true_amount,
-                diffid:eventid
-            },
-            datatype:"json",
-            success:(
-                function (data) {
-                    if(data.success()){
-                        location.reload(true);
-                    }
-
+                        }
             }
-            ),
-        }
-    )
-}
-function ablebtn(btnid) {
+         )
+     }
+     function sysdata() {
+          shop_name = $.trim($("select[name=sys_shop_name]").val());
+          money = $.trim($("input[name=sys_sale_money]").val());
+         data_date=$.trim($("input[name=sys_data_date]").val());
+                   $.ajax(
+                 {
+                     url:"{% url 'syscheck' %}",
+                     type:"get",
+                     data:{shop_name:shop_name,money:money,data_date:data_date},
+                     datatype:"json",
+                     success:function(data) {
+                            window.location.reload();
+
+
+                        }
+            }
+         )
+     }
+    function edit_event(eventid) {
+        diff=$("#diff"+eventid).text()
+        remark=$("#remark"+eventid).text()
+        true_amount=$.trim($("input[name=true_amount"+eventid+"]").val())
+        $.ajax(
+            {
+                url:"{% url 'update_diff' %}",
+                type:"POST",
+                data:{
+                    diff_new:diff,
+                    remark:remark,
+                    true_amount:true_amount,
+                    diffid:eventid
+                },
+                datatype:"json",
+                success:(
+                    function (data) {
+                        if(data.success()){
+                            location.reload(true);
+                        }
+
+                }
+                ),
+            }
+        )
+    }
+    function ablebtn(btnid) {
      $("#"+btnid+"edit").attr("disabled",false);
     $("#"+btnid+"cansle").attr("disabled",true);
 };
@@ -436,20 +436,32 @@ font-weight:800
                      <div class="col-md-4 col-sm-4 col-md-offset-1">
                      {% csrf_token %}
                 <form action="{% url 'upinfo' %}" enctype="multipart/form-data" method="post"  role="form">
-                    <div class="form-group" >
-                         <div class="input-group">
+                    <div class="form-group" id="upfile">
+                         <div class="input-group" id="kj">
                              <span  class="input-group-addon">数据类型</span>
-                             <select name="upinfo_type" class="form-control" >
+                             <select name="upinfo_type" class="form-control" onchange="selectchange()">
+                                 <option value="none">请选择上传的数据类型</option>
                                  <option value="sysamout">系统数据</option>
                                  <option value="shopamout">店铺数据</option>
+                                 <option value="saleflow" >流水账</option>
                              </select>
                          </div>
                         <br>
-                         <div class="input-group">
+                         <div class="input-group" id="datadatesj" style="display: none;">
                             <span class="input-group-addon" >数据日期</span>
                              <input size="10" type="text"  readonly name="exceldate" class="form_datetime_excel form-control" >
                          </div>
                         <br>
+                        <div class="input-group" id="flowstart" style="display: none;">
+                            <span class="input-group-addon" >账目开始日期</span>
+                             <input size="10" type="text"  readonly name="saledatestart" class="saledatestart form-control" >
+                         </div>
+                         <br>
+                        <div class="input-group" id="flowend" style="display: none;">
+                            <span class="input-group-addon" >账目结束日期</span>
+                             <input size="10" type="text"  readonly name="saledateend" class="saledateend form-control" >
+                         </div>
+                         <br>
                          <div class="div1">
                             <div class="div2 ">浏览文件</div>
                             <input type="file" class="inputstyle" name="excelfile" >
@@ -459,6 +471,20 @@ font-weight:800
                         </div>
 
                     </div>
+                    <script>
+                        function selectchange() {
+                            selectValue=$("select[name='upinfo_type']").val()
+                            if (selectValue=='sysamout' ||selectValue=='shopamout') {
+                                $("#flowend,#flowstart").hide();
+                                $("#datadatesj").show();
+                            }else if(selectValue=='saleflow'){
+                                 $("#flowend,#flowstart").show();
+                                $("#datadatesj").hide();
+                            };
+                            }
+
+
+                    </script>
                 </form>
                  </div>
                  </div>

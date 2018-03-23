@@ -1,8 +1,8 @@
 #coding=utf-8
 
 from django.shortcuts import render,HttpResponseRedirect,redirect,HttpResponse
-from models import  *
-from forms import *
+from .models import  *
+from .forms import *
 from django.http import JsonResponse
 from  django.core import serializers
 from django.db.models import Q
@@ -12,6 +12,11 @@ import  os
 import json
 from django.core.paginator import *
 from datetime import *
+
+def login_form(req):
+
+    return render(req,'login.html',locals())
+
 # Create your views here.
 #展示店铺信息并增加修改店铺信息
 def shop(request):
@@ -111,6 +116,7 @@ def addsyscheckdata(req):
 import calendar
 import time
 one_page_data=7
+# @high_paginator(7)
 def checkall(req):
     try:
         curPage = int(req.GET.get('curPage', 1))
@@ -135,13 +141,13 @@ def checkall(req):
     #当月最后一天日期
     day_end='%d-%02d-%02d'%(day_now.tm_year, day_now.tm_mon, monthRange)
     shop_list = ShopInfo.objects.values('Id', 'sysName','sName', 'shopType', "managerId__name", "managerId").filter(
-        shopType__in=["D", "C"]).order_by("sysName")
+        shopType__in=["D", "C"],state__in=['S']).order_by("sysName")
 
     man_list = Managers.objects.values('id', 'name').filter(shopinfo__shopType__in=["D", "C"]).distinct()
 
     startDiff = (curPage - 1) * one_page_data
     endDiff = startDiff + one_page_data
-    print curPage,allPage
+
     diff = datadiff.objects.exclude(amount=0)\
                            .exclude(id_shop__sName__in=['元隆利嘉生活馆','满洲里友谊商厦'])\
                            .filter(id_shop__shopType__in=["D", "C"],
@@ -176,7 +182,7 @@ def checkdata(request):
     startDiff=(curPage-1)*one_page_data
     endDiff=startDiff+one_page_data
     shop_list = ShopInfo.objects.values('Id', 'sName', 'sysName','shopType', "managerId__name", "managerId").filter(
-        shopType__in=["D", "C"]).order_by("-sName")
+        shopType__in=["D", "C"],state__in=['S']).order_by("-sName")
     man_list=Managers.objects.values('id','name').filter(shopinfo__shopType__in=["D","C"]).distinct()
     sel_shop_name=request.GET['select_name']
     sel_man_name=request.GET['man_name']
@@ -288,6 +294,7 @@ def diff_export_excel(request):
     return  response
 
 #修改差异原因
+
 def update_diff(req):
     sava_message = {"sava_message": "提交成功"}
     diff_new=req.POST["diff_new"]
@@ -318,6 +325,7 @@ def changediff(req):
         datadiff.objects.filter(id=id_pk).update(true_amount=value_post)
     return  HttpResponse('YES')
 def excelindb(request):
+    import os
     #店铺列表
     shop_list = ShopInfo.objects.values('sysName','Id', 'sName', 'shopType', "managerId__name", "managerId").filter(
         shopType__in=["D", "C"]).order_by("-sName")
@@ -325,6 +333,7 @@ def excelindb(request):
     man_list = Managers.objects.values('id', 'name').filter(shopinfo__shopType__in=["D", "C"]).distinct()
     sava_message = {"sava_message": "上传成功"}
     excel_file = request.FILES['excelfile']
+    print (excel_file)
     excel_date = request.POST["exceldate"]
     excel_data_type=request.POST['upinfo_type']
     #获取项目根目录
@@ -332,6 +341,7 @@ def excelindb(request):
     with open(filepath +'/static/upload/'+excel_data_type+ excel_date + '.xlsx', 'wb+') as destination:
         for chunk in excel_file.chunks():
             destination.write(chunk)
+
     destination.close()
     excel_data = openpyxl.load_workbook(filepath+'/static/upload/'+ excel_data_type+excel_date+".xlsx")
     sheetnames = excel_data.get_sheet_names()
@@ -353,9 +363,10 @@ def excelindb(request):
                 if datadiff.objects.filter(date=date_excel, id_shop=shop_id).count():
                     shop_amount_base = datadiff.objects.get(date=date_excel, id_shop=shop_id).shop_amount
                     datadiff.objects.filter(date=date_excel, id_shop=shop_id).update(sys_amount=sys_amount_excel,\
-                                                                                     amount=sys_amount_excel-shop_amount_base)
+                                                                                     amount=sys_amount_excel-shop_amount_base,\
+                                                                                     true_amount=shop_amount_base)
                 else:
-                    sys_diff=datadiff(sys_amount=sys_amount_excel,date=date_excel,id_shop=shop_id)
+                    sys_diff=datadiff(sys_amount=sys_amount_excel,date=date_excel,id_shop=shop_id,true_amount=sys_amount_excel)
                     sys_diff.save()
                 date_excel_str=date_excel.strftime("%Y-%m-%d")
         diff = datadiff.objects.exclude(amount=0) \
@@ -363,7 +374,9 @@ def excelindb(request):
                     .filter(id_shop__shopType__in=["D", "C"],
                             date__range=(date_excel_start, date_excel_str)) \
                     .order_by("id_shop", "date")
-        return render(request,'checkdata.html',{"diff":diff,"shop_list":shop_list,"man_list":man_list})
+
+        os.remove(filepath+'/static/upload/'+excel_data_type+excel_date+".xlsx")
+        return render(request,'checkdatanew.html',{"diff":diff,"shop_list":shop_list,"man_list":man_list})
     elif excel_data_type=="shopamout":
         for row_excel in range(2, excel_rows + 1):
                 for column_excel in range(2,excel_columns+1):
@@ -378,9 +391,10 @@ def excelindb(request):
                     if datadiff.objects.filter(date=date_excel, id_shop=shop_id).count():
                         sys_amount_base = datadiff.objects.get(date=date_excel, id_shop=shop_id).sys_amount
                         datadiff.objects.filter(date=date_excel, id_shop=shop_id).update(shop_amount=shopamount_excel,\
-                                                                                         amount=sys_amount_base-shopamount_excel)
+                                                                                         amount=sys_amount_base-shopamount_excel,\
+                                                                                         true_amount=shopamount_excel)
                     else:
-                        shop_diff=datadiff(shop_amount=shopamount_excel,date=date_excel,id_shop=shop_id)
+                        shop_diff=datadiff(shop_amount=shopamount_excel,date=date_excel,id_shop=shop_id,true_amount=shopamount_excel)
                         shop_diff.save()
                 date_excel_str = date_excel.strftime("%Y-%m-%d")
         #数据导入后查询有差异的数据并将结果传递到前端渲染
@@ -389,8 +403,10 @@ def excelindb(request):
             .filter(id_shop__shopType__in=["D", "C"],
                     date__range=(date_excel_start, date_excel_str)) \
             .order_by("id_shop", "date")
-        return render(request, 'checkdata.html', {"diff": diff, "shop_list": shop_list, "man_list": man_list})
+        return render(request, 'checkdatanew.html', {"diff": diff, "shop_list": shop_list, "man_list": man_list})
         #批量导入人员信息
+    elif excel_data_type=='saleflow':
+        pass
     elif excel_data_type=="staff":
         for row_excel in range(2, excel_rows + 1):
                 staff_name=excel_sheets.cell(row=row_excel,column=1).value
@@ -432,6 +448,7 @@ def excelindb(request):
                  Area.objects.update_or_create(name=area_name,manager=manager_id)
                  return HttpResponseRedirect("/")
         #批量导入门店档案
+
     elif excel_data_type=='shopinfo':
         for row_excel in range(2, excel_rows + 1):
                 shop_sysname_excel=excel_sheets.cell(row=row_excel,column=1).value
@@ -462,6 +479,22 @@ def excelindb(request):
                 )
                 return render(request,'shop.html',locals())
 
+def saleflowindb(request):
+    try:
+        saledatestart=request.POST['saledatestart']
+        saledateEnd=request.POST['saledateend']
+        excel_file = request.FILES['excelfile']
+        saleflow.objects.filter(saleDate__range=[saledatestart, saledateEnd]).delete()
+        filepath = os.path.abspath(os.path.dirname('__file__'))
+        with open(filepath + '/static/upload/' + saledatestart + saledateEnd + '.xlsx', 'wb+') as destination:
+            for chunk in excel_file.chunks():
+                destination.write(chunk)
+        destination.close()
+        excel_data = openpyxl.load_workbook(filepath + '/static/upload/' + saledatestart +saledateEnd  + ".xlsx")
+
+    except ValueError:
+        pass
+
 
 def fo(reqest):
     manager=Managers.objects.all()
@@ -470,8 +503,8 @@ def fo(reqest):
 
 def read_diff_info(req):
     data=req.GET
-    for i in data:
-        print i
+
+
     # 获取当前时间
     day_now = time.localtime()
     # 当月第一天日期
